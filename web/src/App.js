@@ -1,3 +1,4 @@
+import EmptyLayout from "./EmptyLayout";
 
 function App() {
   return (

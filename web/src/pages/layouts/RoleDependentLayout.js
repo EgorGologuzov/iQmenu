@@ -1,10 +1,10 @@
 import React from 'react'
 import OwnerLayout from './OwnerLayout'
 import GeneralLayout from './GeneralLayout'
-import { ROLES } from '../../values/roles'
+import { CURRENT_TEST_ROLE, ROLES } from '../../values/roles'
 
 function RoleDependentLayout() {
-  const userRole = ROLES.OWNER.NAME;
+  const userRole = CURRENT_TEST_ROLE;
   if (userRole === ROLES.OWNER.NAME)
     return <OwnerLayout />
   else

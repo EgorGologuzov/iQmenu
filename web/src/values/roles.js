@@ -6,3 +6,5 @@ export const ROLES = Object.freeze({
     NAME: 'owner'
   }),
 })
+
+export const CURRENT_TEST_ROLE = ROLES.GUEST.NAME

@@ -1,14 +1,15 @@
 import React from 'react'
 import OwnerLayout from './OwnerLayout'
 import GeneralLayout from './GeneralLayout'
-import { CURRENT_TEST_ROLE, ROLES } from '../../values/roles'
+import { ROLES } from '../../values/roles'
+import { useSelector } from 'react-redux';
 
 function RoleDependentLayout() {
-  const userRole = CURRENT_TEST_ROLE;
-  if (userRole === ROLES.OWNER.NAME)
-    return <OwnerLayout />
-  else
-    return <GeneralLayout />
+  const userRole = useSelector(state => state.user.role);
+  switch (userRole) {
+    case ROLES.OWNER.NAME: return <OwnerLayout />;
+    default: return <GeneralLayout />;
+  }
 }
 
 export default RoleDependentLayout

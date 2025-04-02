@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux';
-import { setTitle } from '../store/pageSlice';
+import { setTitle } from '../store/slices/pageSlice';
 import { DEFAULT_HEADER_TITLE, DEFAULT_TAB_TITLE } from '../values/strings';
 
 function useTitle(payload, deps) {

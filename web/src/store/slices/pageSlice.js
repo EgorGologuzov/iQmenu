@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { DEFAULT_HEADER_TITLE, DEFAULT_TAB_TITLE } from '../values/strings';
+import { DEFAULT_HEADER_TITLE, DEFAULT_TAB_TITLE } from '../../values/strings';
 
 const pageSlice = createSlice({
   name: "page",
@@ -17,4 +17,4 @@ const pageSlice = createSlice({
 })
 
 export const { setTitle } = pageSlice.actions;
-export default pageSlice.reducer;
+export const pageReducer = pageSlice.reducer;

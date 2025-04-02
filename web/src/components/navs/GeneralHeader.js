@@ -1,14 +1,14 @@
 import React from 'react';
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Logo from '../icons/Logo';
 import { Container, IconButton } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 function GeneralHeader() {
-  const title = "Заголовок страницы"
+  const title = useSelector(state => state.page.headerTitle)
   return (
     <AppBar position="static">
       <Container>
@@ -22,10 +22,10 @@ function GeneralHeader() {
           {title && <Typography variant="subtitle1" component="div" sx={{ ml: 1, display: { xs: 'none', sm: 'block' } }}>
             /
           </Typography>}
-          {title && <Typography variant="subtitle1" noWrap component="h1" sx={{ ml: 1, flexGrow: 1 }}>
+          {title && <Typography variant="subtitle1" noWrap component="h1" sx={{ ml: 1 }}>
             { title }
           </Typography>}
-          <Button color="inherit">Вход</Button>
+          <Button color="inherit" sx={{ ml: "auto" }}>Вход</Button>
         </Toolbar>
       </Container>
     </AppBar>

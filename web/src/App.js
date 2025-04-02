@@ -13,36 +13,40 @@ import Reg from './pages/general/Reg'
 import E404 from "./components/errors/E404";
 import { ThemeProvider } from "@emotion/react";
 import { APP_THEME } from "./values/theme";
+import { Provider } from "react-redux"
+import { APP_STORE } from "./store/store";
 
 function App() {
   return (
-    <ThemeProvider theme={APP_THEME}>
-      <BrowserRouter>
-        <Routes>
+    <Provider store={APP_STORE} >
+      <ThemeProvider theme={APP_THEME}>
+        <BrowserRouter>
+          <Routes>
 
-          <Route path="/" element={<EmptyLayout />} >
-            <Route path="auth" element={<Auth />} />
-            <Route path="reg" element={<Reg />} />
-          </Route>
+            <Route path="/" element={<EmptyLayout />} >
+              <Route path="auth" element={<Auth />} />
+              <Route path="reg" element={<Reg />} />
+            </Route>
 
-          <Route path="/" element={<RoleDependentLayout />} >
-            <Route index element={<Presentation />}/>
-            <Route path=":id" element={<MenuView />} />
-            <Route path=":id/favor" element={<Favorite />} />
-          </Route>
+            <Route path="/" element={<RoleDependentLayout />} >
+              <Route index element={<Presentation />}/>
+              <Route path=":menuId" element={<MenuView />} />
+              <Route path=":menuId/favor" element={<Favorite />} />
+            </Route>
 
-          <Route path="/o" element={<OwnerLayout />} >
-            <Route index element={<Navigate to="menu" replace />}/>
-            <Route path="menu" element={<MenuList />} />
-            <Route path="menu/new" element={<MenuCreate />} />
-            <Route path="menu/:id/edit" element={<MenuEdit />} />
-          </Route>
+            <Route path="/o" element={<OwnerLayout />} >
+              <Route index element={<Navigate to="menu" replace />}/>
+              <Route path="menu" element={<MenuList />} />
+              <Route path="menu/new" element={<MenuCreate />} />
+              <Route path="menu/:menuId/edit" element={<MenuEdit />} />
+            </Route>
 
-          <Route path="*" element={<E404 />} />
+            <Route path="*" element={<E404 />} />
 
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </Provider>
   );
 }
 

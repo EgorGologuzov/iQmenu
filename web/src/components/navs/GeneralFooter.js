@@ -1,19 +1,15 @@
 import React from 'react';
-import { Box, Typography, Container } from '@mui/material';
-import { styled } from '@mui/material/styles';
-
-const FooterWrapper = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  padding: theme.spacing(1, 0),
-  marginTop: 'auto',
-}));
+import { Box, Typography, Container, Link } from '@mui/material';
 
 function GeneralFooter() {
   const currentYear = new Date().getFullYear();
-
   return (
-    <FooterWrapper component="footer">
+    <Box component="footer" sx={{
+      backgroundColor: "primary.main",
+      color: "primary.contrastText",
+      py: 1,
+      mt: "auto",
+    }}>
       <Container>
         <Box
           display="flex"
@@ -21,15 +17,15 @@ function GeneralFooter() {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Typography variant="body1" color="inherit">
-            <b>iQmenu</b> — цифровые меню для ресторанов и кафе
+          <Typography variant="body1" color="inherit" align="center">
+            <Link href="/" variant="body1" color="inherit">iQmenu</Link> — цифровые меню для кафе и ресторанов
           </Typography>
-          <Typography variant="body1" color="inherit">
-            © {currentYear} <b>iQmenu</b>. Все права защищены.
+          <Typography variant="body1" color="inherit" align="center">
+            © {currentYear} iQmenu. Все права защищены.
           </Typography>
         </Box>
       </Container>
-    </FooterWrapper>
+    </Box>
   );
 };
 

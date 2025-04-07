@@ -3,11 +3,12 @@ import AppBar from '@mui/material/AppBar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Logo from '../icons/Logo';
-import { Container, IconButton, Stack } from '@mui/material';
+import { Avatar, Box, Container, IconButton, Stack } from '@mui/material';
 import { useSelector } from 'react-redux';
 
-function GeneralHeader() {
+function OwnerHeader() {
   const title = useSelector(state => state.page.headerTitle);
+  const { name, avatar } = useSelector(state => state.user);
   return (
     <AppBar position="static">
       <Container sx={{ pl: 1, pr: 2 }}>
@@ -26,7 +27,13 @@ function GeneralHeader() {
             {title}
           </Typography>}
 
-          <Button color="inherit">Вход</Button>
+          <Stack direction="row" spacing={1} alignItems="center" justifySelf="right" sx={{ cursor: "pointer" }}>
+            <Typography variant="body1" component="div" noWrap sx={{ display: { xs: 'none', sm: 'block' } }}>
+              {name}
+            </Typography>
+            {avatar && <Avatar alt={name} src={avatar} />}
+            {!avatar && <Avatar sx={{ bgcolor: "secondary.main" }}>{name[0]}</Avatar>}
+          </Stack>
 
         </Stack>
       </Container>
@@ -34,4 +41,4 @@ function GeneralHeader() {
   );
 }
 
-export default GeneralHeader
+export default OwnerHeader

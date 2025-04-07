@@ -43,8 +43,8 @@ id* | int | Идентификатор меню
 owner* | uuid | Идентификатор пользователя-владельца
 isActive* | bool | Меню опубликованно?
 products* | list[product] | Список продуктов
-company_name | str | Название заведения
-menu_name | str | Название меню
+companyName | str | Название заведения
+menuName | str | Название меню
 categories | list[str] | Список категорий (по умолчанию: Основные, Десерты, Напитки)
 image | str | Ссылка на изображение меню
 

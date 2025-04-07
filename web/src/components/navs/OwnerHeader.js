@@ -14,27 +14,25 @@ function OwnerHeader() {
       <Container sx={{ pl: 1, pr: 2 }}>
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
 
-          <Stack direction="row" spacing={1} alignItems="center">
-            <IconButton size="large" edge="start"  sx={{ p: 1 }} href="/">
-              <Logo />
-            </IconButton>
-            <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              iQmenu
-            </Typography>
-            {title && <Typography variant="subtitle1" component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              /
-            </Typography>}
-            {title && <Typography variant="subtitle1" noWrap component="h1">
-              { title }
-            </Typography>}
-          </Stack>
+          <IconButton size="large" edge="start" sx={{ p: 1 }} href="/">
+            <Logo />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: title ? "unset" : 1 }}>
+            iQmenu
+          </Typography>
+          {title && <Typography variant="subtitle1" component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
+            /
+          </Typography>}
+          {title && <Typography variant="subtitle1" noWrap component="h1" sx={{ flexGrow: 1 }}>
+            {title}
+          </Typography>}
 
           <Stack direction="row" spacing={1} alignItems="center" justifySelf="right" sx={{ cursor: "pointer" }}>
             <Typography variant="body1" component="div" noWrap sx={{ display: { xs: 'none', sm: 'block' } }}>
-              { name }
+              {name}
             </Typography>
-            { avatar && <Avatar alt={name} src={avatar} /> }
-            { !avatar && <Avatar sx={{ bgcolor: "secondary.main" }}>{ name[0] }</Avatar> }
+            {avatar && <Avatar alt={name} src={avatar} />}
+            {!avatar && <Avatar sx={{ bgcolor: "secondary.main" }}>{name[0]}</Avatar>}
           </Stack>
 
         </Stack>

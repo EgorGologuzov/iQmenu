@@ -17,10 +17,10 @@ function GeneralFooter() {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Typography variant="body1" color="inherit">
+          <Typography variant="body1" color="inherit" align="center">
             <Link href="/" variant="body1" color="inherit">iQmenu</Link> — цифровые меню для кафе и ресторанов
           </Typography>
-          <Typography variant="body1" color="inherit">
+          <Typography variant="body1" color="inherit" align="center">
             © {currentYear} iQmenu. Все права защищены.
           </Typography>
         </Box>

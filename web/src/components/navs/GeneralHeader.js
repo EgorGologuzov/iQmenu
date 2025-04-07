@@ -13,24 +13,20 @@ function GeneralHeader() {
       <Container sx={{ pl: 1, pr: 2 }}>
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
 
-          <Stack direction="row" spacing={1} alignItems="center">
-            <IconButton size="large" edge="start"  sx={{ p: 1 }} href="/">
-              <Logo />
-            </IconButton>
-            <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              iQmenu
-            </Typography>
-            {title && <Typography variant="subtitle1" component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              /
-            </Typography>}
-            {title && <Typography variant="subtitle1" noWrap component="h1">
-              { title }
-            </Typography>}
-          </Stack>
+          <IconButton size="large" edge="start" sx={{ p: 1 }} href="/">
+            <Logo />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: title ? "unset" : 1 }}>
+            iQmenu
+          </Typography>
+          {title && <Typography variant="subtitle1" component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
+            /
+          </Typography>}
+          {title && <Typography variant="subtitle1" noWrap component="h1" sx={{ flexGrow: 1 }}>
+            {title}
+          </Typography>}
 
-          <Stack direction="row" alignItems="center">
-            <Button color="inherit">Вход</Button>
-          </Stack>
+          <Button color="inherit">Вход</Button>
 
         </Stack>
       </Container>

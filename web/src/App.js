@@ -7,9 +7,9 @@ import MenuCreate from './pages/owner/MenuCreate'
 import MenuEdit from './pages/owner/MenuEdit'
 import Presentation from './pages/general/Presentation'
 import MenuView from './pages/general/MenuView'
-import Favorite from './pages/general/Favorite'
 import Auth from './pages/general/Auth'
 import Reg from './pages/general/Reg'
+import Account from "./pages/owner/Account";
 import E404 from "./components/errors/E404";
 import { ThemeProvider } from "@emotion/react";
 import { APP_THEME } from "./values/theme";
@@ -51,7 +51,6 @@ function AppRouting() {
         <Route path="/" element={<RoleDependentLayout />} >
           <Route index element={<Presentation />} />
           <Route path=":menuId" element={<MenuView />} />
-          <Route path=":menuId/favor" element={<Favorite />} />
         </Route>
 
         <Route path="/o" element={<OwnerLayout />} >
@@ -59,6 +58,7 @@ function AppRouting() {
           <Route path="menu" element={<MenuList />} />
           <Route path="menu/new" element={<MenuCreate />} />
           <Route path="menu/:menuId/edit" element={<MenuEdit />} />
+          <Route path="me" element={<Account />} />
         </Route>
 
         <Route path="*" element={<E404 />} />

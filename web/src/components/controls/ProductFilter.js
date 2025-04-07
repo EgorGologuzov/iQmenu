@@ -14,7 +14,7 @@ const FILTERS_DEFAULT = Object.freeze({
 function ProductFilter({ menu, onFilter }) {
 
   const [selectedOption, setSelectedOption] = useState(OPTIONS.NONE);
-  const [filters, setFilters] = useState(FILTERS_DEFAULT);
+  const [filters, setFilters] = useState({ ...FILTERS_DEFAULT });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleFilterButtonClick = () => {
@@ -35,10 +35,10 @@ function ProductFilter({ menu, onFilter }) {
   }
 
   const handleFiltersReset = () => {
+    setFilters({ ...FILTERS_DEFAULT });
     if (selectedOption == OPTIONS.FILTERS) {
       setSelectedOption(OPTIONS.NONE);
     }
-    setFilters(FILTERS_DEFAULT);
   }
 
   const handleDialogClose = () => {

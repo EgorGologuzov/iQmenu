@@ -13,7 +13,7 @@ function ProductFiltersDialog({ menu, filters, onClose, onApply, onReset, ...oth
   }
 
   const handleResetButtonClick = () => {
-    onApply && onReset();
+    onReset && onReset();
     onClose && onClose();
   }
 

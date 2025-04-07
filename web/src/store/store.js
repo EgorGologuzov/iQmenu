@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { pageReducer } from './slices/pageSlice'
-import { setUserData, userReducer } from './slices/userSlice'
-import { CURRENT_USER_DATA_FOR_TEST } from '../values/roles'
+import { userReducer } from './slices/userSlice'
 
 export const APP_STORE = configureStore({
   reducer: {
@@ -9,6 +8,3 @@ export const APP_STORE = configureStore({
     user: userReducer,
   }
 })
-
-// Для тестирования
-APP_STORE.dispatch(setUserData(CURRENT_USER_DATA_FOR_TEST));

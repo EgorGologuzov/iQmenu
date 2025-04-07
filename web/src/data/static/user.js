@@ -1,6 +1,6 @@
 
 export const USER_SERVICE = {
-  auth(authData){},
-  reg(regData){},
-  update(userData){},
+  async auth(authData){},
+  async reg(regData){},
+  async update(userData){},
 }

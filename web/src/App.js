@@ -17,43 +17,55 @@ import { Provider } from "react-redux"
 import { APP_STORE } from "./store/store";
 import { setUserData } from './store/slices/userSlice'
 import { GUEST_USER_DATA_FOR_TEST, OWNER_USER_DATA_FOR_TEST } from './values/roles'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 // Для тестирования ролей
 const CURRENT_USER = GUEST_USER_DATA_FOR_TEST; // установить данные для тестирования пользователя определенной роли здесь
 APP_STORE.dispatch(setUserData(CURRENT_USER));
 
+// Инициализация React Query
+const QUERY_CLIENT = new QueryClient();
+
 function App() {
   return (
-    <Provider store={APP_STORE} >
-      <ThemeProvider theme={APP_THEME}>
-        <BrowserRouter>
-          <Routes>
-
-            <Route path="/" element={<EmptyLayout />} >
-              <Route path="auth" element={<Auth />} />
-              <Route path="reg" element={<Reg />} />
-            </Route>
-
-            <Route path="/" element={<RoleDependentLayout />} >
-              <Route index element={<Presentation />}/>
-              <Route path=":menuId" element={<MenuView />} />
-              <Route path=":menuId/favor" element={<Favorite />} />
-            </Route>
-
-            <Route path="/o" element={<OwnerLayout />} >
-              <Route index element={<Navigate to="menu" replace />}/>
-              <Route path="menu" element={<MenuList />} />
-              <Route path="menu/new" element={<MenuCreate />} />
-              <Route path="menu/:menuId/edit" element={<MenuEdit />} />
-            </Route>
-
-            <Route path="*" element={<E404 />} />
-
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
-    </Provider>
+    <QueryClientProvider client={QUERY_CLIENT}>
+      <Provider store={APP_STORE} >
+        <ThemeProvider theme={APP_THEME}>
+          <AppRouting />
+        </ThemeProvider>
+      </Provider>
+    </QueryClientProvider>
   );
+}
+
+function AppRouting() {
+  return (
+    <BrowserRouter>
+      <Routes>
+
+        <Route path="/" element={<EmptyLayout />} >
+          <Route path="auth" element={<Auth />} />
+          <Route path="reg" element={<Reg />} />
+        </Route>
+
+        <Route path="/" element={<RoleDependentLayout />} >
+          <Route index element={<Presentation />} />
+          <Route path=":menuId" element={<MenuView />} />
+          <Route path=":menuId/favor" element={<Favorite />} />
+        </Route>
+
+        <Route path="/o" element={<OwnerLayout />} >
+          <Route index element={<Navigate to="menu" replace />} />
+          <Route path="menu" element={<MenuList />} />
+          <Route path="menu/new" element={<MenuCreate />} />
+          <Route path="menu/:menuId/edit" element={<MenuEdit />} />
+        </Route>
+
+        <Route path="*" element={<E404 />} />
+
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App;

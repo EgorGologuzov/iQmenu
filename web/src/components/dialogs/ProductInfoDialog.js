@@ -1,16 +1,3 @@
-// import { Dialog, DialogTitle } from '@mui/material'
-// import React from 'react'
-
-// function ProductInfoDialog({ product, ...otherProps }) {
-//   return (
-//     <Dialog {...otherProps}>
-//       <DialogTitle>{ product.name }</DialogTitle>
-//     </Dialog>
-//   )
-// }
-
-// export default ProductInfoDialog
-
 import React from 'react';
 import {
   Dialog,
@@ -20,7 +7,6 @@ import {
   Chip,
   Divider,
   Box,
-  Avatar,
   Stack,
   IconButton,
   DialogContent,
@@ -34,7 +20,7 @@ const ProductInfoDialog = ({ open, onClose, product }) => {
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
 
       <DialogContent sx={{ p: 0 }}>
-        
+
         <Stack direction="column" spacing={1} sx={{ p: 2 }}>
 
           {/* Изображение продукта */}
@@ -52,7 +38,7 @@ const ProductInfoDialog = ({ open, onClose, product }) => {
             <Chip label="Нет в наличии" color="error" size="small" />
           )}
 
-          {/* Цена и вес */}
+          {/* Цена и кнопка добавить в избранное */}
           <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
             <Typography variant="h6" component="div" color="secondary">
               {product.price}₽

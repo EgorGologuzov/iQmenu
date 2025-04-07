@@ -1,49 +1,62 @@
 import React, { useState } from 'react'
 import useIQmenuApi from "../../hooks/useIQmenuApi"
 import { useParams } from "react-router"
-import { Container, Stack, Grid } from "@mui/material"
+import { Grid, Alert, CircularProgress } from "@mui/material"
 import useTitle from "../../hooks/useTitle"
 import ProductInfoDialog from '../../components/dialogs/ProductInfoDialog'
 import ProductViewCard from '../../components/cards/ProductViewCard'
+import { useQuery } from '@tanstack/react-query'
+import withStackContainerShell from '../../hoc/withStackContainerShell'
 
 function MenuView() {
-  const services = useIQmenuApi();
+  const service = useIQmenuApi();
   const { menuId } = useParams();
-  const menu = services.menu.getById(menuId);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const { data: menu, isLoading, error } = useQuery({
+    queryKey: ["MenuView/getMenuById"],
+    queryFn: () => service.menu.getById(menuId),
+  })
 
   const showProductDialog = (product) => {
     setSelectedProduct(product);
-    setDialogOpen(true);
+    setIsDialogOpen(true);
   }
 
   const hideProductDialog = () => {
     setSelectedProduct(null);
-    setDialogOpen(false);
+    setIsDialogOpen(false);
   }
 
-  useTitle({ general: menu ? [menu.companyName, menu.menuName].join(" / ") : undefined }, [menu.companyName, menu.menuName]);
+  useTitle({ general: menu ? [menu.companyName, menu.menuName].join(" / ") : undefined }, [menu]);
+
+  if (isLoading) {
+    return <CircularProgress />
+  }
+
+  if (error) {
+    return <Alert severity="error">{ error.message }</Alert>
+  }
+
+  if (!menu) {
+    return <Alert severity="info">Меню не найдено...</Alert>
+  }
 
   return (
     <>
-      <Container sx={{ pt: "1rem", pb: "1rem" }}>
-        <Stack direction="column" spacing={3} alignItems="center">
-
-          <Grid container spacing={1}>
-            {menu.products.map((product, _) =>
-              <Grid key={product.name} size={{ xs: 6, sm: 4, md: 3 }}>
-                <ProductViewCard product={product} onClick={() => showProductDialog(product)} />
-              </Grid>
-            )}
+      <Grid container spacing={1}>
+        {menu.products.map((product, _) =>
+          <Grid key={product.name} size={{ xs: 6, sm: 4, md: 3 }}>
+            <ProductViewCard product={product} onClick={() => showProductDialog(product)} />
           </Grid>
+        )}
+      </Grid>
 
-        </Stack>
-      </Container>
-
-      <ProductInfoDialog product={selectedProduct} open={dialogOpen} onClose={hideProductDialog} />
+      <ProductInfoDialog product={selectedProduct} open={isDialogOpen} onClose={hideProductDialog} />
     </>
   )
 }
 
-export default MenuView
+export default withStackContainerShell(MenuView)

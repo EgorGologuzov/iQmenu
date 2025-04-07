@@ -13,11 +13,11 @@ import {
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-const ProductInfoDialog = ({ open, onClose, product }) => {
+function ProductInfoDialog({ product, onClose, ...otherProps }) {
   if (!product) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog {...otherProps} onClose={onClose} maxWidth="sm" fullWidth>
 
       <DialogContent sx={{ p: 0 }}>
 

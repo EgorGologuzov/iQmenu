@@ -13,18 +13,18 @@ import Logo from '../../components/icons/Logo';
 function Auth() {
   return (
     <Stack spacing={2} width={'100%'} maxWidth={'sm'} borderRadius={'10px 10px 5px 5px'} bgcolor={'white'} padding={'10px'} boxShadow={'0 30px 40px rgba(0,0,0,.2)'}>
-      <Stack direction={'row'} justifyContent={'center'} bgcolor="#444444" spacing={2} alignContent={'center'} alignItems={'center'} borderRadius={'10px 10px 0px 0px'}>
-      <Typography variant='h5' align='center' height={'min-content'} color='primary.contrastText'>Авторизация</Typography>
-        <IconButton size="large" edge="start" sx={{ p: 1, bgcolor:"#444444" }} href="/">
+      <Stack bgcolor="#444444" alignContent={'center'} alignItems={'center'} borderRadius={'10px 10px 0px 0px'}>
+      <IconButton size="large" edge="start" sx={{ p: 0, flexDirection:'end', bgcolor:"#444444", marginTop:'5px',boxShadow:'-1px 4px 8px 5px rgb(0 0 0 / 33%);'}} href="/">
           <Logo />
         </IconButton>
+        <Typography variant='h5' paddingBottom={'5px'} sx={{textShadow:'-1px 4px black'}} align='center' color='primary.contrastText'>Авторизация</Typography>
       </Stack>
       <FormControl
       fullWidth
       variant="outlined"
       color='primary'>
         <InputLabel size="small" htmlFor="outlined-adornment-password">
-          Логин
+          Телефон
         </InputLabel>
         <OutlinedInput
           id="outlined-adornment-password"
@@ -54,6 +54,9 @@ function Auth() {
           Submit
         </Button>
       </FormControl>
+      <Button variant='text' sx={{padding:0}} color='secondary' href='/reg'>
+        Зарегистрироваться
+      </Button>
     </Stack>
   )
 }

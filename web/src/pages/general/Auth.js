@@ -29,9 +29,9 @@ function Auth() {
         <OutlinedInput
           id="outlined-adornment-password"
           type='text'
-          name="password"
+          name="Phone"
           size="small"
-          label="Пароль"
+          label="Телефон"
         />
       </FormControl>
       <FormControl

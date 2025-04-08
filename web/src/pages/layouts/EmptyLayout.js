@@ -3,8 +3,7 @@ import { Outlet } from 'react-router'
 
 function EmptyLayout() {
   return (
-    <div>
-      EmptyLayout
+    <div className='empty-layout'>
       <Outlet />
     </div>
   )

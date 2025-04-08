@@ -1,6 +1,6 @@
-import { Box, Card, CardMedia, Chip, IconButton, Stack, Typography } from '@mui/material'
+import { Box, Card, CardMedia, Chip, Stack, Typography } from '@mui/material'
 import React from 'react'
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import ProductFavoriteButton from '../controls/ProductFavoriteButton';
 
 function ProductViewCard({ product, onClick }) {
   return (
@@ -37,9 +37,7 @@ function ProductViewCard({ product, onClick }) {
           <Typography variant="h6" component="div" color="secondary" onClick={onClick} sx={{ cursor: "pointer" }}>
             {product.price}₽
           </Typography>
-          <IconButton aria-label="Добавить в избранное">
-            <FavoriteIcon />
-          </IconButton>
+          <ProductFavoriteButton product={product} />
         </Stack>
 
         <Typography variant="subtitle2" component="div" noWrap onClick={onClick} sx={{ cursor: "pointer" }}>

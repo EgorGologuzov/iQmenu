@@ -1,17 +1,6 @@
 import React from 'react';
-import {
-  Dialog,
-  DialogActions,
-  Typography,
-  Button,
-  Chip,
-  Divider,
-  Box,
-  Stack,
-  IconButton,
-  DialogContent,
-} from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import { Dialog, DialogActions, Typography, Button, Chip, Divider, Box, Stack, DialogContent } from '@mui/material';
+import ProductFavoriteButton from '../controls/ProductFavoriteButton';
 
 function ProductInfoDialog({ product, onClose, ...otherProps }) {
   if (!product) return null;
@@ -43,9 +32,7 @@ function ProductInfoDialog({ product, onClose, ...otherProps }) {
             <Typography variant="h6" component="div" color="secondary">
               {product.price}₽
             </Typography>
-            <IconButton aria-label="Добавить в избранное">
-              <FavoriteIcon />
-            </IconButton>
+            <ProductFavoriteButton product={product} />
           </Stack>
 
           {/* Название */}

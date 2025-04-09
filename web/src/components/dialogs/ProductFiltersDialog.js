@@ -2,39 +2,61 @@ import { Button, Dialog, DialogActions, DialogContent, Divider, List, ListItem, 
 import React, { useEffect, useState } from 'react'
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { useDispatch, useSelector } from 'react-redux';
+import { setFilters } from '../../store/slices/pageSlice';
+import { MENU_FILTERS_DEFAULT } from '../../values/default';
+import { deepCopy } from '../../utils/utils';
 
-function ProductFiltersDialog({ menu, filters, onClose, onApply, onReset, ...otherProps }) {
+function ProductFiltersDialog({ menu, onClose, onApply, onReset, ...otherProps }) {
 
+  const filters = useSelector(state => state.page.filters);
   const [filtersEdit, setFiltersEdit] = useState({ ...filters });
-
+  const dispatch = useDispatch();
+  
   const handleApplyButtonClick = () => {
-    onApply && onApply(filtersEdit);
+    dispatch(setFilters(deepCopy(filtersEdit)));
+    onApply && onApply();
     onClose && onClose();
   }
 
   const handleResetButtonClick = () => {
+    dispatch(setFilters(deepCopy(MENU_FILTERS_DEFAULT)));
+    setFiltersEdit(deepCopy(MENU_FILTERS_DEFAULT));
     onReset && onReset();
     onClose && onClose();
   }
 
-  const handleIsActiveOnlySwitchChange = (event) => setFiltersEdit({ ...filtersEdit, isActiveOnly: event.target.checked });
+  const handleIsActiveOnlySwitchChange = (event) => {
+    const newFilters = deepCopy(filtersEdit);
+    newFilters.isActiveOnly = event.target.checked;
+    setFiltersEdit(newFilters);
+  }
 
   const handleAllCategoriesSwitchChange = (event) => {
     if (event.target.checked) {
-      setFiltersEdit({ ...filtersEdit, category: undefined });
+      const newFilters = deepCopy(filtersEdit);
+      newFilters.categories = [];
+      setFiltersEdit(newFilters);
     }
   }
 
   const handleCategoryButtonClick = (category) => {
-    setFiltersEdit({ ...filtersEdit, category })
+    if (filtersEdit.categories.includes(category)) {
+      const index = filtersEdit.categories.indexOf(category);
+      filtersEdit.categories.splice(index, 1);
+    } else {
+      filtersEdit.categories.push(category);
+    }
+    
+    setFiltersEdit(deepCopy(filtersEdit));
   }
 
   useEffect(() => {
-    setFiltersEdit(filters);
-  }, [filters])
+    setFiltersEdit(deepCopy(filters));
+  }, [JSON.stringify(filters)])
 
   return (
-    <Dialog {...otherProps} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog {...otherProps} onClose={onClose} maxWidth="xs" fullWidth>
 
       <DialogContent sx={{ p: 0 }}>
         <Stack direction="column" spacing={1} sx={{ p: 2 }}>
@@ -44,13 +66,16 @@ function ProductFiltersDialog({ menu, filters, onClose, onApply, onReset, ...oth
             <Switch checked={filtersEdit.isActiveOnly} onChange={handleIsActiveOnlySwitchChange} />
           </Stack>
 
-          {menu.categories && menu.categories.length && (
+          {menu.categories && menu.categories.length != 0 && (
             <>
               <Divider sx={{ my: 2 }} />
 
               <Stack direction="row" justifyContent="space-between" alignItems="center" >
                 <Typography variant="subtitle1" gutterBottom>Все категории:</Typography>
-                <Switch checked={!filtersEdit.category} onChange={handleAllCategoriesSwitchChange} />
+                <Switch
+                  checked={!filtersEdit.categories || filtersEdit.categories.length == 0}
+                  onChange={handleAllCategoriesSwitchChange} 
+                />
               </Stack>
 
               <List>
@@ -58,7 +83,11 @@ function ProductFiltersDialog({ menu, filters, onClose, onApply, onReset, ...oth
                   <ListItem key={category} disablePadding>
                     <ListItemButton onClick={() => handleCategoryButtonClick(category)}>
                       <ListItemIcon>
-                        {filtersEdit.category == category ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+                        { 
+                          filtersEdit.categories && filtersEdit.categories.includes(category) 
+                          ? <CheckBoxIcon /> 
+                          : <CheckBoxOutlineBlankIcon />
+                        }
                       </ListItemIcon>
                       <ListItemText primary={category} />
                     </ListItemButton>

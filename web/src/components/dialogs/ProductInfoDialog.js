@@ -6,7 +6,7 @@ function ProductInfoDialog({ product, onClose, ...otherProps }) {
   if (!product) return null;
 
   return (
-    <Dialog {...otherProps} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog {...otherProps} onClose={onClose} maxWidth="xs" fullWidth>
 
       <DialogContent sx={{ p: 0 }}>
 

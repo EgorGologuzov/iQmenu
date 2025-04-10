@@ -20,7 +20,7 @@ import { GUEST_USER_DATA_FOR_TEST, OWNER_USER_DATA_FOR_TEST } from './values/rol
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 // Для тестирования ролей
-const CURRENT_USER = GUEST_USER_DATA_FOR_TEST; // установить данные для тестирования пользователя определенной роли здесь
+const CURRENT_USER = OWNER_USER_DATA_FOR_TEST; // установить данные для тестирования пользователя определенной роли здесь
 APP_STORE.dispatch(setUserData(CURRENT_USER));
 
 // Инициализация React Query

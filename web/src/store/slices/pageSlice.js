@@ -6,7 +6,10 @@ const pageSlice = createSlice({
   initialState: {
     tabTitle: DEFAULT_TAB_TITLE,
     headerTitle: DEFAULT_HEADER_TITLE,
-    filters: undefined,
+    filters: {},
+    sortBy: [],
+    groupBy: [],
+    data: {},
   },
   reducers: {
     setTitle: (state, action) => {
@@ -16,9 +19,12 @@ const pageSlice = createSlice({
     },
     setFilters: (state, action) => {
       state.filters = action.payload;
-    }
+    },
+    setPageData: (state, action) => {
+      state.data = action.payload;
+    },
   }
 })
 
-export const { setTitle, setFilters } = pageSlice.actions;
+export const { setTitle, setFilters, setPageData } = pageSlice.actions;
 export const pageReducer = pageSlice.reducer;

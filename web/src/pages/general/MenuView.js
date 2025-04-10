@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import useIQmenuApi from "../../hooks/useIQmenuApi"
 import { useParams } from "react-router"
 import { Grid, Alert, CircularProgress, Typography, Divider } from "@mui/material"
@@ -8,10 +8,10 @@ import ProductViewCard from '../../components/cards/ProductViewCard'
 import { useQuery } from '@tanstack/react-query'
 import withStackContainerShell from '../../hoc/withStackContainerShell'
 import ProductFilter from '../../components/controls/ProductFilter'
-import { useDispatch, useSelector } from 'react-redux'
-import { setFilters } from '../../store/slices/pageSlice'
+import { useSelector } from 'react-redux'
 import { MENU_FILTERS_DEFAULT } from '../../values/default'
 import { arraysIntersection, deepCopy } from '../../utils/utils'
+import useFiltersInitialValue from '../../hooks/useFiltersInitialValue'
 
 function MenuView() {
   const service = useIQmenuApi();
@@ -22,7 +22,6 @@ function MenuView() {
 
   const filters = useSelector(state => state.page.filters);
   const favorites = useSelector(state => state.favorite.find(record => record.menuId == menuId));
-  const dispatch = useDispatch();
 
   const { data: menu, isLoading, error } = useQuery({
     queryKey: ["MenuView/getMenuById"],
@@ -93,12 +92,18 @@ function MenuView() {
     setIsDialogOpen(false);
   }
 
-  useTitle({ general: menu ? [menu.companyName, menu.menuName].join(" / ") : undefined }, [menu]);
+  const buildTitle = () => {
+    if (!menu) return undefined;
+    const list = [];
+    if (menu.companyName) list.push(menu.companyName);
+    if (menu.menuName) list.push(menu.menuName);
+    return list.join(" / ");
+  }
 
-  useEffect(() => {
-    dispatch(setFilters(deepCopy(MENU_FILTERS_DEFAULT)));
-    return () => dispatch(setFilters(undefined));
-  }, [])
+  const title = buildTitle();
+  useTitle({ general: title }, [title]);
+
+  useFiltersInitialValue(deepCopy(MENU_FILTERS_DEFAULT));
 
   if (isLoading) {
     return <CircularProgress />

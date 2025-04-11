@@ -8,5 +8,9 @@ export const APP_STORE = configureStore({
     page: pageReducer,
     user: userReducer,
     favorite: favoriteReducer,
-  }
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 })

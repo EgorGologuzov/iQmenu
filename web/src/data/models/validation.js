@@ -34,3 +34,31 @@ export function validateProduct(p) {
 
   return { isValid: !Object.keys(errors).length, errors: errors };
 }
+
+export function validateMenu(m) {
+  if (!m) return;
+
+  const errors = {};
+
+  if (!m.menuName || m.menuName.length < 2 || m.menuName.length > 100) {
+    errors.menuName = "Обязательное поле, длина от 2 до 100 символов";
+  }
+
+  if (!m.companyName || m.companyName.length < 2 || m.companyName.length > 100) {
+    errors.companyName = "Обязательное поле, длина от 2 до 100 символов";
+  }
+
+  if (m.categories && m.categories.length > 30) {
+    errors.categories = "Максимальное кол-во категорий 30";
+  }
+
+  if (!m.products || !m.products.length) {
+    errors.products = "Добавьте минимум 1 продукт";
+  }
+
+  if (m.products && m.products.length > 100) {
+    errors.products = "Максимальное кол-во продуктов 100";
+  }
+
+  return { isValid: !Object.keys(errors).length, errors: errors };
+}

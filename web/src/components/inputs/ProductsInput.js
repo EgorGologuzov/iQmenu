@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   List,
   ListItem,
@@ -32,8 +32,9 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import ImageIcon from '@mui/icons-material/Image';
 import { CSS } from '@dnd-kit/utilities';
 import ProductEditDialog from '../dialogs/ProductsEditDialog';
-import { deepCopy } from '../../utils/utils';
+import { deepCopy, fileToDataUrl } from '../../utils/utils';
 import { PRODUCT_CREATE_TEMPLATE } from '../../values/default';
+import withInputShell from '../../hoc/withInputShell';
 
 const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
   const {
@@ -44,6 +45,20 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
     transition,
     isDragging
   } = useSortable({ id });
+
+  const [imageUrl, setImageUrl] = useState(null);
+
+  const syncImageWithImageUrl = async () => {
+    if (typeof product.image == "string") {
+      setImageUrl(product.image);
+    } else if (product.image instanceof File) {
+      setImageUrl(await fileToDataUrl(product.image));
+    }
+  }
+
+  useEffect(() => {
+    syncImageWithImageUrl();
+  }, [product.image]);
 
   return (
     <ListItem
@@ -74,7 +89,7 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
         <DragIndicatorIcon />
       </IconButton>
       <ListItemAvatar>
-        <Avatar variant="rounded" src={product.image}>
+        <Avatar variant="rounded" src={imageUrl} sx={{ width: 50, height: 50 }}>
           <ImageIcon />
         </Avatar>
       </ListItemAvatar>
@@ -225,4 +240,4 @@ const ProductsInput = ({ products, categories, onChange }) => {
   );
 };
 
-export default ProductsInput;
+export default withInputShell(ProductsInput);

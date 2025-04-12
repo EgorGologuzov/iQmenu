@@ -34,6 +34,11 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
     }
   }
 
+  const handleCancelButtonClick = () => {
+    setEditedProduct(null);
+    onClose && onClose();
+  }
+
   const syncProductAndEditedProduct = () => {
     if (!product) {
       return;
@@ -62,7 +67,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
         <Stack spacing={2} sx={{ pt: 1 }}>
 
           <ImageInput
-            src={editedProduct.image}
+            image={editedProduct.image}
             onChange={file => setEditedProduct({ ...editedProduct, image: file })}
           />
 
@@ -152,7 +157,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Отмена</Button>
+        <Button onClick={handleCancelButtonClick}>Отмена</Button>
         <Button
           onClick={() => onSave && onSave(editedProduct)}
           variant="contained"

@@ -1,38 +1,23 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Button, Typography, Stack, Link } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { fileToDataUrl } from '../../utils/utils';
+import withInputShell from '../../hoc/withInputShell';
 
-function ImageInput({ src, onChange }) {
-  const [preview, setPreview] = useState({ src: src, isDataUrl: false, hasSrc: !!src });
+function ImageInput({ image, onChange }) {
+  const [imageUrl, setImageUrl] = useState(null);
   const [error, setError] = useState(null);
 
   const onDrop = useCallback(async (acceptedFiles) => {
-    const file = acceptedFiles[0];
-    if (!file) return;
-
-    // Создаем превью
     try {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result;
-        const newPreview = { src: dataUrl, isDataUrl: true, hasSrc: !!dataUrl };
-        setPreview(newPreview);
-        setError(null);
-        onChange && onChange(file);
-      };
-      reader.readAsDataURL(file);
+      const file = acceptedFiles[0];
+      onChange && onChange(file);
+      setError(null);
     } catch (er) {
       setError(er);
     }
-  }, [onChange])
-
-  const handleDeleteButtonClick = useCallback(() => {
-    setPreview({ src: null, isDataUrl: false, hasSrc: false });
-    setError(null);
-    onChange && onChange(null);
-    inputRef.current.value = "";
   }, [onChange])
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -52,16 +37,35 @@ function ImageInput({ src, onChange }) {
     inputRef.current = node;
   }
 
+  const handleDeleteButtonClick = useCallback(() => {
+    onChange && onChange(null);
+    setError(null);
+    setImageUrl(null);
+    inputRef.current.value = "";
+  }, [onChange])
+
+  const syncImageWithImageUrl = async () => {
+    if (typeof image == "string") {
+      setImageUrl(image);
+    } else if (image instanceof File) {
+      setImageUrl(await fileToDataUrl(image));
+    }
+  }
+
+  useEffect(() => {
+    syncImageWithImageUrl();
+  }, [image]);
+
   return (
     <Stack direction="column" spacing={2} sx={{ width: '100%' }}>
 
-      {preview && preview.hasSrc && (
+      {imageUrl && (
         <Stack direction="column" position="relative">
           <Box
             component="img"
             sx={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 2 }}
-            src={preview.src}
-            alt="Установленное изобаржение"
+            src={imageUrl}
+            alt={imageUrl}
           />
           <Button
             onClick={handleDeleteButtonClick}
@@ -89,7 +93,7 @@ function ImageInput({ src, onChange }) {
       >
         <input {...inputProps} ref={combinedRef} />
         <CloudUploadIcon />
-        <Typography variant="subtitle1" component="div">
+        <Typography variant="subtitle2" component="div">
           Перетащите изображение сюда или <Link color="secondary" >выберите файл</Link>
         </Typography>
         <Typography variant="caption" component="div" color="text.secondary" gutterBottom>
@@ -99,11 +103,11 @@ function ImageInput({ src, onChange }) {
 
       {error && (
         <Typography color="error">
-          {error}
+          {error.message}
         </Typography>
       )}
     </Stack>
   );
 }
 
-export default ImageInput;
+export default withInputShell(ImageInput);

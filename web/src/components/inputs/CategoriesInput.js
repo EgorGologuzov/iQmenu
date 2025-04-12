@@ -26,6 +26,7 @@ import {
 } from '@dnd-kit/sortable';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { CSS } from '@dnd-kit/utilities';
+import withInputShell from '../../hoc/withInputShell';
 
 const SortableItem = ({ id, category, onDelete }) => {
   const {
@@ -164,4 +165,4 @@ const CategoriesInput = ({ categories, onChange }) => {
   );
 };
 
-export default CategoriesInput;
+export default withInputShell(CategoriesInput);

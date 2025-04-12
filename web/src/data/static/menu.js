@@ -1,6 +1,8 @@
 import MENU_1 from "./json/menu-1.json"
-import { sleep } from "../../utils/utils";
+import { deepCopy, sleep } from "../../utils/utils";
 
+const menus = [MENU_1];
+let idCount = 10;
 
 export const MENU_SERVICE = {
   async getById(id) {
@@ -10,13 +12,22 @@ export const MENU_SERVICE = {
       throw new Error("Тестовая ошибка: id < 1");
     }
 
-    if (id == 1) {
-      return MENU_1;
+    return menus.find(menu => menu.id == id) ?? null;
+  },
+  async create(menuData) {
+    await sleep(1000);
+
+    if (menuData.categories && menuData.categories.length > 5) {
+      throw new Error("Тестовая ошибка: категорий не может быть больше 5");
     }
 
-    return null;
+    const newMenu = deepCopy(menuData);
+    newMenu.id = idCount++;
+    newMenu.qr = "https://assets.turbologo.ru/blog/ru/2020/01/18163037/qr-kod.png";
+    menus.push(newMenu)
+
+    return newMenu;
   },
-  async create(menuData){},
   async update(id, menuData){},
   async delete(id){},
 }

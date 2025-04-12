@@ -75,6 +75,11 @@ function MenuView() {
     )
 
     groups.push({
+      groupName: "Без категории",
+      products: products.filter(product => !product.categories || !product.categories.length),
+    })
+
+    groups.push({
       groupName: "Временно недоступны",
       products: products.filter(product => !product.isActive),
     })
@@ -92,15 +97,7 @@ function MenuView() {
     setIsDialogOpen(false);
   }
 
-  const buildTitle = () => {
-    if (!menu) return undefined;
-    const list = [];
-    if (menu.companyName) list.push(menu.companyName);
-    if (menu.menuName) list.push(menu.menuName);
-    return list.join(" / ");
-  }
-
-  const title = buildTitle();
+  const title = menu ? [menu.companyName, menu.menuName].filter(Boolean).join(" / ") : undefined;
   useTitle({ general: title }, [title]);
 
   useFiltersInitialValue(deepCopy(MENU_FILTERS_DEFAULT));

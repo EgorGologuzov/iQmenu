@@ -27,6 +27,8 @@ import {
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { CSS } from '@dnd-kit/utilities';
 import withInputShell from '../../hoc/withInputShell';
+import { validateCategory } from '../../data/models/validation';
+import { processCategory } from '../../data/models/processing';
 
 const SortableItem = ({ id, category, onDelete }) => {
   const {
@@ -81,16 +83,16 @@ const CategoriesInput = ({ categories, onChange }) => {
   );
 
   const handleAddCategory = () => {
-    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-      const updatedCategories = [...categories, newCategory.trim()];
-      setCategories(updatedCategories);
-      setNewCategory('');
-    }
+    const updatedCategories = [...(categories ?? []), processCategory(newCategory)];
+    setCategories(updatedCategories);
+    setNewCategory('');
   };
 
   const handleDeleteCategory = (id) => {
-    const updatedCategories = categories.filter((_, index) => index !== id);
-    setCategories(updatedCategories);
+    if (categories) {
+      const updatedCategories = categories.filter((_, index) => index !== id);
+      setCategories(updatedCategories);
+    }
   };
 
   const handleDragEnd = (event) => {
@@ -104,6 +106,9 @@ const CategoriesInput = ({ categories, onChange }) => {
     setActiveId(null);
   };
 
+  const { isValid, errors } = validateCategory(newCategory) ?? { isValid: true, errors: {} };
+  const isDublicate = categories && categories.includes(processCategory(newCategory));
+
   return (
     <Stack direction="column" spacing={1}>
       <Stack direction="row" alignItems="start">
@@ -113,13 +118,13 @@ const CategoriesInput = ({ categories, onChange }) => {
           label="Новая категория"
           variant="outlined"
           size="small"
-          error={categories.includes(newCategory)}
-          helperText={categories.includes(newCategory) ? "Такая категория уже есть" : undefined}
+          error={isDublicate || !isValid}
+          helperText={isDublicate ? "Такая категория уже есть" : errors.category}
           fullWidth
         />
         <IconButton
           onClick={handleAddCategory}
-          disabled={!newCategory || categories.includes(newCategory)}
+          disabled={!newCategory || isDublicate || !isValid}
           color="success"
         >
           <AddIcon />
@@ -133,11 +138,11 @@ const CategoriesInput = ({ categories, onChange }) => {
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={categories.map((_, index) => index)}
+          items={categories && categories.map((_, index) => index)}
           strategy={verticalListSortingStrategy}
         >
           <List sx={{ borderWidth: "1px", borderColor: "#c4c4c4", borderStyle: "solid", borderRadius: 2, p: 0 }}>
-            {categories.map((category, index) => (
+            {categories && categories.map((category, index) => (
               <SortableItem
                 key={category}
                 id={index}
@@ -156,7 +161,7 @@ const CategoriesInput = ({ categories, onChange }) => {
         </DragOverlay>
       </DndContext>
 
-      {categories.length === 0 && (
+      {!categories || categories.length === 0 && (
         <Alert severity="info">
           Нет добавленных категорий
         </Alert>

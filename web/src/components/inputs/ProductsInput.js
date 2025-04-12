@@ -29,7 +29,7 @@ import {
   useSortable
 } from '@dnd-kit/sortable';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import ImageIcon from '@mui/icons-material/Image';
+import FastfoodIcon from '@mui/icons-material/Fastfood';
 import { CSS } from '@dnd-kit/utilities';
 import ProductEditDialog from '../dialogs/ProductsEditDialog';
 import { deepCopy, fileToDataUrl } from '../../utils/utils';
@@ -65,14 +65,9 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
       ref={setNodeRef}
       {...attributes}
       secondaryAction={
-        <>
-          <IconButton edge="end" onClick={() => onEdit(product)} sx={{ mr: 1 }}>
-            <EditIcon />
-          </IconButton>
-          <IconButton edge="end" onClick={() => onDelete(product.id)}>
-            <DeleteIcon />
-          </IconButton>
-        </>
+        <IconButton edge="end" onClick={() => onDelete(product.id)}>
+          <DeleteIcon />
+        </IconButton>
       }
       sx={{
         transform: CSS.Transform.toString(transform),
@@ -81,7 +76,6 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
         borderBottomColor: "divider",
         borderBottomWidth: "1px",
         borderBottomStyle: "solid",
-        pr: 12,
         pl: 0
       }}
     >
@@ -90,7 +84,7 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
       </IconButton>
       <ListItemAvatar>
         <Avatar variant="rounded" src={imageUrl} sx={{ width: 50, height: 50 }}>
-          <ImageIcon />
+          <FastfoodIcon />
         </Avatar>
       </ListItemAvatar>
       <ListItemText
@@ -100,7 +94,10 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
               label={product.isActive ? "Есть" : "Нет"}
               size="small"
               color={product.isActive ? "success" : "error"}
-              onClick={() => onToggleActive(product.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleActive(product.id);
+              }}
               sx={{ cursor: 'pointer' }}
             />
             <Typography noWrap>{product.name}</Typography>
@@ -108,9 +105,10 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
         }
         secondary={
           <Typography color="text.secondary" noWrap sx={{ fontSize: 12 }} >
-            {[product.price + ' ₽', ...product.categories].filter(Boolean).join(', ')}
+            {[product.price + ' ₽', ...(product.categories ?? [])].filter(Boolean).join(', ')}
           </Typography>
         }
+        onClick={(e) => onEdit && onEdit(product)}
       />
     </ListItem>
   );

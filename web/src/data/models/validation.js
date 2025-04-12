@@ -1,3 +1,4 @@
+import { processCategory, processMenu, processProduct } from "./processing";
 
 // const validationResultTemplate = {
 //   isValid: false,
@@ -11,8 +12,9 @@ export function validateProduct(p) {
   if (!p) return;
 
   const errors = {};
+  p = processProduct(p);
 
-  if (!p.name || p.name.legth < 2 || p.name.length > 100) {
+  if (!p.name || p.name.length < 2 || p.name.length > 100) {
     errors.name = "Обязательное поле, длина от 2 до 100 символов";
   }
 
@@ -39,6 +41,7 @@ export function validateMenu(m) {
   if (!m) return;
 
   const errors = {};
+  m = processMenu(m);
 
   if (!m.menuName || m.menuName.length < 2 || m.menuName.length > 100) {
     errors.menuName = "Обязательное поле, длина от 2 до 100 символов";
@@ -58,6 +61,19 @@ export function validateMenu(m) {
 
   if (m.products && m.products.length > 100) {
     errors.products = "Максимальное кол-во продуктов 100";
+  }
+
+  return { isValid: !Object.keys(errors).length, errors: errors };
+}
+
+export function validateCategory(c) {
+  if (!c) return;
+
+  const errors = {};
+  c = processCategory(c);
+
+  if (c.length > 30 || c.length == 0) {
+    errors.category = "Длина должна быть от 1 до 30 символов";
   }
 
   return { isValid: !Object.keys(errors).length, errors: errors };

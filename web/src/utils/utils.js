@@ -22,3 +22,7 @@ export function fileToDataUrl(file) {
     reader.readAsDataURL(file);
   });
 }
+
+export function asInSentense(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

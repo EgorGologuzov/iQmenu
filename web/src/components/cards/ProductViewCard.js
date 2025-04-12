@@ -1,6 +1,7 @@
-import { Box, Card, CardMedia, Chip, Stack, Typography } from '@mui/material'
+import { Avatar, Box, Card, CardMedia, Chip, Stack, Typography } from '@mui/material'
 import React from 'react'
 import ProductFavoriteButton from '../controls/ProductFavoriteButton';
+import FastfoodIcon from '@mui/icons-material/Fastfood';
 
 function ProductViewCard({ product, onClick }) {
   return (
@@ -19,14 +20,16 @@ function ProductViewCard({ product, onClick }) {
         )}
 
         {/* Картинка */}
-        <CardMedia
-          component="img"
-          height="200"
-          image={product.image}
-          alt={product.name}
-          onClick={onClick}
-          sx={{ cursor: "pointer" }}
-        />
+        <Box sx={{ width: "100%", aspectRatio: "1 / 1" }}>
+          <Avatar
+            variant="square"
+            src={product.image}
+            onClick={onClick}
+            sx={{ cursor: "pointer", width: "100%", height: "100%" }}
+          >
+            <FastfoodIcon sx={{ width: 80, height: 80 }} />
+          </Avatar>
+        </Box>
 
       </Box>
 

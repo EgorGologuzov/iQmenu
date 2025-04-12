@@ -101,8 +101,8 @@ function ProductFiltersDialog({ menu, onClose, onApply, onReset, ...otherProps }
       </DialogContent>
 
       <DialogActions>
-        <Button variant="outlined" sx={{ flexGrow: 1 }} onClick={handleResetButtonClick}>Сбросить</Button>
-        <Button variant="contained" sx={{ flexGrow: 1 }} onClick={handleApplyButtonClick}>Применить</Button>
+        <Button variant="text" onClick={handleResetButtonClick}>Сбросить</Button>
+        <Button variant="contained" onClick={handleApplyButtonClick}>Применить</Button>
       </DialogActions>
 
     </Dialog>

@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { deepCopy } from '../../utils/utils'
 import { MENU_CREATE_TEMPLATE } from '../../values/default'
 import { useDispatch, useSelector } from 'react-redux';
 import usePageDataInitialValue from '../../hooks/usePageDataInitialValue'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
-import { Alert, Box, Button, CircularProgress, Divider, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, CircularProgress, Divider, Stack, TextField, Typography } from '@mui/material';
 import { setPageData } from '../../store/slices/pageSlice';
 import useTitle from '../../hooks/useTitle';
 import ImageInput from '../../components/inputs/ImageInput';
@@ -15,6 +15,7 @@ import useIQmenuApi from '../../hooks/useIQmenuApi';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { validateMenu } from '../../data/models/validation';
+import { processMenu } from '../../data/models/processing';
 
 function MenuCreate() {
 
@@ -62,6 +63,7 @@ function MenuCreate() {
         onChange={(event) => setMenuAttrs({ companyName: event.target.value })}
         error={errors.companyName}
         helperText={errors.companyName}
+        size="small"
       />
 
       <TextField
@@ -72,6 +74,7 @@ function MenuCreate() {
         onChange={(event) => setMenuAttrs({ menuName: event.target.value })}
         error={errors.menuName}
         helperText={errors.menuName}
+        size="small"
       />
 
       <ImageInput
@@ -123,7 +126,7 @@ function MenuCreate() {
 
       <Button
         variant="contained"
-        onClick={() => createMenu(menu)}
+        onClick={() => createMenu(processMenu(menu))}
         loading={isMutationPending}
         loadingPosition="center"
         disabled={isMutationPending || !isValid}

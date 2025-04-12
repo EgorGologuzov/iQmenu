@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   TextField,
   Stack,
@@ -14,6 +14,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { validateProduct } from '../../data/models/validation';
 import ImageInput from '../inputs/ImageInput';
+import { processProduct } from '../../data/models/processing';
 
 const ProductEditDialog = ({ open, onClose, product, products, categories, onSave }) => {
   const [editedProduct, setEditedProduct] = useState(product);
@@ -27,10 +28,10 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
   };
 
   const handleCategoryChipClick = (category) => {
-    if (editedProduct.categories.includes(category)) {
+    if (includesCategory(category)) {
       setEditedProduct({ ...editedProduct, categories: editedProduct.categories.filter(c => c != category) })
     } else {
-      setEditedProduct({ ...editedProduct, categories: [...editedProduct.categories, category] })
+      setEditedProduct({ ...editedProduct, categories: [...(editedProduct.categories ?? []), category] })
     }
   }
 
@@ -50,6 +51,10 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
     else if (editedProduct.id != product.id) {
       setEditedProduct({ ...product });
     }
+  }
+
+  const includesCategory = (category) => {
+    return editedProduct.categories && editedProduct.categories.includes(category)
   }
 
   useEffect(() => {
@@ -88,6 +93,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             margin="normal"
             error={isProductNameDublicate || errors.name}
             helperText={isProductNameDublicate ? "Продукт с таким названием уже существует" : errors.name}
+            size="small"
           />
 
           <TextField
@@ -101,15 +107,16 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             margin="normal"
             error={errors.price}
             helperText={errors.price}
+            size="small"
           />
 
           <Box sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", gap: 1 }}>
-            {categories.map(category => (
+            {categories && categories.map(category => (
               <Chip
                 key={category}
                 label={category}
-                icon={editedProduct.categories.includes(category) ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
-                color={editedProduct.categories.includes(category) ? "primary" : "default"}
+                icon={includesCategory(category) ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
+                color={includesCategory(category) ? "primary" : "default"}
                 onClick={() => handleCategoryChipClick(category)}
                 sx={{ cursor: 'pointer' }}
               />
@@ -159,7 +166,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
       <DialogActions>
         <Button onClick={handleCancelButtonClick}>Отмена</Button>
         <Button
-          onClick={() => onSave && onSave(editedProduct)}
+          onClick={() => onSave && onSave(processProduct(editedProduct))}
           variant="contained"
           disabled={isProductNameDublicate || !isValid}
         >

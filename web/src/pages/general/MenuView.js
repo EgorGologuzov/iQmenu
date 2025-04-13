@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useState } from 'react'
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import useIQmenuApi from "../../hooks/useIQmenuApi"
 import { useParams } from "react-router"
 import { Grid, Alert, CircularProgress, Typography, Divider } from "@mui/material"
@@ -46,6 +46,7 @@ function MenuView() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [filters, setFilters] = useState(deepCopy(MENU_FILTERS_DEFAULT));
+  const [isPrerender, setIsPrerender] = useState(true);
 
   const favorites = useSelector(state => state.favorite.find(record => record.menuId == menuId));
 
@@ -136,6 +137,15 @@ function MenuView() {
     setIsDialogOpen(true);
   }, [])
 
+  const handleFiltersChange = useCallback((filters) => {
+    setFilters(filters);
+    setIsPrerender(true);
+  }, [])
+
+  useEffect(() => {
+    if (isPrerender) setTimeout(() => setIsPrerender(false), 500);
+  });
+
   if (isLoading) {
     return <CircularProgress />
   }
@@ -153,17 +163,21 @@ function MenuView() {
       <ProductFilter
         filters={filters}
         categories={menu.categories}
-        onChange={(filters) => setFilters(filters)}
+        onChange={handleFiltersChange}
       />
 
       {(!displayGroups || !displayGroups.length) &&
         <Alert severity="info">Ни один продукт не прошел фильтры... Попробуйет сбросить их!</Alert>
       }
 
-      <CardGrid
-        displayGroups={displayGroups}
-        onCardClick={showProductDialog}
-      />
+      {isPrerender && <CircularProgress />}
+
+      {!isPrerender &&
+        <CardGrid
+          displayGroups={displayGroups}
+          onCardClick={showProductDialog}
+        />
+      }
 
       <ProductInfoDialog product={selectedProduct} open={isDialogOpen} onClose={hideProductDialog} />
     </>

@@ -1,5 +1,5 @@
 {
-  "id": 1,
+  "id": 2,
   "owner": "123e4567-e89b-12d3-a456-426614174000",
   "isActive": true,
   "products": [
@@ -10,8 +10,7 @@
       "categories": ["Основные"],
       "weight": 280,
       "description": "Классический салат с листьями айсберга, куриной грудкой и соусом Цезарь",
-      "composition": "Курица, айсберг, помидоры черри, пармезан, сухарики",
-      "image": "https://menunedeli.ru/wp-content/uploads/2022/07/41322293-5B97-451F-886E-2522AB91F67B-886x700.jpeg"
+      "composition": "Курица, айсберг, помидоры черри, пармезан, сухарики"
     },
     {
       "name": "Тирамису",
@@ -20,7 +19,7 @@
       "categories": ["Десерты"],
       "weight": 150,
       "description": "Итальянский десерт с маскарпоне и кофейной пропиткой",
-      "image": "https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
+      "image": "--https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
     },
     {
       "name": "Латте",
@@ -60,16 +59,14 @@
       "price": 240,
       "isActive": true,
       "categories": ["Основные"],
-      "weight": 200,
-      "image": "https://eda.ru/images/RecipePhoto/390x390/krem-sup-iz-shampinonov-s-timyanom-i-soevym-sousom_125761_photo_149129.jpg"
-    },
+      "weight": 200    },
     {
       "name": "Мохито",
       "price": 320,
       "isActive": true,
       "categories": ["Напитки", "Алкоголь"],
       "composition": "Ром, лайм, мята, содовая",
-      "image": "https://ist.say7.info/img0007/11/711_01303xh_3913_1024.jpg"
+      "image": "--https://ist.say7.info/img0007/11/711_01303xh_3913_1024.jpg"
     },
     {
       "name": "Чизкейк Нью-Йорк",
@@ -107,8 +104,7 @@
       "price": 210,
       "isActive": true,
       "categories": ["Закуски"],
-      "composition": "Авокадо, лайм, кинза, чили",
-      "image": "https://receptoriy.ru/upload/Guacamole.jpg"
+      "composition": "Авокадо, лайм, кинза, чили"
     },
     {
       "name": "Шоколадный фондан",
@@ -116,7 +112,7 @@
       "isActive": false,
       "categories": ["Десерты"],
       "description": "Тёплый шоколадный кекс с жидкой сердцевиной",
-      "image": "https://eda.ru/images/RecipePhoto/390x390/shokoladnij-fondan_49755_photo_53437.jpg"
+      "image": "--https://eda.ru/images/RecipePhoto/390x390/shokoladnij-fondan_49755_photo_53437.jpg"
     },
     {
       "name": "Эспрессо",

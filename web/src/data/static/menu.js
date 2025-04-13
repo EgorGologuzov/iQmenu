@@ -1,7 +1,9 @@
 import MENU_1 from "./json/menu-1.json"
+import MENU_2 from "./json/menu-2.json"
+import MENU_3 from "./json/menu-3.json"
 import { deepCopy, sleep } from "../../utils/utils";
 
-const menus = [MENU_1];
+const menus = [MENU_1, MENU_2, MENU_3];
 let idCount = 10;
 
 export const MENU_SERVICE = {

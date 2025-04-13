@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { memo, useCallback, useMemo, useState } from 'react'
 import useIQmenuApi from "../../hooks/useIQmenuApi"
 import { useParams } from "react-router"
 import { Grid, Alert, CircularProgress, Typography, Divider } from "@mui/material"
@@ -11,21 +11,47 @@ import ProductFilter from '../../components/controls/ProductFilter'
 import { useSelector } from 'react-redux'
 import { MENU_FILTERS_DEFAULT } from '../../values/default'
 import { arraysIntersection, deepCopy } from '../../utils/utils'
-import useFiltersInitialValue from '../../hooks/useFiltersInitialValue'
+
+const CardGrid = memo(({ displayGroups, onCardClick }) => {
+  return (
+    <>
+      {displayGroups && displayGroups.length != 0 &&
+        <Grid container spacing={1} sx={{ width: "100%" }}>
+          {displayGroups.map(group =>
+            <React.Fragment key={group.groupName}>
+              <Grid size={{ xs: 12 }}>
+                <Divider />
+                <Typography component="h6" variant="h6" textAlign="center" sx={{ my: 1 }}>
+                  {group.groupName}
+                </Typography>
+                <Divider />
+              </Grid>
+              {group.products.map((product, _) =>
+                <Grid key={product.name} size={{ xs: 6, sm: 4, md: 3 }}>
+                  <ProductViewCard product={product} onClick={onCardClick} />
+                </Grid>
+              )}
+            </React.Fragment>
+          )}
+        </Grid>
+      }
+    </>
+  )
+})
 
 function MenuView() {
-  const service = useIQmenuApi();
+  const api = useIQmenuApi();
   const { menuId } = useParams();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [filters, setFilters] = useState(deepCopy(MENU_FILTERS_DEFAULT));
 
-  const filters = useSelector(state => state.page.filters);
   const favorites = useSelector(state => state.favorite.find(record => record.menuId == menuId));
 
   const { data: menu, isLoading, error } = useQuery({
     queryKey: ["MenuView/getMenuById"],
-    queryFn: () => service.menu.getById(menuId),
+    queryFn: () => api.menu.getById(menuId),
   })
 
   const filterProducts = (products) => {
@@ -87,11 +113,6 @@ function MenuView() {
     return groups.filter(group => group.products && group.products.length);
   }
 
-  const showProductDialog = (product) => {
-    setSelectedProduct(product);
-    setIsDialogOpen(true);
-  }
-
   const hideProductDialog = () => {
     setSelectedProduct(null);
     setIsDialogOpen(false);
@@ -100,7 +121,20 @@ function MenuView() {
   const title = menu ? [menu.companyName, menu.menuName].filter(Boolean).join(" / ") : undefined;
   useTitle({ general: title }, [title]);
 
-  useFiltersInitialValue(deepCopy(MENU_FILTERS_DEFAULT));
+  const displayProducts = useMemo(
+    () => menu?.products ? filterProducts(menu.products) : undefined,
+    [filters, menu?.products]
+  );
+
+  const displayGroups = useMemo(
+    () => displayProducts ? groupProducts(displayProducts) : undefined,
+    [displayProducts]
+  );
+
+  const showProductDialog = useCallback((product) => {
+    setSelectedProduct(product);
+    setIsDialogOpen(true);
+  }, [])
 
   if (isLoading) {
     return <CircularProgress />
@@ -114,37 +148,22 @@ function MenuView() {
     return <Alert severity="info">Меню не найдено...</Alert>
   }
 
-  const displayProducts = filterProducts(menu.products);
-  const displayGroups = groupProducts(displayProducts);
-
   return (
     <>
-      <ProductFilter menu={menu} />
+      <ProductFilter
+        filters={filters}
+        categories={menu.categories}
+        onChange={(filters) => setFilters(filters)}
+      />
 
       {(!displayGroups || !displayGroups.length) &&
         <Alert severity="info">Ни один продукт не прошел фильтры... Попробуйет сбросить их!</Alert>
       }
 
-      {displayGroups && displayGroups.length != 0 &&
-        <Grid container spacing={1} sx={{ width: "100%" }}>
-          {displayGroups.map(group =>
-            <React.Fragment key={group.groupName}>
-              <Grid size={{ xs: 12 }}>
-                <Divider />
-                <Typography component="h6" variant="h6" textAlign="center" sx={{ my: 1 }}>
-                  { group.groupName }
-                </Typography>
-                <Divider />
-              </Grid>
-              {group.products.map((product, _) =>
-                <Grid key={product.name} size={{ xs: 6, sm: 4, md: 3 }}>
-                  <ProductViewCard product={product} onClick={() => showProductDialog(product)} />
-                </Grid>
-              )}
-            </React.Fragment>
-          )}
-        </Grid>
-      }
+      <CardGrid
+        displayGroups={displayGroups}
+        onCardClick={showProductDialog}
+      />
 
       <ProductInfoDialog product={selectedProduct} open={isDialogOpen} onClose={hideProductDialog} />
     </>

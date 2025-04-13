@@ -3,41 +3,31 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Button, ButtonGroup } from '@mui/material';
 import ProductFiltersDialog from '../dialogs/ProductFiltersDialog';
-import { useDispatch, useSelector } from 'react-redux';
-import { setFilters } from '../../store/slices/pageSlice';
 import { deepCopy } from '../../utils/utils';
+import { MENU_FILTERS_DEFAULT } from '../../values/default';
 
-function ProductFilter({ menu }) {
+function ProductFilter({ filters, categories, onChange }) {
 
-  const filters = useSelector(state => state.page.filters);
-  const dispatch = useDispatch();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [filtersApplied, setFiltersApplied] = useState(false);
+  const [isFiltersApplied, setIsFiltersApplied] = useState(false);
 
-  const handleFilterButtonClick = () => {
-    setIsDialogOpen(true);
+  const dialogFilters = { 
+    isActiveOnly: filters.isActiveOnly,
+    categories: filters.categories,
+  };
+
+  const changeFiltersAttrs = (newAttrs) => {
+    onChange && onChange({ ...filters, ...newAttrs });
   }
 
-  const setFavoritesOnly = (favoritesOnly) => {
-    const newFilters = deepCopy(filters);
-    newFilters.favoritesOnly = favoritesOnly;
-    dispatch(setFilters(newFilters));
+  const handleOnApply = (dialogFilters) => {
+    changeFiltersAttrs(dialogFilters);
+    setIsFiltersApplied(true);
   }
 
-  const handleFavoriteButtonClick = () => {
-    setFavoritesOnly(!filters.favoritesOnly);
-  }
-
-  const handleFiltersApply = () => {
-    setFiltersApplied(true);
-  }
-
-  const handleFiltersReset = () => {
-    setFiltersApplied(false);
-  }
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
+  const handleOnReset = () => {
+    changeFiltersAttrs(deepCopy(MENU_FILTERS_DEFAULT));
+    setIsFiltersApplied(false);
   }
 
   return (
@@ -45,9 +35,9 @@ function ProductFilter({ menu }) {
       <ButtonGroup sx={{ width: "100%" }}>
         <Button
           startIcon={<FilterListIcon />}
-          variant={ filtersApplied ? "contained" : "outlined" }
+          variant={ isFiltersApplied ? "contained" : "outlined" }
           sx={{ flexGrow: 1 }}
-          onClick={handleFilterButtonClick}
+          onClick={() => setIsDialogOpen(true)}
         >
           Фильтры
         </Button>
@@ -56,18 +46,19 @@ function ProductFilter({ menu }) {
           variant={ filters.favoritesOnly ? "contained" : "outlined" }
           color="error"
           sx={{ flexGrow: 1 }}
-          onClick={handleFavoriteButtonClick}
+          onClick={() => changeFiltersAttrs({ favoritesOnly: !filters.favoritesOnly })}
         >
           Избранное
         </Button>
       </ButtonGroup>
 
       <ProductFiltersDialog
-        menu={menu}
+        filters={dialogFilters}
+        categories={categories}
         open={isDialogOpen}
-        onClose={handleDialogClose}
-        onApply={handleFiltersApply}
-        onReset={handleFiltersReset}
+        onClose={() => setIsDialogOpen(false)}
+        onApply={handleOnApply}
+        onReset={handleOnReset}
       />
     </>
   )

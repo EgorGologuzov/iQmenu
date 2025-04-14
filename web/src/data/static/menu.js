@@ -7,6 +7,7 @@ const menus = [MENU_1, MENU_2, MENU_3];
 let idCount = 10;
 
 export const MENU_SERVICE = {
+
   async getById(id) {
     await sleep(1000);
 
@@ -16,6 +17,7 @@ export const MENU_SERVICE = {
 
     return menus.find(menu => menu.id == id) ?? null;
   },
+
   async create(menuData) {
     await sleep(1000);
 
@@ -30,6 +32,8 @@ export const MENU_SERVICE = {
 
     return newMenu;
   },
+  
   async update(id, menuData){},
   async delete(id){},
+  async getUsersMenus(userId){},
 }

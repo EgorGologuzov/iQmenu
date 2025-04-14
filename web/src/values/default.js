@@ -1,3 +1,14 @@
+import { ROLES } from './roles';
+
+export const GUEST_DATA_DEFAULT = Object.freeze({
+  role: ROLES.GUEST.NAME,
+  apiAccessToken: undefined,
+  id: undefined,
+  phone: undefined,
+  email: undefined,
+  name: undefined,
+  avatar: undefined, 
+})
 
 export const MENU_FILTERS_DEFAULT = Object.freeze({
   favoritesOnly: false,

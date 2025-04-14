@@ -29,10 +29,10 @@ function MenuCreate() {
     onSuccess: (createdMenu) => navigate(`/o/menu/${createdMenu.id}/edit`, { replace: true })
   });
 
-  const buildedMenu = { ...menu, image: image, categories: categories, products: products };
+  const buildedMenu = processMenu({ ...menu, image: image, categories: categories, products: products });
 
   const handleCreateButtonClick = () => {
-    createMenu(processMenu(buildedMenu));
+    createMenu(buildedMenu);
   }
 
   const { isValid, errors } = validateMenu(buildedMenu);
@@ -73,7 +73,7 @@ function MenuCreate() {
 
       <ImageInput
         image={image}
-        onChange={useCallback(file => setImage(file), [])}
+        onChange={setImage}
         label="Главное изображение меню"
         error={errors.image}
         helperText={errors.image}
@@ -81,7 +81,7 @@ function MenuCreate() {
 
       <CategoriesInput
         categories={categories}
-        onChange={useCallback(categories => setCategories(categories), [])}
+        onChange={setCategories}
         label="Категории"
         error={errors.categories}
         helperText={errors.categories}
@@ -90,7 +90,7 @@ function MenuCreate() {
       <ProductsInput
         products={products}
         categories={categories}
-        onChange={useCallback(products => setProducts(products), [])}
+        onChange={setProducts}
         label="Продукты"
         error={errors.products}
         helperText={errors.products}

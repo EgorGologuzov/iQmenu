@@ -105,7 +105,7 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
         spacing={1}
         justifyContent="flex-start"
         alignItems="center"
-        sx={{ width: "100%" }}
+        sx={{ flexGrow: 1, minWidth: 0, width: "100%" }}
       >
         <SortableItemStartMemo imageUrl={imageUrl} {...listeners} />
 
@@ -114,13 +114,13 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
           spacing={1}
           justifyContent="center"
           onClick={() => onEdit && onEdit(product)}
-          sx={{ cursor: 'pointer', width: "100%" }}
+          sx={{ cursor: 'pointer', flexGrow: 1, minWidth: 0, width: "100%"}}
         >
           <Stack
             direction="row"
             alignItems="center"
             spacing={1}
-            sx={{ mb: 1 }}
+            sx={{ mb: 1, flexGrow: 1, minWidth: 0, width: "100%" }}
           >
             <Chip
               label={product.isActive ? "Есть" : "Нет"}
@@ -131,10 +131,10 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
                 onToggleActive(product.id);
               }}
             />
-            <Typography noWrap>{product.name}</Typography>
+            <Typography noWrap sx={{ flexGrow: 1, minWidth: 0 }} >{product.name}</Typography>
           </Stack>
 
-          <Typography color="text.secondary" noWrap sx={{ fontSize: 12 }} >
+          <Typography color="text.secondary" noWrap sx={{ fontSize: 12, minWidth: 0, width: "100%" }} >
             {[product.price + ' ₽', ...(product.categories ?? [])].filter(Boolean).join(', ')}
           </Typography>
 

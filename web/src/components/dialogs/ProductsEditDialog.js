@@ -16,7 +16,7 @@ import { validateProduct } from '../../data/models/validation';
 import ImageInput from '../inputs/ImageInput';
 import { processProduct } from '../../data/models/processing';
 
-const CategoriesList = ({ productCategories, categories, onChange }) => {
+const CategoriesList = memo(({ productCategories, categories, onChange }) => {
 
   const handleCategoryChipClick = (category) => {
     if (includesCategory(category)) {
@@ -44,10 +44,11 @@ const CategoriesList = ({ productCategories, categories, onChange }) => {
       ))}
     </Box>
   )
-}
+})
 
 const ProductEditDialog = ({ open, onClose, product, products, categories, onSave }) => {
   const [editedProduct, setEditedProduct] = useState(product);
+  const [editedProductCategories, setEditedProductCategories] = useState(editedProduct?.categories);
 
   const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
@@ -63,15 +64,11 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
   }
 
   const syncProductAndEditedProduct = () => {
-    if (!product) {
-      return;
-    }
-    else if (!editedProduct) {
-      setEditedProduct({ ...product });
-      return;
-    }
-    else if (editedProduct.id != product.id) {
-      setEditedProduct({ ...product });
+    if (!product) return;
+
+    if (!editedProduct || editedProduct.id != product.id) {
+      setEditedProduct(product);
+      setEditedProductCategories(product.categories);
     }
   }
 
@@ -81,8 +78,11 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
 
   if (!editedProduct) return;
 
-  const isProductNameDublicate = products.some(p => p.name === processProduct(editedProduct).name && p.id != editedProduct.id);
-  const { isValid, errors } = validateProduct(editedProduct);
+  const buildedProduct = processProduct({ ...editedProduct, categories: editedProductCategories });
+  const { isValid, errors } = validateProduct(buildedProduct);
+  const isProductNameDublicate = products.some(p => 
+    p.name === buildedProduct.name && p.id != buildedProduct.id
+  );
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
@@ -129,9 +129,9 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
           />
 
           <CategoriesList
-            productCategories={editedProduct.categories}
+            productCategories={editedProductCategories}
             categories={categories}
-            onChange={(productCategories) => setEditedProduct({ ...editedProduct, categories: productCategories })}
+            onChange={setEditedProductCategories}
           />
 
           <TextField
@@ -180,7 +180,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
       <DialogActions>
         <Button onClick={handleCancelButtonClick}>Отмена</Button>
         <Button
-          onClick={() => onSave && onSave(processProduct(editedProduct))}
+          onClick={() => onSave && onSave(buildedProduct)}
           variant="contained"
           disabled={isProductNameDublicate || !isValid}
         >

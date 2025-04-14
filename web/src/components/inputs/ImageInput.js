@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Button, Typography, Stack, Link } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -45,10 +45,18 @@ function ImageInput({ image, onChange }) {
   }, [onChange])
 
   const syncImageWithImageUrl = async () => {
+    if (!image) return;
+
     if (typeof image == "string") {
       setImageUrl(image);
-    } else if (image instanceof File) {
-      setImageUrl(await fileToDataUrl(image));
+    }
+    
+    if (image instanceof File) {
+      try {
+        setImageUrl(await fileToDataUrl(image));
+      } catch (er) {
+        console.error("Не удалось установить изображение продукта:", er);
+      }
     }
   }
 
@@ -110,4 +118,4 @@ function ImageInput({ image, onChange }) {
   );
 }
 
-export default withInputShell(ImageInput);
+export default withInputShell(memo(ImageInput));

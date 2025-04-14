@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import {
   TextField,
   Stack,
@@ -16,24 +16,46 @@ import { validateProduct } from '../../data/models/validation';
 import ImageInput from '../inputs/ImageInput';
 import { processProduct } from '../../data/models/processing';
 
+const CategoriesList = ({ productCategories, categories, onChange }) => {
+
+  const handleCategoryChipClick = (category) => {
+    if (includesCategory(category)) {
+      onChange(productCategories.filter(c => c != category))
+    } else {
+      onChange([...(productCategories ?? []), category])
+    }
+  }
+
+  const includesCategory = (category) => {
+    return productCategories && productCategories.includes(category)
+  }
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", gap: 1 }}>
+      {categories && categories.map(category => (
+        <Chip
+          key={category}
+          label={category}
+          icon={includesCategory(category) ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
+          color={includesCategory(category) ? "primary" : "default"}
+          onClick={() => handleCategoryChipClick(category)}
+          sx={{ cursor: 'pointer' }}
+        />
+      ))}
+    </Box>
+  )
+}
+
 const ProductEditDialog = ({ open, onClose, product, products, categories, onSave }) => {
   const [editedProduct, setEditedProduct] = useState(product);
 
-  const handleChange = (e) => {
+  const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
     setEditedProduct(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-  };
-
-  const handleCategoryChipClick = (category) => {
-    if (includesCategory(category)) {
-      setEditedProduct({ ...editedProduct, categories: editedProduct.categories.filter(c => c != category) })
-    } else {
-      setEditedProduct({ ...editedProduct, categories: [...(editedProduct.categories ?? []), category] })
-    }
-  }
+  }, []);
 
   const handleCancelButtonClick = () => {
     setEditedProduct(null);
@@ -53,17 +75,13 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
     }
   }
 
-  const includesCategory = (category) => {
-    return editedProduct.categories && editedProduct.categories.includes(category)
-  }
-
   useEffect(() => {
     syncProductAndEditedProduct();
   });
 
   if (!editedProduct) return;
 
-  const isProductNameDublicate = products.some(p => p.name === editedProduct.name && p.id != editedProduct.id);
+  const isProductNameDublicate = products.some(p => p.name === processProduct(editedProduct).name && p.id != editedProduct.id);
   const { isValid, errors } = validateProduct(editedProduct);
 
   return (
@@ -110,18 +128,11 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             size="small"
           />
 
-          <Box sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", gap: 1 }}>
-            {categories && categories.map(category => (
-              <Chip
-                key={category}
-                label={category}
-                icon={includesCategory(category) ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
-                color={includesCategory(category) ? "primary" : "default"}
-                onClick={() => handleCategoryChipClick(category)}
-                sx={{ cursor: 'pointer' }}
-              />
-            ))}
-          </Box>
+          <CategoriesList
+            productCategories={editedProduct.categories}
+            categories={categories}
+            onChange={(productCategories) => setEditedProduct({ ...editedProduct, categories: productCategories })}
+          />
 
           <TextField
             name="weight"
@@ -133,6 +144,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             margin="normal"
             error={errors.weight}
             helperText={errors.weight}
+            size="small"
           />
 
           <TextField
@@ -146,6 +158,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             rows={3}
             error={errors.composition}
             helperText={errors.composition}
+            size="small"
           />
 
           <TextField
@@ -159,6 +172,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             rows={6}
             error={errors.description}
             helperText={errors.description}
+            size="small"
           />
 
         </Stack>

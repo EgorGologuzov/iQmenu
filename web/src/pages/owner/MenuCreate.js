@@ -1,11 +1,8 @@
-import React from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { deepCopy } from '../../utils/utils'
 import { MENU_CREATE_TEMPLATE } from '../../values/default'
-import { useDispatch, useSelector } from 'react-redux';
-import usePageDataInitialValue from '../../hooks/usePageDataInitialValue'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
-import { Alert, Button, CircularProgress, Divider, Stack, TextField, Typography } from '@mui/material';
-import { setPageData } from '../../store/slices/pageSlice';
+import { Alert, Button, Divider, Stack, TextField, Typography } from '@mui/material';
 import useTitle from '../../hooks/useTitle';
 import ImageInput from '../../components/inputs/ImageInput';
 import SwitchInput from '../../components/inputs/SwitchInput';
@@ -18,32 +15,29 @@ import { validateMenu } from '../../data/models/validation';
 import { processMenu } from '../../data/models/processing';
 
 function MenuCreate() {
-
-  const menu = useSelector(state => state.page.data);
-  const dispatch = useDispatch();
+  const [menu, setMenu] = useState(deepCopy(MENU_CREATE_TEMPLATE));
+  const [image, setImage] = useState({ data: menu.image });
+  const [categories, setCategories] = useState(menu.categories);
+  const [products, setProducts] = useState(menu.products);
 
   const api = useIQmenuApi();
   const navigate = useNavigate();
 
-  const { isValid, errors } = validateMenu(menu);
-
-  const { mutate: createMenu, error: isMutationError, isPending: isMutationPending } = useMutation({
+  const { mutate: createMenu, error: mutationError, isPending: isMutationPending } = useMutation({
     mutationFn: (menuData) => api.menu.create(menuData),
-    mutationKey: ["menu"],
+    mutationKey: ["MenuCreate/menu"],
     onSuccess: (createdMenu) => navigate(`/o/menu/${createdMenu.id}/edit`, { replace: true })
   });
 
-  const setMenuAttrs = (newAttrs) => {
-    dispatch(setPageData({ ...menu, ...newAttrs }));
+  const buildedMenu = { ...menu, image: image, categories: categories, products: products };
+
+  const handleCreateButtonClick = () => {
+    createMenu(processMenu(buildedMenu));
   }
+
+  const { isValid, errors } = validateMenu(buildedMenu);
 
   useTitle({ general: "Новое меню" }, []);
-
-  usePageDataInitialValue(deepCopy(MENU_CREATE_TEMPLATE));
-
-  if (!menu || menu.isActive === undefined) {
-    return <CircularProgress />;
-  }
 
   return (
     <Stack direction="column" spacing={2} width="100%" maxWidth={500}>
@@ -52,7 +46,7 @@ function MenuCreate() {
         id="isActive"
         label="Опубликовать:"
         checked={menu.isActive}
-        onChange={(event) => setMenuAttrs({ isActive: event.target.checked })}
+        onChange={useCallback(event => setMenu({ ...menu, isActive: event.target.checked }), [menu])}
       />
 
       <TextField
@@ -60,7 +54,7 @@ function MenuCreate() {
         label="Название заведения"
         required
         value={menu.companyName ?? ""}
-        onChange={(event) => setMenuAttrs({ companyName: event.target.value })}
+        onChange={useCallback(event => setMenu({ ...menu, companyName: event.target.value  }), [menu])}
         error={errors.companyName}
         helperText={errors.companyName}
         size="small"
@@ -71,62 +65,44 @@ function MenuCreate() {
         label="Название меню"
         required
         value={menu.menuName ?? ""}
-        onChange={(event) => setMenuAttrs({ menuName: event.target.value })}
+        onChange={useCallback(event => setMenu({ ...menu, menuName: event.target.value }), [menu])}
         error={errors.menuName}
         helperText={errors.menuName}
         size="small"
       />
 
       <ImageInput
-        image={menu.image}
-        onChange={file => setMenuAttrs({ image: file })}
+        image={image}
+        onChange={useCallback(file => setImage(file), [])}
         label="Главное изображение меню"
         error={errors.image}
         helperText={errors.image}
       />
 
       <CategoriesInput
-        categories={menu.categories}
-        onChange={categories => setMenuAttrs({ categories: categories })}
+        categories={categories}
+        onChange={useCallback(categories => setCategories(categories), [])}
         label="Категории"
         error={errors.categories}
         helperText={errors.categories}
       />
 
       <ProductsInput
-        products={menu.products}
-        categories={menu.categories}
-        onChange={(products) => setMenuAttrs({ products: products })}
+        products={products}
+        categories={categories}
+        onChange={useCallback(products => setProducts(products), [])}
         label="Продукты"
         error={errors.products}
         helperText={errors.products}
       />
 
-      {/* {createdMenu && (
-        <>
-          <Alert severity="success">Меню успешно создано</Alert>
-          <Box
-            component="img"
-            sx={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 2 }}
-            src={createdMenu.qr}
-            alt="QR-код для меню"
-          />
-          <Button variant="contained">
-            Копировать QR-код
-          </Button>
-          <Button variant="outlined" onClick={() => navigate(-1)}>
-            Назад
-          </Button>
-        </>
-      )} */}
-
     <Divider />
 
-      {isMutationError && <Alert severity="error">{isMutationError.message}</Alert>}
+      {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
 
       <Button
         variant="contained"
-        onClick={() => createMenu(processMenu(menu))}
+        onClick={handleCreateButtonClick}
         loading={isMutationPending}
         loadingPosition="center"
         disabled={isMutationPending || !isValid}
@@ -143,7 +119,7 @@ function MenuCreate() {
       </Button>
 
       <Typography component="div" variant="body1">
-        {JSON.stringify(menu, null, " ")}
+        {JSON.stringify(buildedMenu, null, " ")}
       </Typography>
 
     </Stack>

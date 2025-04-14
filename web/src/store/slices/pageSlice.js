@@ -6,7 +6,6 @@ const pageSlice = createSlice({
   initialState: {
     tabTitle: DEFAULT_TAB_TITLE,
     headerTitle: DEFAULT_HEADER_TITLE,
-    data: {},
   },
   reducers: {
     setTitle: (state, action) => {
@@ -14,11 +13,8 @@ const pageSlice = createSlice({
       state.headerTitle = action.payload.headerTitle ?? action.payload.general ?? DEFAULT_HEADER_TITLE;
       document.title = state.tabTitle;
     },
-    setPageData: (state, action) => {
-      state.data = action.payload;
-    },
   }
 })
 
-export const { setTitle, setPageData } = pageSlice.actions;
+export const { setTitle } = pageSlice.actions;
 export const pageReducer = pageSlice.reducer;

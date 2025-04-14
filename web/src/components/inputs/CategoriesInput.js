@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import {
   List,
   ListItem,
@@ -121,6 +121,7 @@ const CategoriesInput = ({ categories, onChange }) => {
           error={isDublicate || !isValid}
           helperText={isDublicate ? "Такая категория уже есть" : errors.category}
           fullWidth
+          onKeyDown={(e) => e.key === "Enter" && !isDublicate & isValid ? handleAddCategory() : undefined}
         />
         <IconButton
           onClick={handleAddCategory}
@@ -170,4 +171,4 @@ const CategoriesInput = ({ categories, onChange }) => {
   );
 };
 
-export default withInputShell(CategoriesInput);
+export default withInputShell(memo(CategoriesInput));

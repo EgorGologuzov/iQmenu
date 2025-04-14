@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import {
   List,
   ListItem,
@@ -36,6 +36,19 @@ import { deepCopy, fileToDataUrl } from '../../utils/utils';
 import { PRODUCT_CREATE_TEMPLATE } from '../../values/default';
 import withInputShell from '../../hoc/withInputShell';
 
+const SortableItemStartMemo = memo(({ imageUrl, ...listeners }) => {
+  return (
+    <>
+      <IconButton {...listeners} sx={{ touchAction: 'none' }}>
+        <DragIndicatorIcon />
+      </IconButton>
+      <Avatar variant="rounded" src={imageUrl} sx={{ width: 50, height: 50 }}>
+        <FastfoodIcon />
+      </Avatar>
+    </>
+  )
+})
+
 const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
   const {
     attributes,
@@ -49,10 +62,18 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
   const [imageUrl, setImageUrl] = useState(null);
 
   const syncImageWithImageUrl = async () => {
+    if (!product.image) return;
+
     if (typeof product.image == "string") {
       setImageUrl(product.image);
-    } else if (product.image instanceof File) {
-      setImageUrl(await fileToDataUrl(product.image));
+    }
+
+    if (product.image instanceof File) {
+      try {
+        setImageUrl(await fileToDataUrl(product.image));
+      } catch (er) {
+        console.error("Не удалось установить изображение продукта:", er);
+      }
     }
   }
 
@@ -79,17 +100,28 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
         pl: 0
       }}
     >
-      <IconButton {...listeners} sx={{ touchAction: 'none' }}>
-        <DragIndicatorIcon />
-      </IconButton>
-      <ListItemAvatar>
-        <Avatar variant="rounded" src={imageUrl} sx={{ width: 50, height: 50 }}>
-          <FastfoodIcon />
-        </Avatar>
-      </ListItemAvatar>
-      <ListItemText
-        primary={
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        justifyContent="flex-start"
+        alignItems="center"
+        sx={{ width: "100%" }}
+      >
+        <SortableItemStartMemo imageUrl={imageUrl} {...listeners} />
+
+        <Stack
+          direction="column"
+          spacing={1}
+          justifyContent="center"
+          onClick={() => onEdit && onEdit(product)}
+          sx={{ cursor: 'pointer', width: "100%" }}
+        >
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{ mb: 1 }}
+          >
             <Chip
               label={product.isActive ? "Есть" : "Нет"}
               size="small"
@@ -98,25 +130,23 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
                 e.stopPropagation();
                 onToggleActive(product.id);
               }}
-              sx={{ cursor: 'pointer' }}
             />
             <Typography noWrap>{product.name}</Typography>
           </Stack>
-        }
-        secondary={
+
           <Typography color="text.secondary" noWrap sx={{ fontSize: 12 }} >
             {[product.price + ' ₽', ...(product.categories ?? [])].filter(Boolean).join(', ')}
           </Typography>
-        }
-        onClick={(e) => onEdit && onEdit(product)}
-      />
+
+        </Stack>
+
+      </Stack>
+
     </ListItem>
   );
 };
 
-const ProductsInput = ({ products, categories, onChange }) => {
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState(null);
+const SortableItemsList = memo(({ products, onEdit, onChange }) => {
   const [activeId, setActiveId] = useState(null);
 
   const sensors = useSensors(
@@ -124,16 +154,8 @@ const ProductsInput = ({ products, categories, onChange }) => {
     useSensor(KeyboardSensor)
   );
 
-  const handleAddProduct = () => {
-    const newProduct = deepCopy(PRODUCT_CREATE_TEMPLATE);
-    newProduct.id = Math.random(); // tmp id
-    setCurrentProduct(newProduct);
-    setEditDialogOpen(true);
-  };
-
   const handleEditProduct = (product) => {
-    setCurrentProduct({ ...product });
-    setEditDialogOpen(true);
+    onEdit(product);
   };
 
   const handleDeleteProduct = (id) => {
@@ -146,15 +168,6 @@ const ProductsInput = ({ products, categories, onChange }) => {
     ));
   };
 
-  const handleSaveProduct = (product) => {
-    if (currentProduct.name) {
-      onChange(products.map(p => p.id === currentProduct.id ? product : p));
-    } else {
-      onChange([...products, product]);
-    }
-    setEditDialogOpen(false);
-  };
-
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (active.id !== over.id) {
@@ -165,6 +178,63 @@ const ProductsInput = ({ products, categories, onChange }) => {
     setActiveId(null);
   };
 
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={({ active }) => setActiveId(active.id)}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={products.map(product => product.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <List sx={{ borderWidth: "1px", borderColor: "#c4c4c4", borderStyle: "solid", borderRadius: 2, p: 0 }}>
+          {products.map((product) => (
+            <SortableItem
+              key={product.id}
+              id={product.id}
+              product={product}
+              onEdit={handleEditProduct}
+              onDelete={handleDeleteProduct}
+              onToggleActive={handleToggleActive}
+            />
+          ))}
+        </List>
+      </SortableContext>
+      <DragOverlay>
+        {activeId ? (
+          <ListItem sx={{ bgcolor: 'background.paper', boxShadow: 3 }}>
+            <ListItemText
+              primary={products.find(p => p.id === activeId)?.name}
+            />
+          </ListItem>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  )
+})
+
+const ProductsInput = ({ products, categories, onChange }) => {
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState(null);
+
+  const handleAddProduct = () => {
+    const newProduct = deepCopy(PRODUCT_CREATE_TEMPLATE);
+    newProduct.id = Math.random(); // tmp id
+    setCurrentProduct(newProduct);
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveProduct = (product) => {
+    if (currentProduct.name) {
+      onChange(products.map(p => p.id === currentProduct.id ? product : p));
+    } else {
+      onChange([...products, product]);
+    }
+    setEditDialogOpen(false);
+  };
+
   const initTmpIdsForProducts = () => {
     products.forEach(p => {
       if (!p.id) {
@@ -172,6 +242,11 @@ const ProductsInput = ({ products, categories, onChange }) => {
       }
     })
   }
+
+  const handleEditProduct = useCallback((product) => {
+    setCurrentProduct({ ...product });
+    setEditDialogOpen(true);
+  }, []);
 
   initTmpIdsForProducts();
 
@@ -186,39 +261,11 @@ const ProductsInput = ({ products, categories, onChange }) => {
         Добавить продукт
       </Button>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={({ active }) => setActiveId(active.id)}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={products.map(product => product.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <List sx={{ borderWidth: "1px", borderColor: "#c4c4c4", borderStyle: "solid", borderRadius: 2, p: 0 }}>
-            {products.map((product) => (
-              <SortableItem
-                key={product.id}
-                id={product.id}
-                product={product}
-                onEdit={handleEditProduct}
-                onDelete={handleDeleteProduct}
-                onToggleActive={handleToggleActive}
-              />
-            ))}
-          </List>
-        </SortableContext>
-        <DragOverlay>
-          {activeId ? (
-            <ListItem sx={{ bgcolor: 'background.paper', boxShadow: 3 }}>
-              <ListItemText
-                primary={products.find(p => p.id === activeId)?.name}
-              />
-            </ListItem>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+      <SortableItemsList
+        products={products}
+        onChange={onChange}
+        onEdit={handleEditProduct}
+      />
 
       {products.length === 0 && (
         <Alert severity="info">
@@ -238,4 +285,4 @@ const ProductsInput = ({ products, categories, onChange }) => {
   );
 };
 
-export default withInputShell(ProductsInput);
+export default withInputShell(memo(ProductsInput));

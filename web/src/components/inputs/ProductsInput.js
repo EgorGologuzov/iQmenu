@@ -12,7 +12,7 @@ import {
   ListItemAvatar,
   Avatar,
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import {
   DndContext,
   closestCenter,
@@ -36,30 +36,16 @@ import { deepCopy, fileToDataUrl } from '../../utils/utils';
 import { PRODUCT_CREATE_TEMPLATE } from '../../values/default';
 import withInputShell from '../../hoc/withInputShell';
 
-const SortableItemStartMemo = memo(({ imageUrl, ...listeners }) => {
-  return (
-    <>
-      <IconButton {...listeners} sx={{ touchAction: 'none' }}>
-        <DragIndicatorIcon />
-      </IconButton>
-      <Avatar variant="rounded" src={imageUrl} sx={{ width: 50, height: 50 }}>
-        <FastfoodIcon />
-      </Avatar>
-    </>
-  )
-})
-
-const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id });
+const SortableItemContent = memo(({ product, actions, listeners }) => {
 
   const [imageUrl, setImageUrl] = useState(null);
+
+  const handleItemTextClick = () => actions.onEdit(product);
+
+  const handleIsActiveChipClick = (e) => {
+    e.stopPropagation();
+    actions.onToggleActive(product);
+  };
 
   const syncImageWithImageUrl = async () => {
     if (!product.image) return;
@@ -82,14 +68,74 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
   }, [product.image]);
 
   return (
+    <>
+      <IconButton {...listeners} sx={{ touchAction: 'none' }}>
+        <DragIndicatorIcon />
+      </IconButton>
+
+      <ListItemAvatar>
+        <Avatar variant="rounded" src={imageUrl}>
+          <FastfoodIcon />
+        </Avatar>
+      </ListItemAvatar>
+
+      <ListItemText
+        primary={
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{ mb: 1 }}
+          >
+            <Chip
+              label={product.isActive ? "Есть" : "Нет"}
+              size="small"
+              color={product.isActive ? "success" : "error"}
+              onClick={handleIsActiveChipClick}
+            />
+            <Typography noWrap>{product.name}</Typography>
+          </Stack>
+        }
+        secondary={
+          <Typography noWrap variant="caption" color="text.secondary">
+            {[product.price + ' ₽', ...(product.categories ?? [])].filter(Boolean).join(', ')}
+          </Typography>
+        }
+        onClick={handleItemTextClick}
+        sx={{ cursor: 'pointer' }}
+      />
+    </>
+  )
+}, (prev, next) => {
+  return prev.listeners == next.listeners && prev.product == next.product && prev.actions == next.actions;
+})
+
+const SortableItemSecondaryActions = memo(({ product, actions }) => {
+  const handleDeleteButtonClick = () => actions.onDelete(product);
+  return (
+    <IconButton edge="end" onClick={handleDeleteButtonClick}>
+      <DeleteIcon />
+    </IconButton>
+  )
+}, (prev, next) => {
+  return prev.product == next.product && prev.actions == next.actions;
+})
+
+const SortableItem = ({ id, product, actions }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id });
+
+  return (
     <ListItem
       ref={setNodeRef}
       {...attributes}
-      secondaryAction={
-        <IconButton edge="end" onClick={() => onDelete(product.id)}>
-          <DeleteIcon />
-        </IconButton>
-      }
+      secondaryAction={<SortableItemSecondaryActions product={product} actions={actions} />}
       sx={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -100,71 +146,31 @@ const SortableItem = ({ id, product, onEdit, onDelete, onToggleActive }) => {
         pl: 0
       }}
     >
-      <Stack
-        direction="row"
-        spacing={1}
-        justifyContent="flex-start"
-        alignItems="center"
-        sx={{ flexGrow: 1, minWidth: 0, width: "100%" }}
-      >
-        <SortableItemStartMemo imageUrl={imageUrl} {...listeners} />
-
-        <Stack
-          direction="column"
-          spacing={1}
-          justifyContent="center"
-          onClick={() => onEdit && onEdit(product)}
-          sx={{ cursor: 'pointer', flexGrow: 1, minWidth: 0, width: "100%"}}
-        >
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1}
-            sx={{ mb: 1, flexGrow: 1, minWidth: 0, width: "100%" }}
-          >
-            <Chip
-              label={product.isActive ? "Есть" : "Нет"}
-              size="small"
-              color={product.isActive ? "success" : "error"}
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleActive(product.id);
-              }}
-            />
-            <Typography noWrap sx={{ flexGrow: 1, minWidth: 0 }} >{product.name}</Typography>
-          </Stack>
-
-          <Typography color="text.secondary" noWrap sx={{ fontSize: 12, minWidth: 0, width: "100%" }} >
-            {[product.price + ' ₽', ...(product.categories ?? [])].filter(Boolean).join(', ')}
-          </Typography>
-
-        </Stack>
-
-      </Stack>
-
+      <SortableItemContent
+        product={product}
+        actions={actions}
+        listeners={listeners}
+      />
     </ListItem>
   );
 };
 
 const SortableItemsList = memo(({ products, onEdit, onChange }) => {
   const [activeId, setActiveId] = useState(null);
+  const [actions, _] = useState({ onEdit: null, onDelete: null, onToggleActive: null });
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor)
   );
 
-  const handleEditProduct = (product) => {
-    onEdit(product);
+  const handleDeleteProduct = (product) => {
+    onChange(products.filter(p => p.id !== product.id));
   };
 
-  const handleDeleteProduct = (id) => {
-    onChange(products.filter(p => p.id !== id));
-  };
-
-  const handleToggleActive = (id) => {
+  const handleToggleActive = (product) => {
     onChange(products.map(p =>
-      p.id === id ? { ...p, isActive: !p.isActive } : p
+      p.id === product.id ? { ...p, isActive: !p.isActive } : p
     ));
   };
 
@@ -177,6 +183,10 @@ const SortableItemsList = memo(({ products, onEdit, onChange }) => {
     }
     setActiveId(null);
   };
+
+  actions.onEdit = onEdit;
+  actions.onDelete = handleDeleteProduct;
+  actions.onToggleActive = handleToggleActive;
 
   return (
     <DndContext
@@ -195,9 +205,7 @@ const SortableItemsList = memo(({ products, onEdit, onChange }) => {
               key={product.id}
               id={product.id}
               product={product}
-              onEdit={handleEditProduct}
-              onDelete={handleDeleteProduct}
-              onToggleActive={handleToggleActive}
+              actions={actions}
             />
           ))}
         </List>

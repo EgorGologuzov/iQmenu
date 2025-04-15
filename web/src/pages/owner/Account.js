@@ -22,8 +22,8 @@ function Account() {
   });
 
   return (
-    <Grid sx={{placeSelf:'center', maxWidth:'1000px',paddingTop:'40px', paddingX:'5px'}} container columnSpacing={4}>
-      <Grid size={{xs:12,sm:3}} textAlign={'center'}>
+    <Grid sx={{placeSelf:'center', maxWidth:'sm',paddingTop:'40px', paddingX:'5px'}} container columnSpacing={4}>
+      <Grid size={{xs:12,sm:12}} textAlign={'center'}>
         <IconButton sx={{width:'100%',aspectRatio:'1/1', maxWidth:'200px'}} component='label' tabIndex={-1}>
           <Avatar src={avatar} sx={{width:'100%',height:'100%'}}/>
           <VisuallyHiddenInput
@@ -33,7 +33,7 @@ function Account() {
         />
         </IconButton>
       </Grid>
-      <Grid size={{xs:12, sm:9}} alignContent={'center'}>
+      <Grid size={{xs:12, sm:12}} alignContent={'center'}>
         <Stack spacing={2}>
           <FormControl
           fullWidth

@@ -8,7 +8,6 @@ let idCount = 10;
 
 export const MENU_SERVICE = {
 
-
   async getById(id) {
     await sleep(1000);
 
@@ -18,7 +17,6 @@ export const MENU_SERVICE = {
 
     return MENUS.find(menu => menu.id == id) ?? null;
   },
-
 
   async create(menuData) {
     await sleep(1000);
@@ -34,8 +32,6 @@ export const MENU_SERVICE = {
 
     return newMenu;
   },
-  
-  async update(id, menuData){},
 
   async update(id, menuData) {
     await sleep(1000);

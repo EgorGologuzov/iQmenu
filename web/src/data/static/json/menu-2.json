@@ -2,6 +2,8 @@
   "id": 2,
   "owner": "123e4567-e89b-12d3-a456-426614174000",
   "isActive": true,
+  "createAt": "2025-04-10 22:45:48.198",
+  "qr": "https://assets.turbologo.ru/blog/ru/2020/01/18163037/qr-kod.png",
   "products": [
     {
       "name": "Цезарь с курицей",
@@ -125,5 +127,5 @@
   "companyName": "Кафе «Уют»",
   "menuName": "Основное меню",
   "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
-  "image": "https://example.com/images/menu-cover.jpg"
+  "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg"
 }

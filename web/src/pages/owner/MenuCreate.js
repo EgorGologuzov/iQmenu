@@ -25,15 +25,11 @@ function MenuCreate() {
 
   const { mutate: createMenu, error: mutationError, isPending: isMutationPending } = useMutation({
     mutationFn: (menuData) => api.menu.create(menuData),
-    mutationKey: ["MenuCreate/menu"],
-    onSuccess: (createdMenu) => navigate(`/o/menu/${createdMenu.id}/edit`, { replace: true })
+    mutationKey: ["MenuCreate/api.menu.create"],
+    onSuccess: () => navigate(`/o/menu`, { replace: true })
   });
 
   const buildedMenu = processMenu({ ...menu, image: image, categories: categories, products: products });
-
-  const handleCreateButtonClick = () => {
-    createMenu(buildedMenu);
-  }
 
   const { isValid, errors } = validateMenu(buildedMenu);
 
@@ -46,7 +42,7 @@ function MenuCreate() {
         id="isActive"
         label="Опубликовать:"
         checked={menu.isActive}
-        onChange={useCallback(event => setMenu({ ...menu, isActive: event.target.checked }), [menu])}
+        onChange={event => setMenu({ ...menu, isActive: event.target.checked })}
       />
 
       <TextField
@@ -54,7 +50,7 @@ function MenuCreate() {
         label="Название заведения"
         required
         value={menu.companyName ?? ""}
-        onChange={useCallback(event => setMenu({ ...menu, companyName: event.target.value  }), [menu])}
+        onChange={event => setMenu({ ...menu, companyName: event.target.value })}
         error={errors.companyName}
         helperText={errors.companyName}
         size="small"
@@ -65,7 +61,7 @@ function MenuCreate() {
         label="Название меню"
         required
         value={menu.menuName ?? ""}
-        onChange={useCallback(event => setMenu({ ...menu, menuName: event.target.value }), [menu])}
+        onChange={event => setMenu({ ...menu, menuName: event.target.value })}
         error={errors.menuName}
         helperText={errors.menuName}
         size="small"
@@ -96,13 +92,13 @@ function MenuCreate() {
         helperText={errors.products}
       />
 
-    <Divider />
+      <Divider />
 
       {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
 
       <Button
         variant="contained"
-        onClick={handleCreateButtonClick}
+        onClick={() => createMenu(buildedMenu)}
         loading={isMutationPending}
         loadingPosition="center"
         disabled={isMutationPending || !isValid}
@@ -117,10 +113,6 @@ function MenuCreate() {
       >
         Вернуться назад
       </Button>
-
-      <Typography component="div" variant="body1">
-        {JSON.stringify(buildedMenu, null, " ")}
-      </Typography>
 
     </Stack>
   )

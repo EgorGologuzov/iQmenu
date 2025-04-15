@@ -51,7 +51,7 @@ function MenuView() {
   const favorites = useSelector(state => state.favorite.find(record => record.menuId == menuId));
 
   const { data: menu, isLoading, error } = useQuery({
-    queryKey: ["MenuView/getMenuById"],
+    queryKey: ["MenuView/api.menu.getById"],
     queryFn: () => api.menu.getById(menuId),
   })
 

@@ -57,6 +57,7 @@ const CategoriesList = memo(({ productCategories, categories, onChange }) => {
     <Box sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", gap: 1 }}>
       {categories && categories.map(category => (
         <CategoriesListItem
+          key={category}
           category={category}
           isChecked={isChecked(category)}
           actions={actions}
@@ -121,14 +122,14 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
           <SwitchInput
             name="isActive"
             label="Есть в наличии"
-            checked={editedProduct.isActive}
+            checked={editedProduct.isActive ?? true}
             onChange={handleChange}
           />
 
           <TextField
             name="name"
             label="Название"
-            value={editedProduct.name}
+            value={editedProduct.name ?? ""}
             onChange={handleChange}
             fullWidth
             required
@@ -142,7 +143,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             name="price"
             label="Цена (руб)"
             type="number"
-            value={editedProduct.price}
+            value={editedProduct.price ?? ""}
             onChange={handleChange}
             fullWidth
             required
@@ -162,7 +163,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             name="weight"
             label="Вес (г)"
             type="number"
-            value={editedProduct.weight}
+            value={editedProduct.weight ?? ""}
             onChange={handleChange}
             fullWidth
             margin="normal"
@@ -174,7 +175,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
           <TextField
             name="composition"
             label="Состав"
-            value={editedProduct.composition}
+            value={editedProduct.composition ?? ""}
             onChange={handleChange}
             fullWidth
             margin="normal"
@@ -188,7 +189,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
           <TextField
             name="description"
             label="Описание"
-            value={editedProduct.description}
+            value={editedProduct.description ?? ""}
             onChange={handleChange}
             fullWidth
             margin="normal"
@@ -208,7 +209,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
           variant="contained"
           disabled={isProductNameDublicate || !isValid}
         >
-          Сохранить
+          ОК
         </Button>
       </DialogActions>
     </Dialog>

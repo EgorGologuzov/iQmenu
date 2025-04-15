@@ -102,7 +102,10 @@ const SortableItemContent = memo(({ product, actions, listeners }) => {
           </Typography>
         }
         onClick={handleItemTextClick}
-        sx={{ cursor: 'pointer' }}
+        sx={{
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+        }}
       />
     </>
   )

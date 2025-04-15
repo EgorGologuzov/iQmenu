@@ -77,13 +77,11 @@ function ImageInput({ image, onChange }) {
           />
           <Button
             onClick={handleDeleteButtonClick}
-            sx={{ position: 'absolute', top: 8, left: 8, }}
+            sx={{ position: 'absolute', bottom: 8, right: 8, "& *": { m: 0 } }}
             startIcon={<DeleteIcon />}
             color="error"
             variant="contained"
-            >
-            Удалить
-          </Button>
+          />
         </Stack>
       )}
 

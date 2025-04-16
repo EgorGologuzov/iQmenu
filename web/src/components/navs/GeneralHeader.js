@@ -12,7 +12,7 @@ function GeneralHeader() {
   return (
     <AppBar position="static">
       <Container sx={{ pl: 1, pr: 2 }}>
-        <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+        <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ pl: 1 }}>
 
           <CLink to="/" noStyles >
             <IconButton size="large" edge="start" sx={{ p: 1 }}>

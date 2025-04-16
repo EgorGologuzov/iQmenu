@@ -20,11 +20,9 @@ const CardGrid = memo(({ displayGroups, onCardClick }) => {
           {displayGroups.map(group =>
             <React.Fragment key={group.groupName}>
               <Grid size={{ xs: 12 }}>
-                <Divider />
-                <Typography component="h6" variant="h6" textAlign="center" sx={{ my: 1 }}>
+                <Typography component="h6" variant="subtitle2" textAlign="center" sx={{ my: 1 }}>
                   {group.groupName}
                 </Typography>
-                <Divider />
               </Grid>
               {group.products.map((product, _) =>
                 <Grid key={product.name} size={{ xs: 6, sm: 4, md: 3 }}>

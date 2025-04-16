@@ -26,3 +26,9 @@ export function fileToDataUrl(file) {
 export function asInSentense(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function logAndReturnError(message) {
+  const error = new Error(message);
+  console.error(error);
+  return error;
+}

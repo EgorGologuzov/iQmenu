@@ -83,7 +83,7 @@ function MenuEdit() {
   }
 
   return (
-    <Stack direction="column" spacing={2} width="100%" maxWidth={500}>
+    <Stack direction="column" spacing={2} sx={{ width: "100%", maxWidth: "sm" }}>
 
       <SaveStatus isSaved={!isChanged} />
 

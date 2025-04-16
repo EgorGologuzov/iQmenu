@@ -43,16 +43,6 @@ function AppRouting() {
     <BrowserRouter>
       <Routes>
 
-        <Route path="/" element={<EmptyLayout />} >
-          <Route path="auth" element={<Auth />} />
-          <Route path="reg" element={<Reg />} />
-        </Route>
-
-        <Route path="/" element={<RoleDependentLayout />} >
-          <Route index element={<Presentation />} />
-          <Route path=":menuId" element={<MenuView />} />
-        </Route>
-
         <Route path="/o" element={<OwnerLayout />} >
           <Route index element={<Navigate to="menu" replace />} />
           <Route path="menu" element={<MenuList />} />
@@ -61,7 +51,16 @@ function AppRouting() {
           <Route path="me" element={<Account />} />
         </Route>
 
-        <Route path="*" element={<E404 />} />
+        <Route path="/" element={<RoleDependentLayout />} >
+          <Route index element={<Presentation />} />
+          <Route path=":menuId" element={<MenuView />} />
+        </Route>
+
+        <Route path="/" element={<EmptyLayout />} >
+          <Route path="auth" element={<Auth />} />
+          <Route path="reg" element={<Reg />} />
+          <Route path="*" element={<E404 />} />
+        </Route>
 
       </Routes>
     </BrowserRouter>

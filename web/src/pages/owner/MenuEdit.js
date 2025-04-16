@@ -1,8 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react'
-import { deepCopy } from '../../utils/utils'
-import { MENU_CREATE_TEMPLATE } from '../../values/default'
+import React, { useEffect, useState } from 'react'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
-import { Alert, Button, CircularProgress, Divider, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, CircularProgress, Divider, Stack, TextField} from '@mui/material';
 import useTitle from '../../hooks/useTitle';
 import ImageInput from '../../components/inputs/ImageInput';
 import SwitchInput from '../../components/inputs/SwitchInput';
@@ -14,6 +12,8 @@ import { useNavigate, useParams } from 'react-router';
 import { validateMenu } from '../../data/models/validation';
 import { processMenu } from '../../data/models/processing';
 import QrView from '../../components/controls/QrView';
+import { compareMenu } from '../../data/models/comparation';
+import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
 
 const SaveStatus = ({ isSaved }) => {
   return isSaved
@@ -26,31 +26,48 @@ function MenuEdit() {
   const [image, setImage] = useState(null);
   const [categories, setCategories] = useState(null);
   const [products, setProducts] = useState(null);
+  const [lastError, setLastError] = useState(null);
 
   const api = useIQmenuApi();
   const navigate = useNavigate();
 
   const { menuId } = useParams();
 
-  const { data: loadedMenu, isLoading: isQueryLoading, error: queryError } = useQuery({
+  const { data: loadedMenu, isLoading: isMenuLoading, error: loadingError } = useQuery({
     queryKey: ["MenuEdit/api.menu.getById"],
     queryFn: () => api.menu.getById(menuId),
   })
 
-  const { mutate: updateMenu, data: updatededMenu, error: mutationError, isPending: isMutationPending } = useMutation({
+  const { mutate: updateMenu, data: updatedMenu, isPending: isUpdatePending, error: updateError, } = useMutation({
     mutationFn: (data) => api.menu.update(data.id, data.menu),
     mutationKey: ["MenuEdit/api.menu.update"],
+    onSuccess: () => setLastError(null),
   });
+
+  const { mutate: deleteMenu, error: deleteError, isPending: isDeletePending,  } = useMutation({
+    mutationFn: (data) => api.menu.delete(data.id),
+    mutationKey: ["MenuEdit/api.menu.delete"],
+    onSuccess: () => navigate("/o/menu"),
+  });
+
+  const buildedMenu = processMenu({ ...(menu ?? {}), image: image, categories: categories, products: products });
+  const { isValid, errors } = validateMenu(buildedMenu);
+  const isChanged = !compareMenu(buildedMenu, loadedMenu) && !compareMenu(buildedMenu, updatedMenu);
 
   const title = loadedMenu ? [loadedMenu.companyName, loadedMenu.menuName, "Редактирование"].filter(Boolean).join(" / ") : undefined;
   useTitle({ general: title }, [title]);
 
-  if (isQueryLoading) {
+  useUnsavedChangesWarning(menu && !isChanged);
+
+  useEffect(() => setLastError(updateError ?? null), [updateError]);
+  useEffect(() => setLastError(deleteError ?? null), [deleteError]);
+
+  if (isMenuLoading) {
     return <CircularProgress />
   }
 
-  if (queryError) {
-    return <Alert severity="error">{queryError.message}</Alert>
+  if (loadingError) {
+    return <Alert severity="error">{loadingError.message}</Alert>
   }
 
   if (!loadedMenu) {
@@ -64,13 +81,6 @@ function MenuEdit() {
     setProducts(loadedMenu.products);
     return <CircularProgress />
   }
-
-  const buildedMenu = processMenu({ ...menu, image: image, categories: categories, products: products });
-  const { isValid, errors } = validateMenu(buildedMenu);
-  const buildedMenuJson = JSON.stringify(buildedMenu);
-  const loadedMenuJson = JSON.stringify(loadedMenu);
-  const updatededMenuJson = JSON.stringify(updatededMenu);
-  const isChanged = buildedMenuJson !== loadedMenuJson && buildedMenuJson !== updatededMenuJson;
 
   return (
     <Stack direction="column" spacing={2} width="100%" maxWidth={500}>
@@ -135,14 +145,14 @@ function MenuEdit() {
 
       <SaveStatus isSaved={!isChanged} />
 
-      {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
+      {lastError && <Alert severity="error">{lastError.message}</Alert>}
 
       <Button
         variant="contained"
-        loading={isMutationPending}
         loadingPosition="center"
+        loading={isUpdatePending}
         onClick={() => updateMenu({ id: buildedMenu.id, menu: buildedMenu })}
-        disabled={isMutationPending || !isValid || !isChanged}
+        disabled={isUpdatePending || isDeletePending || !isValid || !isChanged}
       >
         Сохранить изменения
       </Button>
@@ -150,9 +160,20 @@ function MenuEdit() {
       <Button
         variant="outlined"
         onClick={() => navigate(-1)}
-        disabled={isMutationPending}
+        disabled={isUpdatePending || isDeletePending}
       >
         Вернуться назад
+      </Button>
+
+      <Button
+        variant="contained"
+        loadingPosition="center"
+        color="error"
+        loading={isDeletePending}
+        onClick={() => deleteMenu(buildedMenu)}
+        disabled={isUpdatePending || isDeletePending}
+      >
+        Удалить меню
       </Button>
 
       <Divider />

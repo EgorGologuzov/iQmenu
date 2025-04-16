@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { deepCopy } from '../../utils/utils'
 import { MENU_CREATE_TEMPLATE } from '../../values/default'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
-import { Alert, Button, Divider, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, Divider, Stack, TextField } from '@mui/material';
 import useTitle from '../../hooks/useTitle';
 import ImageInput from '../../components/inputs/ImageInput';
 import SwitchInput from '../../components/inputs/SwitchInput';
@@ -13,10 +13,12 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { validateMenu } from '../../data/models/validation';
 import { processMenu } from '../../data/models/processing';
+import { compareMenu } from '../../data/models/comparation';
+import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
 
 function MenuCreate() {
   const [menu, setMenu] = useState(deepCopy(MENU_CREATE_TEMPLATE));
-  const [image, setImage] = useState({ data: menu.image });
+  const [image, setImage] = useState(menu.image);
   const [categories, setCategories] = useState(menu.categories);
   const [products, setProducts] = useState(menu.products);
 
@@ -30,10 +32,12 @@ function MenuCreate() {
   });
 
   const buildedMenu = processMenu({ ...menu, image: image, categories: categories, products: products });
-
   const { isValid, errors } = validateMenu(buildedMenu);
+  const isChanged = !compareMenu(buildedMenu, MENU_CREATE_TEMPLATE);
 
   useTitle({ general: "Новое меню" }, []);
+
+  useUnsavedChangesWarning(menu && !isChanged);
 
   return (
     <Stack direction="column" spacing={2} width="100%" maxWidth={500}>

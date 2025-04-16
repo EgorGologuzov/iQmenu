@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Stack, Typography } from '@mui/material'
+import { Box, Button, Stack } from '@mui/material'
 import React, { memo, useState } from 'react'
 import SaveIcon from '@mui/icons-material/Save';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -7,41 +7,41 @@ import withInputShell from '../../hoc/withInputShell';
 
 const ActionButton = ({ icon, onClick, noCopy }) => {
 
-  const sx = { height: "37px", "& span": { margin: "0px" } };
-
   const [isCopied, setIsCopied] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isBusy, setIsBusy] = useState(false);
 
-  const handleClick = () => {
-    if (!isCopied) {
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 5000);
-      onClick && onClick();
+  const handleClick = async () => {
+    if (!isCopied && !isError) {
+      setIsBusy(true);
+      try {
+        onClick && await onClick();
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 5000);
+      } catch (er) {
+        console.error("Не удалось выполнить действие", er);
+        setIsError(true);
+        setTimeout(() => setIsError(false), 5000);
+      } finally {
+        setIsBusy(false);
+      }
     }
   }
 
-  if (noCopy) {
-    return (
-      <Button
-        variant="contained"
-        size="small"
-        startIcon={icon}
-        color="primary"
-        onClick={onClick}
-        sx={sx}
-      />
-    )
-  }
+  const isSuccess = isCopied && !noCopy;
 
   return (
     <Button
       variant="contained"
       size="small"
-      startIcon={isCopied ? undefined : icon}
-      color={isCopied ? "success" : "primary"}
+      loadingPosition="center"
+      sx={{ height: "37px", "& span": { margin: "0px" } }}
+      startIcon={isSuccess || isError ? undefined : icon}
+      color={isSuccess ? "success" : isError ? "error" : "primary"}
       onClick={handleClick}
-      sx={sx}
+      loading={isBusy}
     >
-      {isCopied ? "Скопировано" : ""}
+      {isSuccess ? "Скопировано!" : isError ? "Ошибка!" : ""}
     </Button>
   )
 }
@@ -71,8 +71,8 @@ const QrView = ({ src }) => {
     ]);
   }
 
-  const handleUrlCopyButtonClick = () => {
-    navigator.clipboard.writeText(src);
+  const handleUrlCopyButtonClick = async () => {
+    await navigator.clipboard.writeText(src);
   }
 
   return (

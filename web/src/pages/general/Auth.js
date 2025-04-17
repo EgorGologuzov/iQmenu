@@ -1,20 +1,39 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form';
+import { useQuery, useMutation } from '@tanstack/react-query'
+import {auth} from '../../data/static/user'
+import useIQmenuApi from '../../hooks/useIQmenuApi';
 import {
   FormControl,
-  InputLabel,
+  CheckIcon,
   Stack,
   Typography,
   IconButton,
   Button,
-  TextField
+  TextField,
+  Alert
 } from '@mui/material';
 import Logo from '../../components/icons/Logo';
 import PasswordInput from '../../components/inputs/PasswordInput';
 import { useNavigate } from 'react-router';
 
 function Auth() {
-
   const navigate = useNavigate();
+  const api=useIQmenuApi(); 
+  const {
+    register,
+    handleSubmit,
+    getValues,
+  } = useForm();
+
+  const { mutate: authorizeUser, error: mutationError, isPending: isMutationPending, status }=useMutation({
+    mutationFn: (data)=>api.user.auth(data),
+    mutationKey: ['Auth'],
+  })
+
+  const onSubmit = async () => {
+    authorizeUser(getValues(),{onSuccess: (data)=> console.log(data)})
+  }
 
   return (
     <Stack spacing={2} width={'100%'} maxWidth="sm" borderRadius={1} bgcolor={'white'} padding={'10px'} boxShadow={'0 30px 40px rgba(0,0,0,.2)'}>
@@ -24,32 +43,43 @@ function Auth() {
         </IconButton>
         <Typography variant='h5' paddingBottom={'5px'} sx={{ textShadow: '-1px 4px black' }} align='center' color='primary.contrastText'>Авторизация</Typography>
       </Stack>
-      <FormControl
-        fullWidth
-        variant="outlined"
-        color='primary'>
-        <TextField
-          type='text'
-          id="phone"
-          size="small"
-          label="Телефон"
-        />
-      </FormControl>
-      <FormControl
-        fullWidth
-        variant="outlined"
-        color='primary'>
-        <PasswordInput
-          id="password"
-          size="small"
-          label="Пароль"
-        />
-      </FormControl>
-      <FormControl>
-        <Button variant='contained' color='primary'>
-          Войти
-        </Button>
-      </FormControl>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={2}>
+        <FormControl
+          fullWidth
+          variant="outlined"
+          required
+          color='primary'>
+          <TextField
+            type='text'
+            id="phone"
+            size="small"
+            required
+            label="Телефон"
+            {...register('phone',{required:true})}
+          />
+        </FormControl>
+        <FormControl
+          fullWidth
+          variant="outlined"
+          color='primary'
+          required>
+          <PasswordInput
+            id="password"
+            autoComplete='current-password'
+            size="small"
+            label="Пароль"
+            {...register('password',{required:true})}
+          />
+        </FormControl>
+        <FormControl>
+          <Button variant='contained' type='submit' color='primary' loading={isMutationPending}>
+            Войти
+          </Button>
+        </FormControl>
+        </Stack>
+      </form>
+      {mutationError&&<Alert severity="error">{mutationError.message}</Alert>}
       <Button variant='text' color='secondary' onClick={() => navigate('/reg')}>
         Зарегистрироваться
       </Button>

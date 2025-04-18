@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useForm } from 'react-hook-form';
-import { useQuery, useMutation } from '@tanstack/react-query'
-import {auth} from '../../data/static/user'
+import { useMutation } from '@tanstack/react-query'
 import useIQmenuApi from '../../hooks/useIQmenuApi';
+import { useDispatch } from 'react-redux';
 import {
   FormControl,
-  CheckIcon,
   Stack,
   Typography,
   IconButton,
@@ -26,13 +25,17 @@ function Auth() {
     getValues,
   } = useForm();
 
-  const { mutate: authorizeUser, error: mutationError, isPending: isMutationPending, status }=useMutation({
+  const { mutate: authorizeUser, error: mutationError, isPending: isMutationPending }=useMutation({
     mutationFn: (data)=>api.user.auth(data),
     mutationKey: ['Auth'],
   })
 
   const onSubmit = async () => {
-    authorizeUser(getValues(),{onSuccess: (data)=> console.log(data)})
+    authorizeUser(getValues(),{onSuccess: (data)=> 
+    {
+      console.log(localStorage.getItem('userSlice/user'))
+    }
+  })
   }
 
   return (

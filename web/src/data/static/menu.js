@@ -35,5 +35,7 @@ export const MENU_SERVICE = {
   
   async update(id, menuData){},
   async delete(id){},
-  async getUsersMenus(userId){},
+  async getUsersMenus(userId){
+    return menus
+  },
 }

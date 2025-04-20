@@ -1,8 +1,7 @@
 import React from 'react'
 import {
   FormControl,
-  InputLabel,
-  OutlinedInput,
+  Alert,
   Stack,
   Typography,
   IconButton,
@@ -14,8 +13,10 @@ import Logo from '../../components/icons/Logo';
 import PasswordInput from '../../components/inputs/PasswordInput';
 import { useNavigate } from 'react-router';
 import useIQmenuApi from '../../hooks/useIQmenuApi';
+import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import { setUserData } from '../../store/slices/userSlice';
 
 function Reg() {
   const navigate = useNavigate();
@@ -29,8 +30,18 @@ function Reg() {
     formState:{errors}
   } = useForm();
 
+  const { mutate: registerUser, error: mutationError, isPending: isMutationPending }=useMutation({
+    mutationFn: (data)=>api.user.reg(data),
+    mutationKey: ['Reg'],
+  })
+
   const onSubmit = async () => {
-    console.log('fdlfkj')
+    registerUser(getValues(),{onSuccess: (data)=> 
+        {
+          dispatch(setUserData(data))
+          navigate('/o');
+        }
+      })
   }
 
   return (
@@ -52,7 +63,7 @@ function Reg() {
             error={errors.phone && errors.phone.type === 'pattern'}
             helperText={errors.phone && errors.phone.type === 'pattern' && errors.phone.message}
             {...register('phone',{pattern:{
-              value: /^(\+|)(7|8)( |)\d{3}( |)\d{3}( |)(\d{2}( |)){2}$/,
+              value: /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/,
               message: 'Введите российский номер.'
             }})}/>
           </FormControl>
@@ -98,13 +109,13 @@ function Reg() {
           </FormControl>
 
           <FormControl>
-            <Button variant='contained' color='primary' type='submit'>
+            <Button variant='contained' color='primary' type='submit' loading={isMutationPending}>
               Зарегистрироваться
             </Button>
           </FormControl>
         </Stack>
       </form>
-
+      {mutationError&&<Alert severity="error">{mutationError.message}</Alert>}
       <Button variant='text'color='secondary' onClick={() => navigate("/auth")}>
         Войти в аккаунт
       </Button>

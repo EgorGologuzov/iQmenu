@@ -15,10 +15,12 @@ import {
 import Logo from '../../components/icons/Logo';
 import PasswordInput from '../../components/inputs/PasswordInput';
 import { useNavigate } from 'react-router';
+import { setUserData } from '../../store/slices/userSlice';
 
 function Auth() {
   const navigate = useNavigate();
   const api=useIQmenuApi(); 
+  const dispatch=useDispatch();
   const {
     register,
     handleSubmit,
@@ -34,6 +36,8 @@ function Auth() {
     authorizeUser(getValues(),{onSuccess: (data)=> 
     {
       console.log(localStorage.getItem('userSlice/user'))
+      dispatch(setUserData(data))
+      navigate('/o');
     }
   })
   }

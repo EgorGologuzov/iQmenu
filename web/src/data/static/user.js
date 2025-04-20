@@ -27,7 +27,13 @@ export const USER_SERVICE = {
   async reg(regData){
     await sleep(1000);
 
-    return regData;
+    if (!OWNER_TEST_CREDENTIALS.find((owner)=>owner.phone===regData.phone)){
+      // {код вставки пользователя в бд}
+      // ниже будем возвращать нового зареганого пользователя(пока будет фейковый)
+      return OWNER_USER_DATA_FOR_TEST;
+    }
+
+    throw new Error("Тестовая ошибка: пользователь с таким телефоном уже существует")
   },
   async update(userData){},
 }

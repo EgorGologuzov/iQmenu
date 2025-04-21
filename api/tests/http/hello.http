@@ -1,0 +1,5 @@
+GET http://localhost:4200/api/hello
+
+###
+
+GET http://localhost:4200/api/notfound

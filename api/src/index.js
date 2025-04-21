@@ -1,17 +1,18 @@
 import express from 'express'
+import { userRouter } from './routes/userRouter.js';
+import { menuRouter } from './routes/menuRouter.js';
+import { mediaRouter } from './routes/mediaRouter.js';
 
 const APP_RUN_PORT = 4200;
 
-const app = express()
+const app = express();
 
 const main = async () => {
   app.use(express.json());
 
-  app.get('/api/hello', (req, res) => {
-    res
-      .status(200)
-      .json({ message: "Hello!" })
-  })
+  app.use("/api/user", userRouter);
+  app.use("/api/menu", menuRouter);
+  app.use("/api/media", mediaRouter);
 
   app.all('/*notfound', (req, res) => {
     res
@@ -24,4 +25,4 @@ const main = async () => {
   })
 }
 
-main()
+main();

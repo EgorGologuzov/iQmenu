@@ -1,0 +1,11 @@
+###
+
+POST http://localhost:4200/api/user/auth
+
+###
+
+POST http://localhost:4200/api/user/reg
+
+###
+
+PUT http://localhost:4200/api/user/update

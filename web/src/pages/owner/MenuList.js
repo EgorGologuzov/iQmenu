@@ -6,21 +6,29 @@ import MENU_3 from '../../data/static/json/menu-3.json'
 import EditIcon from '@mui/icons-material/Edit';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Card, Grid, CardMedia, CardContent, Typography, IconButton, CardActions, Stack, Button } from '@mui/material'
+import { Card, Grid, CardMedia, CardContent, Typography, IconButton, CardActions, Stack, Button, CircularProgress } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router'
 
 function MenuList() {
   const api=useIQmenuApi()
-  const testData=[MENU_1, MENU_2, MENU_3]
+  const userId=useSelector(state=>state.user.id)
+  const navigate = useNavigate();
+  const {data: menus, isLoading} = useQuery({
+    queryKey: ["MenuList/getUsersMenus"],
+    queryFn: () => api.menu.getUsersMenus(userId),
+  })
 
-  const MenuProduct=()=>{
-
+  if (isLoading){
+    return <CircularProgress sx={{display:'flex',placeSelf:'center', marginTop:2}}/>
   }
 
   return (
     <Stack maxWidth={'md'} justifySelf={'center'}  marginTop={4} spacing={1}  padding={'5px'}>
-      <Button variant='outlined' startIcon={<AddCircleIcon/>}>Создать меню</Button>
+      <Button variant='outlined' startIcon={<AddCircleIcon/>} onClick={()=>navigate('/o/menu/new')}>Создать меню</Button>
       <Grid container width={'100%'} spacing={2}>
-        {testData.map(menu=>
+        {menus.map(menu=>
           <Grid size={{ xs: 6, sm: 4}} key={menu.id}>
             <Card sx={{maxWidth:'100%', maxHeight: 'min-content', textAlign: 'center', p:1}}>
 
@@ -41,7 +49,7 @@ function MenuList() {
               </CardContent>
 
               <CardActions disableSpacing sx={{placeContent:'space-around', p:0}}>
-                <IconButton aria-label="add to favorites" size='large' >
+                <IconButton aria-label="add to favorites" size='large' onClick={()=>console.log(menu.id)}>
                   <EditIcon />
                 </IconButton>
                 <IconButton aria-label="share" size='large'>

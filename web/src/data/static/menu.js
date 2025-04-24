@@ -80,6 +80,6 @@ export const MENU_SERVICE = {
   async getUsersMenus(userId){
     await sleep(1000);
 
-    return menus
+    return MENUS;
   },
 }

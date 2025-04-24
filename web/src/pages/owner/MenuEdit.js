@@ -34,7 +34,7 @@ function MenuEdit() {
   const { menuId } = useParams();
 
   const { data: loadedMenu, isLoading: isMenuLoading, error: loadingError } = useQuery({
-    queryKey: ["MenuEdit/api.menu.getById"],
+    queryKey: ["MenuEdit/api.menu.getById", menuId],
     queryFn: () => api.menu.getById(menuId),
   })
 

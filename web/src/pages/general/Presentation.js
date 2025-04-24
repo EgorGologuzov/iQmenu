@@ -19,7 +19,7 @@ function TechStackCard({ tech, desc, image }) {
           sx={{ objectFit: 'contain' }}
           image={image}
         />
-        <CardContent alignContent='center' sx={{ padding: "0", paddingX: '5px' }}>
+        <CardContent sx={{ padding: "0", paddingX: '5px', alignContent: 'center' }}>
           <Typography variant="h6" component="div">
             {tech}
           </Typography>
@@ -52,7 +52,7 @@ function Presentation() {
   return (
     <Stack alignItems={'center'} textAlign={'center'} spacing={2}>
 
-      <Stack alignItems={'center'} textAlign={'center'} spacing={2} sx={{ pt: 6, pb: 18 }}>
+      <Stack spacing={2} sx={{ height: "calc(100vh - 144px)", textAlign: "center", alignItems: "center", justifyContent: "center" }}>
         <SvgIcon
           inheritViewBox
           sx={{ width: 150, height: 150, backgroundColor: "primary.main", borderRadius: "50%", borderWidth: "3px", borderColor: "primary.main", borderStyle: "solid" }}

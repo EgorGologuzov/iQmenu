@@ -77,5 +77,9 @@ export const MENU_SERVICE = {
     return current;
   },
   
-  async getUsersMenus(userId){},
+  async getUsersMenus(userId){
+    await sleep(1000);
+
+    return menus
+  },
 }

@@ -1,21 +1,48 @@
 import React from 'react'
 import {
   FormControl,
-  InputLabel,
-  OutlinedInput,
+  Alert,
   Stack,
   Typography,
   IconButton,
   Button,
-  TextField
+  TextField,
+  FormHelperText
 } from '@mui/material';
 import Logo from '../../components/icons/Logo';
 import PasswordInput from '../../components/inputs/PasswordInput';
 import { useNavigate } from 'react-router';
+import useIQmenuApi from '../../hooks/useIQmenuApi';
+import { useMutation } from '@tanstack/react-query'
+import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../../store/slices/userSlice';
 
 function Reg() {
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const api=useIQmenuApi(); 
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    watch,
+    formState:{errors}
+  } = useForm({mode:'onChange'});
+
+  const { mutate: registerUser, error: mutationError, isPending: isMutationPending }=useMutation({
+    mutationFn: (data)=>api.user.reg(data),
+    mutationKey: ['Reg'],
+  })
+
+  const onSubmit = async () => {
+    registerUser(getValues(),{onSuccess: (data)=> 
+        {
+          dispatch(setUserData(data))
+          navigate('/o');
+        }
+      })
+  }
 
   return (
     <Stack spacing={2} width={'100%'} maxWidth="sm" borderRadius={'10px 10px 5px 5px'} bgcolor={'white'} padding={'10px'} boxShadow={'0 30px 40px rgba(0,0,0,.2)'}>
@@ -26,42 +53,69 @@ function Reg() {
         <Typography variant='h5' paddingBottom={'5px'} sx={{ textShadow: '-1px 4px black' }} align='center' color='primary.contrastText'>Регистрация</Typography>
       </Stack>
 
-      <FormControl
-        fullWidth
-        color='primary'>
-        <TextField id="phone" label="Телефон" size='small' />
-      </FormControl>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={2}>
+          <FormControl
+            fullWidth
+            color='primary'
+            >
+            <TextField id="phone" label="Телефон" size='small' required
+            error={errors.phone && errors.phone.type === 'pattern'}
+            helperText={errors.phone && errors.phone.type === 'pattern' && errors.phone.message}
+            {...register('phone',{pattern:{
+              value: /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/,
+              message: 'Введите российский номер.'
+            }})}/>
+          </FormControl>
 
-      <FormControl
-        fullWidth
-        color='primary'>
-        <TextField id="email" label="E-mail" size='small' />
-      </FormControl>
+          <FormControl
+            fullWidth
+            color='primary'>
+            <TextField id="email" label="E-mail" size='small' required error={errors.email && errors.email.type === 'pattern'}
+            helperText={errors.email && errors.email.type === 'pattern' && errors.email.message}
+            {...register('email',{required:true, pattern: {
+              value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+              message: 'Неправильный адрес электронной почты.',
+            }})}/>
+          </FormControl>
 
-      <FormControl
-        fullWidth
-        color='primary'>
-        <TextField id="username" label="Имя" helperText="Как к вам обращаться?" size='small' />
-      </FormControl>
+          <FormControl
+            fullWidth
+            color='primary'>
+            <TextField id="username" label="Имя" helperText="Как к вам обращаться?" size='small' required
+            {...register('username')}/>
+          </FormControl>
 
-      <FormControl
-        fullWidth
-        color='primary'>
-        <PasswordInput id="password" label="Пароль" size='small' />
-      </FormControl>
+          <FormControl
+            fullWidth
+            color='primary' required
+            error={errors.passwordRepeat}>
+            <PasswordInput id="password" label="Пароль" size='small'
+            {...register('password')}/>
+          </FormControl>
 
-      <FormControl
-        fullWidth
-        color='primary'>
-        <PasswordInput id="passwordRepeat" label="Повторите пароль" size='small' />
-      </FormControl>
+          <FormControl
+            fullWidth
+            color='primary' required
+            error={errors.passwordRepeat}>
+            <PasswordInput id="passwordRepeat" label="Повторите пароль" size='small'
+            {...register('passwordRepeat',{validate:(value)=>{
+              if (watch('password')!==value){
+                return 'Пароли не совпадают'
+              }
+            }})}
+            />
+            {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat.message}</FormHelperText>}
+          </FormControl>
 
-      <FormControl>
-        <Button variant='contained' color='primary'>
-          Зарегистрироваться
-        </Button>
-      </FormControl>
-
+          <FormControl>
+            <Button variant='contained' color='primary' type='submit' loading={isMutationPending}>
+              Зарегистрироваться
+            </Button>
+          </FormControl>
+        </Stack>
+      </form>
+      {mutationError&&<Alert severity="error">{mutationError.message}</Alert>}
       <Button variant='text'color='secondary' onClick={() => navigate("/auth")}>
         Войти в аккаунт
       </Button>

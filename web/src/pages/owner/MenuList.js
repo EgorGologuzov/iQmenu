@@ -49,7 +49,7 @@ function MenuList() {
               </CardContent>
 
               <CardActions disableSpacing sx={{placeContent:'space-around', p:0}}>
-                <IconButton aria-label="add to favorites" size='large' onClick={()=>console.log(menu.id)}>
+                <IconButton aria-label="add to favorites" size='large' onClick={()=>navigate(`/o/menu/${menu.id}/edit`)}>
                   <EditIcon />
                 </IconButton>
                 <IconButton aria-label="share" size='large'>

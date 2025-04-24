@@ -1,45 +1,66 @@
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  TextField,
+  TextField as TextFieldOriginal,
   Stack,
   Dialog,
   DialogContent,
   DialogActions,
   Button,
   Chip,
-  Box
+  Box,
 } from '@mui/material';
-import SwitchInput from '../inputs/SwitchInput';
+import SwitchInputOriginal from '../inputs/SwitchInput';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { validateProduct } from '../../data/models/validation';
 import ImageInput from '../inputs/ImageInput';
 import { processProduct } from '../../data/models/processing';
 
+const TextField = memo(TextFieldOriginal);
+const SwitchInput = memo(SwitchInputOriginal);
+
+const CategoriesListItem = memo(({ category, isChecked, actions }) => {
+  const handleChipClick = () => actions.onClick(category);
+  return (
+    <Chip
+      key={category}
+      label={category}
+      icon={isChecked ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
+      color={isChecked ? "primary" : "default"}
+      onClick={handleChipClick}
+      sx={{ cursor: 'pointer' }}
+    />
+  )
+}, (prev, next) => {
+  return prev.category == next.category && prev.isChecked == next.isChecked && prev.actions == next.actions;
+})
+
 const CategoriesList = memo(({ productCategories, categories, onChange }) => {
 
+  const actions = useMemo(() => ({ onClick: null }), []);
+
+  const isChecked = (category) => {
+    return productCategories && productCategories.includes(category);
+  }
+
   const handleCategoryChipClick = (category) => {
-    if (includesCategory(category)) {
+    if (isChecked(category)) {
       onChange(productCategories.filter(c => c != category))
     } else {
       onChange([...(productCategories ?? []), category])
     }
   }
 
-  const includesCategory = (category) => {
-    return productCategories && productCategories.includes(category)
-  }
+  actions.onClick = handleCategoryChipClick;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "row", flexWrap: "wrap", width: "100%", gap: 1 }}>
       {categories && categories.map(category => (
-        <Chip
+        <CategoriesListItem
           key={category}
-          label={category}
-          icon={includesCategory(category) ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
-          color={includesCategory(category) ? "primary" : "default"}
-          onClick={() => handleCategoryChipClick(category)}
-          sx={{ cursor: 'pointer' }}
+          category={category}
+          isChecked={isChecked(category)}
+          actions={actions}
         />
       ))}
     </Box>
@@ -57,6 +78,10 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
       [name]: type === 'checkbox' ? checked : value
     }));
   }, []);
+
+  const handleImageChange = useCallback((file) => {
+    setEditedProduct(prev => ({ ...prev, image: file }));
+  }, [])
 
   const handleCancelButtonClick = () => {
     setEditedProduct(null);
@@ -80,7 +105,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
 
   const buildedProduct = processProduct({ ...editedProduct, categories: editedProductCategories });
   const { isValid, errors } = validateProduct(buildedProduct);
-  const isProductNameDublicate = products.some(p => 
+  const isProductNameDublicate = products.some(p =>
     p.name === buildedProduct.name && p.id != buildedProduct.id
   );
 
@@ -91,20 +116,20 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
 
           <ImageInput
             image={editedProduct.image}
-            onChange={file => setEditedProduct({ ...editedProduct, image: file })}
+            onChange={handleImageChange}
           />
 
           <SwitchInput
             name="isActive"
             label="Есть в наличии"
-            checked={editedProduct.isActive}
+            checked={editedProduct.isActive ?? true}
             onChange={handleChange}
           />
 
           <TextField
             name="name"
             label="Название"
-            value={editedProduct.name}
+            value={editedProduct.name ?? ""}
             onChange={handleChange}
             fullWidth
             required
@@ -118,7 +143,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             name="price"
             label="Цена (руб)"
             type="number"
-            value={editedProduct.price}
+            value={editedProduct.price ?? ""}
             onChange={handleChange}
             fullWidth
             required
@@ -138,7 +163,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
             name="weight"
             label="Вес (г)"
             type="number"
-            value={editedProduct.weight}
+            value={editedProduct.weight ?? ""}
             onChange={handleChange}
             fullWidth
             margin="normal"
@@ -150,7 +175,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
           <TextField
             name="composition"
             label="Состав"
-            value={editedProduct.composition}
+            value={editedProduct.composition ?? ""}
             onChange={handleChange}
             fullWidth
             margin="normal"
@@ -164,7 +189,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
           <TextField
             name="description"
             label="Описание"
-            value={editedProduct.description}
+            value={editedProduct.description ?? ""}
             onChange={handleChange}
             fullWidth
             margin="normal"
@@ -184,7 +209,7 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
           variant="contained"
           disabled={isProductNameDublicate || !isValid}
         >
-          Сохранить
+          ОК
         </Button>
       </DialogActions>
     </Dialog>

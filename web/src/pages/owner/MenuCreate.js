@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { deepCopy } from '../../utils/utils'
 import { MENU_CREATE_TEMPLATE } from '../../values/default'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
-import { Alert, Button, Divider, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, Divider, Stack, TextField } from '@mui/material';
 import useTitle from '../../hooks/useTitle';
 import ImageInput from '../../components/inputs/ImageInput';
 import SwitchInput from '../../components/inputs/SwitchInput';
@@ -13,10 +13,12 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { validateMenu } from '../../data/models/validation';
 import { processMenu } from '../../data/models/processing';
+import { compareMenu } from '../../data/models/comparation';
+import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
 
 function MenuCreate() {
   const [menu, setMenu] = useState(deepCopy(MENU_CREATE_TEMPLATE));
-  const [image, setImage] = useState({ data: menu.image });
+  const [image, setImage] = useState(menu.image);
   const [categories, setCategories] = useState(menu.categories);
   const [products, setProducts] = useState(menu.products);
 
@@ -25,28 +27,26 @@ function MenuCreate() {
 
   const { mutate: createMenu, error: mutationError, isPending: isMutationPending } = useMutation({
     mutationFn: (menuData) => api.menu.create(menuData),
-    mutationKey: ["MenuCreate/menu"],
-    onSuccess: (createdMenu) => navigate(`/o/menu/${createdMenu.id}/edit`, { replace: true })
+    mutationKey: ["MenuCreate/api.menu.create"],
+    onSuccess: () => navigate(`/o/menu`, { replace: true })
   });
 
   const buildedMenu = processMenu({ ...menu, image: image, categories: categories, products: products });
-
-  const handleCreateButtonClick = () => {
-    createMenu(buildedMenu);
-  }
-
   const { isValid, errors } = validateMenu(buildedMenu);
+  const isChanged = !compareMenu(buildedMenu, MENU_CREATE_TEMPLATE);
 
   useTitle({ general: "Новое меню" }, []);
 
+  useUnsavedChangesWarning(menu && !isChanged);
+
   return (
-    <Stack direction="column" spacing={2} width="100%" maxWidth={500}>
+    <Stack direction="column" spacing={2} sx={{ width: "100%", maxWidth: "sm" }}>
 
       <SwitchInput
         id="isActive"
         label="Опубликовать:"
         checked={menu.isActive}
-        onChange={useCallback(event => setMenu({ ...menu, isActive: event.target.checked }), [menu])}
+        onChange={event => setMenu({ ...menu, isActive: event.target.checked })}
       />
 
       <TextField
@@ -54,7 +54,7 @@ function MenuCreate() {
         label="Название заведения"
         required
         value={menu.companyName ?? ""}
-        onChange={useCallback(event => setMenu({ ...menu, companyName: event.target.value  }), [menu])}
+        onChange={event => setMenu({ ...menu, companyName: event.target.value })}
         error={errors.companyName}
         helperText={errors.companyName}
         size="small"
@@ -65,7 +65,7 @@ function MenuCreate() {
         label="Название меню"
         required
         value={menu.menuName ?? ""}
-        onChange={useCallback(event => setMenu({ ...menu, menuName: event.target.value }), [menu])}
+        onChange={event => setMenu({ ...menu, menuName: event.target.value })}
         error={errors.menuName}
         helperText={errors.menuName}
         size="small"
@@ -96,13 +96,13 @@ function MenuCreate() {
         helperText={errors.products}
       />
 
-    <Divider />
+      <Divider />
 
       {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
 
       <Button
         variant="contained"
-        onClick={handleCreateButtonClick}
+        onClick={() => createMenu(buildedMenu)}
         loading={isMutationPending}
         loadingPosition="center"
         disabled={isMutationPending || !isValid}
@@ -117,10 +117,6 @@ function MenuCreate() {
       >
         Вернуться назад
       </Button>
-
-      <Typography component="div" variant="body1">
-        {JSON.stringify(buildedMenu, null, " ")}
-      </Typography>
 
     </Stack>
   )

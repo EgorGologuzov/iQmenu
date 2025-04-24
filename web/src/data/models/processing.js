@@ -1,4 +1,4 @@
-import { asInSentense, deepCopy } from "../../utils/utils";
+import { asInSentense } from "../../utils/utils";
 
 export function processProduct(p) {
   if (!p) return;
@@ -24,7 +24,7 @@ export function processMenu(m) {
 
   m.isActive = !!m.isActive;
   m.menuName = m.menuName ? asInSentense(m.menuName.trim()) : undefined;
-  m.commanyName = m.commanyName ? asInSentense(m.commanyName.trim()) : undefined;
+  m.companyName = m.companyName ? asInSentense(m.companyName.trim()) : undefined;
   m.categories = m.categories && m.categories.length ? m.categories : undefined;
   m.image = m.image ? m.image : undefined;
 

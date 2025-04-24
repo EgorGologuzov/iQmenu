@@ -30,7 +30,29 @@ import withInputShell from '../../hoc/withInputShell';
 import { validateCategory } from '../../data/models/validation';
 import { processCategory } from '../../data/models/processing';
 
-const SortableItem = ({ id, category, onDelete }) => {
+const SortableItemContent = memo(({ category, listeners }) => {
+  return (
+    <>
+      <IconButton {...listeners} sx={{ touchAction: 'none', }}>
+        <DragIndicatorIcon />
+      </IconButton>
+      <ListItemText primary={category} />
+    </>
+  )
+})
+
+const SortableItemSecondaryActions = memo(({ category, actions }) => {
+  const handleDeleteButtonClick = () => actions.onDelete(category);
+  return (
+    <IconButton edge="end" onClick={handleDeleteButtonClick}>
+      <DeleteIcon />
+    </IconButton>
+  )
+}, (prev, next) => {
+  return prev.category == next.category && prev.actions == next.actions;
+})
+
+const SortableItem = ({ id, category, actions }) => {
   const {
     attributes,
     listeners,
@@ -40,17 +62,16 @@ const SortableItem = ({ id, category, onDelete }) => {
     isDragging
   } = useSortable({ id });
 
-  const deleteButton = (
-    <IconButton edge="end" onClick={() => onDelete(id)}>
-      <DeleteIcon />
-    </IconButton>
-  )
-
   return (
     <ListItem
       ref={setNodeRef}
       {...attributes}
-      secondaryAction={deleteButton}
+      secondaryAction={
+        <SortableItemSecondaryActions
+          category={category}
+          actions={actions}
+        />
+      }
       sx={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -61,10 +82,10 @@ const SortableItem = ({ id, category, onDelete }) => {
         pl: 0
       }}
     >
-      <IconButton {...listeners} sx={{ touchAction: 'none', }}>
-        <DragIndicatorIcon />
-      </IconButton>
-      <ListItemText primary={category} />
+      <SortableItemContent
+        category={category}
+        listeners={listeners}
+      />
     </ListItem>
   );
 };
@@ -72,6 +93,11 @@ const SortableItem = ({ id, category, onDelete }) => {
 const CategoriesInput = ({ categories, onChange }) => {
   const [newCategory, setNewCategory] = useState('');
   const [activeId, setActiveId] = useState(null);
+  const [actions, _] = useState({ onDelete: null });
+
+  const processedNewCategory = processCategory(newCategory);
+  const { isValid, errors } = validateCategory(processedNewCategory) ?? { isValid: true, errors: {} };
+  const isDublicate = categories && categories.includes(processedNewCategory);
 
   const setCategories = (categories) => {
     onChange && onChange(categories);
@@ -83,14 +109,14 @@ const CategoriesInput = ({ categories, onChange }) => {
   );
 
   const handleAddCategory = () => {
-    const updatedCategories = [...(categories ?? []), processCategory(newCategory)];
+    const updatedCategories = [...(categories ?? []), processedNewCategory];
     setCategories(updatedCategories);
     setNewCategory('');
   };
 
-  const handleDeleteCategory = (id) => {
+  const handleDeleteCategory = (category) => {
     if (categories) {
-      const updatedCategories = categories.filter((_, index) => index !== id);
+      const updatedCategories = categories.filter(c => c !== category);
       setCategories(updatedCategories);
     }
   };
@@ -106,8 +132,7 @@ const CategoriesInput = ({ categories, onChange }) => {
     setActiveId(null);
   };
 
-  const { isValid, errors } = validateCategory(newCategory) ?? { isValid: true, errors: {} };
-  const isDublicate = categories && categories.includes(processCategory(newCategory));
+  actions.onDelete = handleDeleteCategory;
 
   return (
     <Stack direction="column" spacing={1}>
@@ -148,7 +173,7 @@ const CategoriesInput = ({ categories, onChange }) => {
                 key={category}
                 id={index}
                 category={category}
-                onDelete={handleDeleteCategory}
+                actions={actions}
               />
             ))}
           </List>

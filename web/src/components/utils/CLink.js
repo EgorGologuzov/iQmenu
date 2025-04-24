@@ -1,14 +1,21 @@
-import { Link as MuiLink } from '@mui/material'
-import React from 'react'
-import { Link as RrLink } from 'react-router'
+import { Link } from '@mui/material'
+import { useNavigate } from 'react-router'
 
-const CLink = ({ children, to }) => {
-  return (
-    <RrLink to={to}>
-      <MuiLink color='secondary'>
+const CLink = ({ children, to, options, color="secondary", noStyles=false }) => {
+  const navigate = useNavigate();
+
+  if (noStyles) {
+    return (
+      <div onClick={() => navigate(to, options)} >
         {children}
-      </MuiLink>
-    </RrLink>
+      </div>
+    )
+  }
+
+  return (
+    <Link color={color} onClick={() => navigate(to, options)} >
+      {children}
+    </Link>
   )
 }
 

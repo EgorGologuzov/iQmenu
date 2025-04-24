@@ -28,7 +28,7 @@ function Reg() {
     getValues,
     watch,
     formState:{errors}
-  } = useForm();
+  } = useForm({mode:'onChange'});
 
   const { mutate: registerUser, error: mutationError, isPending: isMutationPending }=useMutation({
     mutationFn: (data)=>api.user.reg(data),

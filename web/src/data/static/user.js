@@ -1,5 +1,6 @@
 import { sleep } from "../../utils/utils"
 import { OWNER_USER_DATA_FOR_TEST } from "../../values/roles";
+import { deepCopy } from "../../utils/utils";
 
 const OWNER_TEST_CREDENTIALS = [
   {
@@ -35,5 +36,13 @@ export const USER_SERVICE = {
 
     throw new Error("Тестовая ошибка: пользователь с таким телефоном уже существует")
   },
-  async update(userData){},
+  async update(userData){
+    await sleep(1000);
+      const data=deepCopy(OWNER_USER_DATA_FOR_TEST)
+      data.avatar=userData.avatar;
+      data.email=userData.email;
+      data.name=userData.name;
+      
+      return data;
+  },
 }

@@ -5,6 +5,14 @@ POST http://localhost:4200/api/user/auth
 ###
 
 POST http://localhost:4200/api/user/reg
+content-type: application/json
+
+{
+  "phone": "+7 (000) 000-00-00",
+  "email": "egor@mail.com",
+  "name": "My name",
+  "password": "1234567890"
+}
 
 ###
 

@@ -4,6 +4,7 @@ import { userRouter } from './routes/userRouter.js'
 import { menuRouter } from './routes/menuRouter.js'
 import { mediaRouter } from './routes/mediaRouter.js'
 import mongoose from 'mongoose'
+import { notFound } from './utils/responses.js'
 
 dotenv.config();
 
@@ -17,9 +18,7 @@ const main = async () => {
   app.use("/api/menu", menuRouter);
   app.use("/api/media", mediaRouter);
   
-  app.all('/*notfound', (req, res) => {
-    res.status(404).json({ message: "Такого эндпоинта нет..." })
-  })
+  app.all('/*notfound', (req, res) => notFound(res, "Такого эндпоинта нет..."));
 
   app.listen(process.env.APP_RUN_PORT, () => console.log(`Server is running on http://localhost:${process.env.APP_RUN_PORT}`));
 

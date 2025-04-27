@@ -1,0 +1,35 @@
+### Auth
+
+POST http://localhost:4200/api/user/auth
+content-type: application/json
+
+{
+  "phone": "+7 (000) 000-00-00",
+  "password": "12345678"
+}
+
+### Reg
+
+POST http://localhost:4200/api/user/reg
+content-type: application/json
+
+{
+  "phone": " + 7 (000) 000-00-00 ",
+  "email": "  example@example.com  ",
+  "name": "  Пользователь 1  ",
+  "password": "12345678",
+  "avatar": "https://example.com/avatar"
+}
+
+### Update
+
+PUT http://localhost:4200/api/user/update
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWEzN2QzNTQxZGMyYTFjZjYyOWYiLCJpYXQiOjE3NDU3NTQ2ODB9.itiqU7QJdIjhCTQe65oKW9sTKMYvOyjPcKv--uph2RA
+content-type: application/json
+
+{
+  "phone": " + 7 (000) 000-00-00 ",
+  "email": "  example@example.com  ",
+  "name": "  Пользователь 1  ",
+  "avatar": null
+}

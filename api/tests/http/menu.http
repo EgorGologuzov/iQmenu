@@ -1,0 +1,19 @@
+###
+
+GET http://localhost:4200/api/menu/1
+
+###
+
+POST http://localhost:4200/api/menu
+
+###
+
+PUT http://localhost:4200/api/menu/1
+
+###
+
+DELETE http://localhost:4200/api/menu/1
+
+###
+
+GET http://localhost:4200/api/menu/list/1

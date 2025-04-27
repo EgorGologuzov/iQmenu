@@ -15,7 +15,23 @@ use('iqmenu')
 db.users.find()
 
 // Найти по id
-// db.users.find({ _id: ObjectId('680d254b4d8b5b8ba0b5f721') })
+// db.users.find({
+//   _id: ObjectId('680e1a15d3541dc2a1cf6298')
+// })
+
+// Найти $or
+// db.users.find({
+//   $or: [
+//     { _id: ObjectId('680e1a15d3541dc2a1cf6298') },
+//     { phone: '+70000000001' }
+//   ]
+// })
+
+// Обновить активность
+// db.users.updateOne(
+//   { _id: ObjectId('680e1a15d3541dc2a1cf6298') },
+//   { $set: { isActive: false } }
+// )
 
 // Удалить по номерам
 // db.users.deleteMany({ phone: { $in: ["+70000000001"] } })

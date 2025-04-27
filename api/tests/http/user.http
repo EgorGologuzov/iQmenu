@@ -4,7 +4,7 @@ POST http://localhost:4200/api/user/auth
 content-type: application/json
 
 {
-  "phone": "+7 (000) 000-00-04",
+  "phone": "+7 (000) 000-00-00",
   "password": "12345678"
 }
 
@@ -14,7 +14,7 @@ POST http://localhost:4200/api/user/reg
 content-type: application/json
 
 {
-  "phone": " + 7 (000) 000-00-04 ",
+  "phone": " + 7 (000) 000-00-00 ",
   "email": "  example@example.com  ",
   "name": "  Пользователь 1  ",
   "password": "12345678",
@@ -28,8 +28,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlM
 content-type: application/json
 
 {
-  "phone": " + 7 (000) 000-00-01 ",
+  "phone": " + 7 (000) 000-00-00 ",
   "email": "  example@example.com  ",
   "name": "  Пользователь 1  ",
-  "avatar": "1234"
+  "avatar": null
 }

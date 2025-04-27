@@ -4,7 +4,7 @@ POST http://localhost:4200/api/user/auth
 content-type: application/json
 
 {
-  "phone": "+7 (000) 000-00-00",
+  "phone": "+7 (000) 000-00-04",
   "password": "12345678"
 }
 
@@ -14,8 +14,8 @@ POST http://localhost:4200/api/user/reg
 content-type: application/json
 
 {
-  "phone": "+7 (000) 000-00-04",
-  "email": "example@example.com",
+  "phone": " + 7 (000) 000-00-04 ",
+  "email": "  example@example.com  ",
   "name": "  Пользователь 1  ",
   "password": "12345678",
   "avatar": "https://example.com/avatar"
@@ -24,12 +24,12 @@ content-type: application/json
 ### Update
 
 PUT http://localhost:4200/api/user/update
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBkMjU0YjRkOGI1YjhiYTBiNWY3MjEiLCJpYXQiOjE3NDU2OTE5Nzl9.jQQ54oqZ4aG3slVQvPrV-UZXnLclo0rv24Oq4K6Wg38
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWEzN2QzNTQxZGMyYTFjZjYyOWYiLCJpYXQiOjE3NDU3NTQ2ODB9.itiqU7QJdIjhCTQe65oKW9sTKMYvOyjPcKv--uph2RA
+content-type: application/json
 
 {
-  "phone": "+7 (000) 000-00-09",
-  "email": "example@example.com",
+  "phone": " + 7 (000) 000-00-01 ",
+  "email": "  example@example.com  ",
   "name": "  Пользователь 1  ",
-  "password": "12345678",
-  "avatar": "https://example.com/avatar"
+  "avatar": "1234"
 }

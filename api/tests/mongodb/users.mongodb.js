@@ -15,10 +15,10 @@ use('iqmenu')
 db.users.find()
 
 // Найти по id
-// db.users.find({ _id: ObjectId('680b97a3fd54bb9d885ce079') })
+// db.users.find({ _id: ObjectId('680d254b4d8b5b8ba0b5f721') })
 
 // Удалить по номерам
-// db.users.deleteMany({ phone: { $in: ["+7 (000) 000-00-00", "+7 (000) 000-00-01"] } })
+// db.users.deleteMany({ phone: { $in: ["+70000000001"] } })
 
 // Удалить все
 // db.users.deleteMany({})

@@ -2,15 +2,20 @@
 
 Для настройки и запуска API смотри [api.md](api.md)
 
+## Содержание
+
+- [Пользователи](#пользователи)
+  - [Авторизация](#авторизация)
+  - [Регистрация](#регистрация)
+  - [Обновление](#обновление)
+
 ## Пользователи
 
 ### Авторизация
 
 Авторизация владельца.
 
-Путь: `/api/user/auth`
-
-Авторизация: `нет`
+Метод: `POST` Путь: `/api/user/auth` Авторизация: `нет`
 
 Схема запроса (модель Auth):
 ```js
@@ -58,9 +63,7 @@ content-type: application/json
 
 Регистрация владельца.
 
-Путь: `/api/user/reg`
-
-Авторизация: `нет`
+Метод: `POST` Путь: `/api/user/reg` Авторизация: `нет`
 
 Схема запроса (модель UserCreate):
 ```js
@@ -112,9 +115,7 @@ content-type: application/json
 
 Обновление данных пользователя.
 
-Путь: `/api/user/update`
-
-Авторизация: `есть`
+Метод: `PUT` Путь: `/api/user/update` Авторизация: `есть`
 
 Схема запроса (модель UserUpdate):
 ```js
@@ -148,11 +149,45 @@ content-type: application/json
 
 **Ответ 422: Ошибка в полях запроса**
 
-**Ответ 400: Пользователь, которому принадлежит токен не найден в БД**
+**Ответ 404: Пользователь, которому принадлежит токен не найден в БД**
 
 **Ответ 400: Не уникальный номер телефона**
 
-**Ответ 200: Авторизация прошла успешно**
+**Ответ 200: Обновление прошло успешно**
+
+Схема ответа (модель UserReturn):
+```js
+{
+  id: { type: "string", valid: true },
+  phone: { type: "string", valid: true },
+  email: { type: "string", valid: true },
+  name: { type: "string", valid: true },
+  isActive: { type: "boolean", valid: true },
+  createAt: { type: "datetime", valid: true },
+  apiAccessToken: { type: "string", valid: true },
+  role: { type: "string", valid: true },
+  avatar: { type: "string", valid: true },
+}
+```
+
+### Актуализация данных
+
+Получение данных о пользователе по id из токена.
+
+Метод: `GET` Путь: `/api/user/me` Авторизация: `есть`
+
+Особенности:
+- Запрос не требует параметров или тела, Id пользователя берется из токена авторизации (`user.apiAccessToken`)
+
+Пример запроса:
+```http
+GET http://localhost:4200/api/user/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWEzN2QzNTQxZGMyYTFjZjYyOWYiLCJpYXQiOjE3NDU3NTQ2ODB9.itiqU7QJdIjhCTQe65oKW9sTKMYvOyjPcKv--uph2RA
+```
+
+**Ответ 404: Пользователь, которому принадлежит токен не найден в БД**
+
+**Ответ 200: Данные найдены и возвращены**
 
 Схема ответа (модель UserReturn):
 ```js
@@ -187,9 +222,10 @@ content-type: application/json
 Схема ответа (модель ErrorsReturn):
 ```js
 {
-  errors: { // содержит объект, с названиями ошибочных полей из запроса в качестве ключей
+  errors: { // содержит объект-словарь, с названиями ошибочных полей из запроса в качестве ключей
     type: "dict",
-    schema: { // каждый ключ ошибочного поля содержит информацию об ошибке в виде такой схемы
+    valid: true,
+    itemSchema: { // каждый ключ ошибочного поля содержит информацию об ошибке в виде такой схемы
       given: { type: "any", valid: true },    // переданное значение
       error: { type: "string", valid: true }, // сообщение о проблеме
     }

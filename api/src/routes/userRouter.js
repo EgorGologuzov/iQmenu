@@ -1,6 +1,6 @@
 import Router from 'express'
 import { Auth, User, UserCreate, UserReturn, UserTokenData, UserUpdate } from '../models/userModels.js'
-import { badRequest, forbidden, ok, unauthorized } from '../utils/responses.js';
+import { badRequest, forbidden, notFound, ok, unauthorized } from '../utils/responses.js';
 import { generateToken } from '../utils/jwt.js';
 import { useAuth } from '../middlewares/useAuth.js';
 import { useModel } from '../middlewares/useModel.js';
@@ -9,6 +9,7 @@ import { hashPassword } from '../utils/cryptography.js';
 
 const r = new Router();
 
+// auth
 
 r.post("/auth", useModel(Auth), async (req, res) => {
   
@@ -30,6 +31,7 @@ r.post("/auth", useModel(Auth), async (req, res) => {
 
 })
 
+// reg
 
 r.post("/reg", useModel(UserCreate), async (req, res) => {
 
@@ -53,6 +55,7 @@ r.post("/reg", useModel(UserCreate), async (req, res) => {
 
 })
 
+// update
 
 r.put("/update", useAuth, useModel(UserUpdate), async (req, res) => {
   
@@ -64,7 +67,7 @@ r.put("/update", useAuth, useModel(UserUpdate), async (req, res) => {
   const foundByPhone = found.find(user => user.phone == updateModel.phone);
 
   if (!foundById) {
-    return badRequest(res, "Пользователь с таким id не найден. Проверьте актуальность токена.");
+    return notFound(res, "Пользователь с таким id не найден. Проверьте актуальность токена.");
   }
 
   if (foundByPhone && foundByPhone._id != foundById._id) {
@@ -75,6 +78,24 @@ r.put("/update", useAuth, useModel(UserUpdate), async (req, res) => {
   await foundById.save();
 
   const result = UserReturn.build(foundById).model;
+
+  return ok(res, result);
+
+})
+
+// me
+
+r.get("/me", useAuth, async (req, res) => {
+  
+  const { userId } = req.user;
+
+  const foundUser = await User.findById(userId);
+
+  if (!foundUser) {
+    return notFound(res, "Пользователь с таким id не найден. Токен не актуален.");
+  }
+
+  const result = UserReturn.build(foundUser).model;
 
   return ok(res, result);
 

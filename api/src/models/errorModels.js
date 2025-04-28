@@ -13,7 +13,8 @@ export const ErrorsReturn = Object.freeze({
   schema: {
     errors: {
       type: "dict",
-      schema: {
+      valid: true,
+      itemSchema: {
         given: { type: "any", valid: true },
         error: { type: "string", valid: true },
       }

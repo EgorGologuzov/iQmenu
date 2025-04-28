@@ -1,0 +1,33 @@
+{
+  "id": 1,
+  "owner": "hdj6sgehhdj6sgehhdj6sgeh",
+  "isActive": true,
+  "createAt": "2025-04-10 22:45:48.198",
+  "qr": "https://assets.turbologo.ru/blog/ru/2020/01/18163037/qr-kod.png",
+  "products": [
+    {
+      "name": "  название   ",
+      "price": "-420.890",
+      "isActive": false,
+      "categories": ["  основные "],
+      "weight": "799.99",
+      "description": "Классический салат с листьями айсберга, куриной грудкой и соусом Цезарь",
+      "composition": "Курица, айсберг, помидоры черри, пармезан, сухарики",
+      "image": "https://menunedeli.ru/wp-content/uploads/2022/07/41322293-5B97-451F-886E-2522AB91F67B-886x700.jpeg"
+    },
+    {
+      "name": "П2",
+      "field0": "value0",
+      "price": 350,
+      "isActive": true,
+      "categories": ["Десерты"],
+      "weight": 150,
+      "description": "Итальянский десерт с маскарпоне и кофейной пропиткой",
+      "image": "https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
+    }
+  ],
+  "companyName": "Кафе «Уют»",
+  "menuName": "Основное меню",
+  "categories": [" основные", " десерты", " закуски "],
+  "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg"
+}

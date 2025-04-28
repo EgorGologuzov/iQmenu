@@ -1,8 +1,9 @@
 import React from 'react'
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query'
 import useIQmenuApi from '../../hooks/useIQmenuApi';
 import { useDispatch } from 'react-redux';
+import { IMaskInput } from 'react-imask'
 import {
   FormControl,
   Stack,
@@ -10,7 +11,8 @@ import {
   IconButton,
   Button,
   TextField,
-  Alert
+  Alert,
+  FormHelperText,
 } from '@mui/material';
 import Logo from '../../components/icons/Logo';
 import PasswordInput from '../../components/inputs/PasswordInput';
@@ -23,9 +25,10 @@ function Auth() {
   const dispatch=useDispatch();
   const {
     register,
+    control,
     handleSubmit,
     getValues,
-  } = useForm();
+  } = useForm({mode:'onChange'});
 
   const { mutate: authorizeUser, error: mutationError, isPending: isMutationPending }=useMutation({
     mutationFn: (data)=>api.user.auth(data),
@@ -40,6 +43,20 @@ function Auth() {
       navigate('/o');
     }
   })
+  }
+
+  const PHONE_MASK = "+{7}(000)00-00-00";
+  function PhoneInputMask(props) {
+    const { inputRef, onChange, ...other } = props;
+    return (
+      <IMaskInput
+        {...other}
+        mask={PHONE_MASK}
+        inputRef={inputRef}
+        onAccept={(value) => onChange({ target: { value } })}
+        overwrite
+      />
+    );
   }
 
   return (
@@ -57,14 +74,21 @@ function Auth() {
           variant="outlined"
           required
           color='primary'>
-          <TextField
-            type='text'
-            id="phone"
-            size="small"
-            required
-            label="Телефон"
-            {...register('phone',{required:true})}
-          />
+           <Controller
+          name="phone"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Телефон"
+              variant="outlined"
+              size='small'
+              slotProps={{inputLabel:{shrink:true}, input:{inputComponent:PhoneInputMask}}}
+              required
+              placeholder="+7(___)___-__-__"
+            />
+          )}
+        />
         </FormControl>
         <FormControl
           fullWidth

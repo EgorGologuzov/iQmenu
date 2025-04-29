@@ -12,7 +12,7 @@
 use('iqmenu')
 
 // Получить все
-db.users.find()
+// db.users.find()
 
 // Найти по id
 // db.users.find({

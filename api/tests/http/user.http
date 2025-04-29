@@ -4,7 +4,7 @@ POST http://localhost:4200/api/user/auth
 content-type: application/json
 
 {
-  "phone": "+7 (000) 000-00-00",
+  "phone": "+7 (000) 000-00-02",
   "password": "12345678"
 }
 
@@ -24,12 +24,17 @@ content-type: application/json
 ### Update
 
 PUT http://localhost:4200/api/user/update
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWEzN2QzNTQxZGMyYTFjZjYyOWYiLCJpYXQiOjE3NDU3NTQ2ODB9.itiqU7QJdIjhCTQe65oKW9sTKMYvOyjPcKv--uph2RA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
 content-type: application/json
 
 {
-  "phone": " + 7 (000) 000-00-00 ",
+  "phone": " + 7 (000) 000-00-02 ",
   "email": "  example@example.com  ",
   "name": "  Пользователь 1  ",
   "avatar": null
 }
+
+### Actualize data
+
+GET http://localhost:4200/api/user/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA

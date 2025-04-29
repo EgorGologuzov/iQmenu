@@ -18,68 +18,73 @@ function hasDuplicates(array, comparator) {
   return false;
 }
 
-function castList(v, p) {
-  const e = {};
+function mapList(v, p) {
+  const errors = {};
   const itemType = typeof p.item.type;
 
   if (itemType === "object") {
     v = v.map((item, index) => {
-      if (p.item.notnull && item === null) {
-        e[index] = error(item, "null не может быть элементом этого списка");
-        return null;
+      if (item === null) {
+        if (p.item.notnull) {
+          errors[index] = error(item, "null - недопустимый элемент списка");
+        }
+        return item;
       }
       const { model, errors, isValid } = mapSchema(item, p.item.type.schema, p.item.type.setDefaults);
       if (!isValid) {
-        e[index] = errors;
+        errors[index] = errors;
       }
       return model;
     })
   }
 
-  if (itemType !== "object") {
+  if (itemType === "string") {
     v = v.map((item, index) => {
-      if (p.item.notnull && item === null) {
-        e[index] = error(item, "null не может быть элементом этого списка");
-        return null;
+      if (item === null) {
+        if (p.item.notnull) {
+          errors[index] = error(item, "null - недопустимый элемент списка");
+        }
+        return item;
       }
-      item = processValue(item, p.item, typeof item);
-      const err = validateValue(item, p.item, typeof item);
-      if (err) {
-        e[index] = err;
+      let e;
+      [item, e] = mapValue(item, p.item);
+      if (e) {
+        errors[index] = e;
       }
       return item;
     })
   }
 
-  return [v, Object.keys(e).length ? e : undefined];
+  return [v, Object.keys(errors).length ? errors : undefined];
 }
 
-function tryCastType(v, p, vType) {
+function tryCast(v, p) {
+  const vType = typeof v;
 
-  // cast string: number, boolean
-  if (vType === "string") {
-    if (p.type === "number") {
-      const number = Number(v);
-      v = number !== NaN ? number : v;
-      return [v, p.type];
-    }
-    if (p.type === "boolean") {
-      const lowerV = v.toLowerCase();
-      v = lowerV === "true" ? true : lowerV === "false" ? false : v;
-      return [v, p.type];
-    }
-  }
-
-  // cast object to special types
+  // cast object => list
   if (vType === "object") {
     if (p.type === "list" && v instanceof Array) {
       let e;
-      [v, e] = castList(v, p);
+      [v, e] = mapList(v, p);
       return [v, p.type, e];
     }
   }
 
-  return [v, typeof v];
+  // cast string => number | boolean
+  if (vType === "string") {
+    if (p.type === "number") {
+      const number = Number(v);
+      v = number !== NaN ? number : v;
+      return [v, p.type, undefined];
+    }
+    if (p.type === "boolean") {
+      const lowerV = v.toLowerCase();
+      v = lowerV === "true" ? true : lowerV === "false" ? false : v;
+      return [v, p.type, undefined];
+    }
+  }
+
+  return [v, undefined, error("Неверный тип данных")];
 }
 
 function processValue(v, p, vType) {
@@ -152,6 +157,43 @@ function validateValue(v, p, vType) {
   }
 }
 
+function mapValue(v, p) {
+
+  // если valid добавлем поле без проверок
+  if (p.valid) {
+    return [v, undefined];
+  }
+
+  // проверяем required, notnull
+  if (p.required && (v === undefined || v === null)) {
+    return [v, error(v, "Это поле обязательно")];
+  }
+  if (p.notnull && v === null) {
+    return [v, error(v, "null - недопустимое значение")];
+  }
+
+  // обрабатываем допустимые null и undefined
+  if (v === null || v === undefined) {
+    return [undefined, undefined];
+  }
+
+  let vType = typeof v;
+
+  if (p.type && vType !== p.type) {
+    let e;
+    [v, vType, e] = tryCast(v, p);
+    if (e) {
+      return [v, e];
+    }
+  }
+
+  // process and validate value
+  v = processValue(v, p, vType);
+  const e = validateValue(v, p, vType);
+
+  return [v, e];
+}
+
 export function mapSchema(source, schema, setDefaults = model => undefined) {
 
   if (!schema) {
@@ -163,84 +205,21 @@ export function mapSchema(source, schema, setDefaults = model => undefined) {
   }
 
   const model = {};
-  const e = {};
+  const errors = {};
 
   Object.keys(schema).forEach(key => {
-    let v = source[key];
-    const p = schema[key];
-
-    // если valid добавлем поле без проверок
-
-    if (p.valid) {
-      model[key] = v;
-      return;
-    }
-
-    // проверяем required, notnull
-
-    if (p.required && (v === undefined || v === null)) {
-      e[key] = error(v, "Это поле обязательно");
-      return;
-    }
-
-    if (p.notnull && v === null) {
-      e[key] = error(v, "null недопустимо для этого поля");
-      return;
-    }
-
-    // обрабатываем допустимые null и undefined
-
-    if (v === null) {
-      model[key] = undefined;
-      return;
-    }
-
-    if (v === undefined) {
-      return;
-    }
-
-    // проверяем тип данных, пытаемся скастить
-
-    let vType = typeof v;
-
-    if (p.type && vType !== p.type) {
-
-      const startedV = v;
-      let err;
-
-      [v, vType, err] = tryCastType(v, p, vType);
-
-      if (startedV === v) {
-        e[key] = error(v, "Неверный тип данных");
-        model[key] = v;
-        return;
-      }
-
-      if (err) {
-        e[key] = err;
-        model[key] = v;
-        return;
-      }
-    }
-
-    v = processValue(v, p, vType);
-
-    const err = validateValue(v, p, vType);
-    if (err) {
-      e[key] = err;
-      model[key] = v;
-      return;
-    }
-
+    const [v, e] = mapValue(source[key], schema[key]);
     model[key] = v;
-
+    if (e) {
+      errors[key] = e;
+    }
   });
 
-  const isValid = !Object.keys(e).find(key => !!e[key]);
+  const isValid = !Object.keys(errors).find(key => !!errors[key]);
 
   if (isValid && typeof setDefaults === "function") {
     setDefaults(model);
   }
 
-  return { model, errors: e, isValid };
+  return { model, errors, isValid };
 }

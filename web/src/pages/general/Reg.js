@@ -14,9 +14,10 @@ import PasswordInput from '../../components/inputs/PasswordInput';
 import { useNavigate } from 'react-router';
 import useIQmenuApi from '../../hooks/useIQmenuApi';
 import { useMutation } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../../store/slices/userSlice';
+import { IMaskInput } from 'react-imask'
 
 function Reg() {
   const navigate = useNavigate();
@@ -26,9 +27,10 @@ function Reg() {
     register,
     handleSubmit,
     getValues,
+    control,
     watch,
     formState:{errors}
-  } = useForm({mode:'onChange'});
+  } = useForm({mode:'onChange',criteriaMode:'all'});
 
   const { mutate: registerUser, error: mutationError, isPending: isMutationPending }=useMutation({
     mutationFn: (data)=>api.user.reg(data),
@@ -42,6 +44,20 @@ function Reg() {
           navigate('/o');
         }
       })
+  }
+
+  const PHONE_MASK = "+{7}(000)00-00-00";
+  function PhoneInputMask(props) {
+    const { inputRef, onChange, ...other } = props;
+    return (
+      <IMaskInput
+        {...other}
+        mask={PHONE_MASK}
+        inputRef={inputRef}
+        onAccept={(value) => onChange({ target: { value } })}
+        overwrite
+      />
+    );
   }
 
   return (
@@ -59,14 +75,31 @@ function Reg() {
             fullWidth
             color='primary'
             >
-            <TextField id="phone" label="Телефон" size='small' required
+            {/* <TextField id="phone" label="Телефон" size='small' required
             error={errors.phone && errors.phone.type === 'pattern'}
             helperText={errors.phone && errors.phone.type === 'pattern' && errors.phone.message}
             {...register('phone',{pattern:{
               value: /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/,
               message: 'Введите российский номер.'
-            }})}/>
+            }})}/> */}
+                <Controller
+              name="phone"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Телефон"
+                  variant="outlined"
+                  size='small'
+                  slotProps={{inputLabel:{shrink:true}, input:{inputComponent:PhoneInputMask}}}
+                  required
+                  placeholder="+7(___)___-__-__"
+                />
+              )}
+            />
           </FormControl>
+
+          
 
           <FormControl
             fullWidth
@@ -91,7 +124,7 @@ function Reg() {
             color='primary' required
             error={errors.passwordRepeat}>
             <PasswordInput id="password" label="Пароль" size='small'
-            {...register('password')}/>
+            {...register('password',{deps:'passwordRepeat'})}/>
           </FormControl>
 
           <FormControl
@@ -103,9 +136,14 @@ function Reg() {
               if (watch('password')!==value){
                 return 'Пароли не совпадают'
               }
+            },
+            minLength:{
+              value:8,
+              message: 'Минимальная длина пароля: 8 символов'
             }})}
             />
-            {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat.message}</FormHelperText>}
+              {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat.types.validate}</FormHelperText>}
+              {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat.types.minLength}</FormHelperText>}
           </FormControl>
 
           <FormControl>

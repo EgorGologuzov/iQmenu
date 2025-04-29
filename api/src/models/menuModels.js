@@ -17,24 +17,42 @@ const productSchema = new mongoose.Schema({
 });
 
 const menuSchema = new mongoose.Schema({
-  id: { type: Number, required: true, unique: true },
-  owner: { type: String, required: true },
+  code: { type: Number, required: true, unique: true },
+  ownerId: { type: String, required: true, index: true },
   isActive: { type: Boolean, required: true },
+  createAt: { type: Date, required: true },
   qr: { type: String, required: true },
   products: { type: [productSchema], required: true },
   companyName: { type: String },
   menuName: { type: String },
   categories: { type: [String] },
   image: { type: String }
-}, {
-  _id: false
 });
 
 export const Menu = mongoose.model("Menu", menuSchema);
 
 // Модели для API
 
-export const Product = Object.freeze({
+export const ProductReturn = Object.freeze({
+
+  schema: {
+    name: { type: "string", valid: true },
+    price: { type: "number", valid: true},
+    isActive: { type: "boolean", valid: true },
+    categories: {
+      type: "list",
+      item: { type: "string", valid: true },
+    },
+    weight: { type: "number", valid: true },
+    description: { type: "string", valid: true },
+    composition: { type: "string", valid: true },
+    image: { type: "string", valid: true }
+  },
+
+  build: source => mapSchema(source, ProductEdit.schema),
+})
+
+export const ProductEdit = Object.freeze({
 
   schema: {
     name: { type: "string", required: true, minLength: 1, maxLength: 50, trim: true, sentenseCase: true },
@@ -52,33 +70,44 @@ export const Product = Object.freeze({
     image: { type: "string", maxLength: 255 }
   },
 
-  build: source => mapSchema(source, Product.schema),
+  build: source => mapSchema(source, ProductEdit.schema),
 })
 
 export const MenuReturn = Object.freeze({
 
   schema: {
-    id: { type: "number", valid: true },
-    owner: { type: "string", valid: true },
+    id: { type: "number", valid: true, sourceName: "code" },
+    ownerId: { type: "string", valid: true },
     isActive: { type: "boolean", valid: true },
+    createAt: { type: "datetime", valid: true },
     qr: { type: "string", valid: true },
     products: {
       type: "list",
-      valid: true,
-      item: { type: Product }
+      item: { type: ProductReturn },
     },
     companyName: { type: "string", valid: true },
     menuName: { type: "string", valid: true },
     categories: {
       type: "list",
-      valid: true,
-      item: { type: "string" }
+      item: { type: "string" },
     },
     image: { type: "string", valid: true }
   },
 
   build: source => mapSchema(source, MenuReturn.schema),
 })
+
+export const MenuListReturn = {
+
+  schema: {
+    menus: {
+      type: "list",
+      item: { type: MenuReturn },
+    }
+  },
+
+  build: source => mapSchema(source, MenuListReturn.schema),
+}
 
 export const MenuCreate = Object.freeze({
 
@@ -89,7 +118,7 @@ export const MenuCreate = Object.freeze({
       required: true,
       minLength: 1,
       maxLength: 100,
-      item: { type: Product, notnull: true },
+      item: { type: ProductEdit, notnull: true },
       uniqueItems: true,
       itemsComparator: (p1, p2) => p1.name == p2.name,
     },
@@ -105,11 +134,10 @@ export const MenuCreate = Object.freeze({
   },
 
   setDefaults(menu) {
-    // невозможно из-за await
-    // menu.id = await Menu.findOne({ id: 1 }).sort("-LAST_MOD").exec();
+    menu.createAt = new Date();
   },
 
-  build: source => mapSchema(source, MenuCreate.schema),
+  build: source => mapSchema(source, MenuCreate.schema, MenuCreate.setDefaults),
 })
 
 export const MenuUpdate = Object.freeze({
@@ -121,7 +149,7 @@ export const MenuUpdate = Object.freeze({
       notnull: true,
       minLength: 1,
       maxLength: 100,
-      item: { type: Product, notnull: true },
+      item: { type: ProductEdit, notnull: true },
       uniqueItems: true,
       itemsComparator: (p1, p2) => p1.name == p2.name,
     },
@@ -136,5 +164,5 @@ export const MenuUpdate = Object.freeze({
     image: { type: "string", maxLength: 255 }
   },
 
-  build: source => mapSchema(source, MenuCreate.schema),
+  build: source => mapSchema(source, MenuUpdate.schema),
 })

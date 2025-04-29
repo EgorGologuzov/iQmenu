@@ -57,7 +57,7 @@ r.post("/reg", useModel(UserCreate), async (req, res) => {
 
 // update
 
-r.put("/update", useAuth, useModel(UserUpdate), async (req, res) => {
+r.put("/update", useAuth(), useModel(UserUpdate), async (req, res) => {
   
   const { userId } = req.user;
   const updateModel = req.model;
@@ -85,7 +85,7 @@ r.put("/update", useAuth, useModel(UserUpdate), async (req, res) => {
 
 // me
 
-r.get("/me", useAuth, async (req, res) => {
+r.get("/me", useAuth(), async (req, res) => {
   
   const { userId } = req.user;
 

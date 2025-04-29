@@ -30,9 +30,9 @@ function mapList(v, p) {
         }
         return item;
       }
-      const { model, errors, isValid } = mapSchema(item, p.item.type.schema, p.item.type.setDefaults);
+      const { model, errors: mapErrors, isValid } = mapSchema(item, p.item.type.schema, p.item.type.setDefaults);
       if (!isValid) {
-        errors[index] = errors;
+        errors[index] = mapErrors;
       }
       return model;
     })
@@ -208,8 +208,20 @@ export function mapSchema(source, schema, setDefaults = model => undefined) {
   const errors = {};
 
   Object.keys(schema).forEach(key => {
-    const [v, e] = mapValue(source[key], schema[key]);
-    model[key] = v;
+    const p = schema[key];
+    let value = source[key];
+
+    // handle sourceName prop
+    if (p.sourceName) {
+      value = source[p.sourceName];
+    }
+
+    const [v, e] = mapValue(value, p);
+
+    if (value !== undefined) {
+      model[key] = v;
+    }
+
     if (e) {
       errors[key] = e;
     }

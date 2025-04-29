@@ -1,38 +1,6 @@
+import { MenuCreate } from "../../src/models/menuModels.js";
 import { mapSchema } from "../../src/utils/schema.js";
 import { test } from "./tools.js";
-
-const exampleModel = {
-  "id": 1,
-  "owner": "123e4567-e89b-12d3-a456-426614174000",
-  "isActive": true,
-  "createAt": "2025-04-10 22:45:48.198",
-  "qr": "https://assets.turbologo.ru/blog/ru/2020/01/18163037/qr-kod.png",
-  "products": [
-    {
-      "name": "Цезарь с курицей",
-      "price": 420,
-      "isActive": false,
-      "categories": ["Основные"],
-      "weight": 280,
-      "description": "Классический салат с листьями айсберга, куриной грудкой и соусом Цезарь",
-      "composition": "Курица, айсберг, помидоры черри, пармезан, сухарики",
-      "image": "https://menunedeli.ru/wp-content/uploads/2022/07/41322293-5B97-451F-886E-2522AB91F67B-886x700.jpeg"
-    },
-    {
-      "name": "Тирамису",
-      "price": 350,
-      "isActive": true,
-      "categories": ["Десерты"],
-      "weight": 150,
-      "description": "Итальянский десерт с маскарпоне и кофейной пропиткой",
-      "image": "https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
-    },
-  ],
-  "companyName": "Кафе «Уют»",
-  "menuName": "Основное меню Основное меню Основное меню",
-  "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
-  "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg"
-}
 
 export const schemaTests = [
 
@@ -200,5 +168,13 @@ export const schemaTests = [
     const { model, errors, isValid } = mapSchema(source, schema);
     test(errors.field[0]).isNotEqual(undefined);
     test(errors.field[1]).isEqual(undefined);
+  },
+
+  function listItem_typeModel_handling() {
+    const itemModel = { schema: { name: { type: "string", maxLength: 3 } } }
+    const schema = { field: { type: "list", item: { type: itemModel } } };
+    const source = { field: [{ name: "1" }, { name: "123" }, { name: "12345" },] };
+    const { model, errors, isValid } = mapSchema(source, schema);
+    test(errors.field[2]).isNotEqual(undefined);
   },
 ]

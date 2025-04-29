@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { mapSchema } from "../utils/schema.js";
+import { makeModel, mapSchema } from "../utils/schema.js";
 import { hashPassword } from "../utils/cryptography.js";
 
 // Модель базы данных
@@ -22,7 +22,7 @@ export const User = mongoose.model("User", userSchema);
 
 // Модели для API
 
-export const Auth = Object.freeze({
+export const Auth = makeModel({
 
   schema: {
     phone: { type: "string", required: true, clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ },
@@ -32,7 +32,7 @@ export const Auth = Object.freeze({
   build: source => mapSchema(source, Auth.schema),
 })
 
-export const UserTokenData = Object.freeze({
+export const UserTokenData = makeModel({
 
   schema: {
     userId: { type: "string", required: true },
@@ -41,7 +41,7 @@ export const UserTokenData = Object.freeze({
   build: source => ({ model: { userId: source.id } })
 })
 
-export const UserReturn = Object.freeze({
+export const UserReturn = makeModel({
 
   schema: {
     id: { type: "string", valid: true },
@@ -58,7 +58,7 @@ export const UserReturn = Object.freeze({
   build: source => mapSchema(source, UserReturn.schema),
 })
 
-export const UserCreate = Object.freeze({
+export const UserCreate = makeModel({
 
   schema: {
     phone: { type: "string", required: true, clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ },
@@ -79,7 +79,7 @@ export const UserCreate = Object.freeze({
   build: source => mapSchema(source, UserCreate.schema, UserCreate.setDefaults),
 })
 
-export const UserUpdate = Object.freeze({
+export const UserUpdate = makeModel({
 
   schema: {
     phone: { type: "string", notnull: true, clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ },

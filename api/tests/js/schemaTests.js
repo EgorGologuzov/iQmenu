@@ -1,5 +1,5 @@
 import { MenuCreate } from "../../src/models/menuModels.js";
-import { mapSchema } from "../../src/utils/schema.js";
+import { makeModel, mapSchema } from "../../src/utils/schema.js";
 import { test } from "./tools.js";
 
 export const schemaTests = [
@@ -92,7 +92,7 @@ export const schemaTests = [
     const { model, errors, isValid } = mapSchema(source, schema);
     test(model.field).isEqual(1);
   },
-  
+
   function notnull_error() {
     const schema = { field: { type: "string", notnull: true } };
     const source = { field: null };
@@ -101,7 +101,7 @@ export const schemaTests = [
   },
 
   // list tests
-  
+
   function list_minLength_error() {
     const schema = { field: { type: "list", item: { type: "string" }, minLength: 2 } };
     const source = { field: ["123"] };
@@ -131,13 +131,21 @@ export const schemaTests = [
     test(errors.field).isNotEqual(undefined);
   },
 
+  function list_emptyString_error() {
+    const schema = { field: { type: "list", item: { type: "string", minLength: 1, maxLength: 3 } } };
+    const source = { field: ["", " 1 ", " 1234 "] };
+    const { model, errors, isValid } = mapSchema(source, schema);
+    test(errors.field[0]).isNotEqual(undefined);
+    test(errors.field[2]).isNotEqual(undefined);
+  },
+
   function listItem_notnull_error() {
     const schema = { field: { type: "list", item: { type: "string", notnull: true } } };
     const source = { field: ["123", null, "123"] };
     const { model, errors, isValid } = mapSchema(source, schema);
     test(errors.field[1]).isNotEqual(undefined);
   },
-  
+
   function listItem_trim_convert() {
     const schema = { field: { type: "list", item: { type: "string", trim: true } } };
     const source = { field: ["  a  ", "  b  "] };
@@ -153,7 +161,7 @@ export const schemaTests = [
     test(model.field[0]).isEqual(0);
     test(model.field[1]).isEqual(1);
   },
-  
+
   function listItem_convertedValueRound_convert() {
     const schema = { field: { type: "list", item: { type: "number", round: true } } };
     const source = { field: ["0.1", "0.9"] };
@@ -163,7 +171,7 @@ export const schemaTests = [
   },
 
   function listItem_regExpAndClear_error() {
-    const schema = { field: { type: "list", item: { type: "string", clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ } } };
+    const schema = makeModel({ field: { type: "list", item: { type: "string", clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ } } });
     const source = { field: ["not valid phone", "+ 7 (000) 000-00-00"] };
     const { model, errors, isValid } = mapSchema(source, schema);
     test(errors.field[0]).isNotEqual(undefined);

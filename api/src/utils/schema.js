@@ -235,3 +235,20 @@ export function mapSchema(source, schema, setDefaults = model => undefined) {
 
   return { model, errors, isValid };
 }
+
+function deepFreeze(o) {
+
+  Object.values(o).forEach(v => {
+    if (Object.isFrozen(v) || v instanceof RegExp) {
+      return;
+    }
+
+    deepFreeze(v);
+  });
+
+  return Object.freeze(o);
+}
+
+export function makeModel(model) {
+  return deepFreeze(model);
+}

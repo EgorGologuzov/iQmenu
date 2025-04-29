@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { mapSchema } from "../utils/schema.js";
+import { makeModel, mapSchema } from "../utils/schema.js";
 
 // Модель базы данных
 
@@ -33,7 +33,7 @@ export const Menu = mongoose.model("Menu", menuSchema);
 
 // Модели для API
 
-export const ProductReturn = Object.freeze({
+export const ProductReturn = makeModel({
 
   schema: {
     name: { type: "string", valid: true },
@@ -52,7 +52,7 @@ export const ProductReturn = Object.freeze({
   build: source => mapSchema(source, ProductEdit.schema),
 })
 
-export const ProductEdit = Object.freeze({
+export const ProductEdit = makeModel({
 
   schema: {
     name: { type: "string", required: true, minLength: 1, maxLength: 50, trim: true, sentenseCase: true },
@@ -60,7 +60,7 @@ export const ProductEdit = Object.freeze({
     isActive: { type: "boolean", required: true },
     categories: {
       type: "list",
-      item: { type: "string", maxLength: 15, trim: true, notnull: true, sentenseCase: true },
+      item: { type: "string", minLength: 1, maxLength: 15, trim: true, notnull: true, sentenseCase: true },
       maxLength: 30,
       uniqueItems: true
     },
@@ -73,7 +73,7 @@ export const ProductEdit = Object.freeze({
   build: source => mapSchema(source, ProductEdit.schema),
 })
 
-export const MenuReturn = Object.freeze({
+export const MenuReturn = makeModel({
 
   schema: {
     id: { type: "number", valid: true, sourceName: "code" },
@@ -97,19 +97,35 @@ export const MenuReturn = Object.freeze({
   build: source => mapSchema(source, MenuReturn.schema),
 })
 
-export const MenuListReturn = {
+export const MinimizedMenuReturn = makeModel({
+
+  schema: {
+    id: { type: "number", valid: true, sourceName: "code" },
+    ownerId: { type: "string", valid: true },
+    isActive: { type: "boolean", valid: true },
+    createAt: { type: "datetime", valid: true },
+    qr: { type: "string", valid: true },
+    companyName: { type: "string", valid: true },
+    menuName: { type: "string", valid: true },
+    image: { type: "string", valid: true }
+  },
+
+  build: source => mapSchema(source, MinimizedMenuReturn.schema),
+})
+
+export const MenuListReturn = makeModel({
 
   schema: {
     menus: {
       type: "list",
-      item: { type: MenuReturn },
+      item: { type: MinimizedMenuReturn },
     }
   },
 
   build: source => mapSchema(source, MenuListReturn.schema),
-}
+})
 
-export const MenuCreate = Object.freeze({
+export const MenuCreate = makeModel({
 
   schema: {
     isActive: { type: "boolean", required: true },
@@ -126,7 +142,7 @@ export const MenuCreate = Object.freeze({
     menuName: { type: "string", required: true, trim: true, minLength: 1, maxLength: 100 },
     categories: {
       type: "list",
-      item: { type: "string", maxLength: 30, trim: true, notnull: true, sentenseCase: true },
+      item: { type: "string", minLength: 1, maxLength: 30, trim: true, notnull: true, sentenseCase: true },
       maxLength: 30,
       uniqueItems: true
     },
@@ -140,7 +156,7 @@ export const MenuCreate = Object.freeze({
   build: source => mapSchema(source, MenuCreate.schema, MenuCreate.setDefaults),
 })
 
-export const MenuUpdate = Object.freeze({
+export const MenuUpdate = makeModel({
 
   schema: {
     isActive: { type: "boolean", notnull: true },
@@ -157,7 +173,7 @@ export const MenuUpdate = Object.freeze({
     menuName: { type: "string", notnull: true, trim: true, minLength: 1, maxLength: 100 },
     categories: {
       type: "list",
-      item: { type: "string", maxLength: 30, trim: true, notnull: true, sentenseCase: true },
+      item: { type: "string", minLength: 1, maxLength: 30, trim: true, notnull: true, sentenseCase: true },
       maxLength: 30,
       uniqueItems: true
     },

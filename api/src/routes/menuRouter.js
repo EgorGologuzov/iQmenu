@@ -4,6 +4,7 @@ import { useModel } from '../middlewares/useModel.js';
 import { Menu, MenuCreate, MenuListReturn, MenuReturn, MenuUpdate } from '../models/menuModels.js';
 import { forbidden, notFound, ok } from '../utils/responses.js';
 import { useIntegerParam } from '../middlewares/useParam.js';
+import { generateQrCode } from '../utils/qr.js';
 
 
 const r = new Router();
@@ -41,9 +42,12 @@ r.post("/", useAuth(), useModel(MenuCreate), async (req, res) => {
   const { userId } = req.user;
   const createModel = req.model;
 
-  createModel.code = (await Menu.aggregate([{ $group: { _id: null, maxCode: { $max: "$code" }}}]).exec())[0].maxCode + 1;
+  const foundMax = await Menu.aggregate([{ $group: { _id: null, maxCode: { $max: "$code" }}}]).exec();
+  const nextCode = foundMax && foundMax.length ? foundMax[0].maxCode + 1 : 1;
+
+  createModel.code = nextCode;
   createModel.ownerId = userId;
-  createModel.qr = "https://example.com/qr";
+  createModel.qr = await generateQrCode(createModel.code);
 
   const newMenu = await Menu.create(createModel);
 

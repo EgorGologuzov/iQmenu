@@ -1,6 +1,6 @@
-###
+### Get by id
 
-GET http://localhost:4200/api/menu/1
+GET http://localhost:4200/api/menu/2
 
 ### Create
 
@@ -10,7 +10,6 @@ content-type: application/json
 
 {
   "isActive": true,
-  "createAt": "2025-04-10 22:45:48.198",
   "products": [
     {
       "name": "Цезарь с курицей",
@@ -38,14 +37,48 @@ content-type: application/json
   "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg"
 }
 
-###
+### Update
 
 PUT http://localhost:4200/api/menu/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+content-type: application/json
 
-###
+{
+  "isActive": false,
+  "createAt": "2024-04-29T12:38:32.609Z",
+  "products": [
+    {
+      "name": "Цезарь с курицей 2",
+      "price": 420,
+      "isActive": false,
+      "categories": ["Основные", "  new category  "],
+      "weight": 280,
+      "description": "Классический салат с листьями айсберга, куриной грудкой и соусом Цезарь",
+      "composition": "Курица, айсберг, помидоры черри, пармезан, сухарики",
+      "image": "https://menunedeli.ru/wp-content/uploads/2022/07/41322293-5B97-451F-886E-2522AB91F67B-886x700.jpeg"
+    },
+    {
+      "name": "Тирамису",
+      "price": 350,
+      "isActive": true,
+      "categories": ["Десерты"],
+      "weight": 150,
+      "description": "Итальянский десерт с маскарпоне и кофейной пропиткой",
+      "image": "https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
+    }
+  ],
+  "companyName": "Кафе «Уют»",
+  "menuName": "Основное меню",
+  "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
+  "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg"
+}
 
-DELETE http://localhost:4200/api/menu/1
+### Delete
 
-###
+DELETE http://localhost:4200/api/menu/7
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
 
-GET http://localhost:4200/api/menu/list/1
+### Get all menu for one user (without products and categories)
+
+GET http://localhost:4200/api/menu/my
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA

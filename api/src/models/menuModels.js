@@ -37,7 +37,7 @@ export const ProductReturn = makeModel({
 
   schema: {
     name: { type: "string", valid: true },
-    price: { type: "number", valid: true},
+    price: { type: "number", valid: true },
     isActive: { type: "boolean", valid: true },
     categories: {
       type: "list",
@@ -182,3 +182,28 @@ export const MenuUpdate = makeModel({
 
   build: source => mapSchema(source, MenuUpdate.schema),
 })
+
+// Полезные функции
+
+let maxMenuCode;
+let findMaxQuery;
+
+async function findMaxCode() {
+  const queryResult = await Menu.aggregate([{ $group: { _id: null, maxCode: { $max: "$code" } } }]).exec();
+  const maxCode = queryResult?.length ? queryResult[0].maxCode : 0;
+  maxMenuCode = maxCode;
+}
+
+export async function nextMenuCode() {
+
+  if (maxMenuCode !== undefined) {
+    return ++maxMenuCode;
+  }
+
+  if (!findMaxQuery) {
+    findMaxQuery = findMaxCode();
+  }
+
+  await findMaxQuery;
+  return await nextMenuCode();
+}

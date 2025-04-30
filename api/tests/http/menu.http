@@ -1,11 +1,16 @@
+### Переменные
+
+@baseUrl = http://localhost:4200
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODEyNTkwZmNjNWUyZjgxYzE3YWY0ZDEiLCJpYXQiOjE3NDYwMzI5MTJ9.D_SO3XtVZnqxwnoeqUfezYhe8VZGstJbxAxsJdc1EDA
+
 ### Get by id
 
-GET http://localhost:4200/api/menu/2
+GET {{baseUrl}}/api/menu/1
 
 ### Create
 
-POST http://localhost:4200/api/menu
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+POST {{baseUrl}}/api/menu
+Authorization: {{token}}
 content-type: application/json
 
 {
@@ -39,8 +44,8 @@ content-type: application/json
 
 ### Update
 
-PUT http://localhost:4200/api/menu/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+PUT {{baseUrl}}/api/menu/1
+Authorization: {{token}}
 content-type: application/json
 
 {
@@ -75,10 +80,10 @@ content-type: application/json
 
 ### Delete
 
-DELETE http://localhost:4200/api/menu/7
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+DELETE {{baseUrl}}/api/menu/1
+Authorization: {{token}}
 
 ### Get all menu for one user (without products and categories)
 
-GET http://localhost:4200/api/menu/my
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+GET {{baseUrl}}/api/menu/my
+Authorization: {{token}}

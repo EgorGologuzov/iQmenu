@@ -1,20 +1,25 @@
+### Переменные
+
+@baseUrl = http://localhost:4200
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODEyNTkwZmNjNWUyZjgxYzE3YWY0ZDEiLCJpYXQiOjE3NDYwMzI5MTJ9.D_SO3XtVZnqxwnoeqUfezYhe8VZGstJbxAxsJdc1EDA
+
 ### Корректная загрузка изображения
 
-POST http://localhost:4200/api/media/image
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+POST {{baseUrl}}/api/media/image
+Authorization: {{token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="image"; filename="eagle_1MB.png"
-Content-Type: image/png
+Content-Disposition: form-data; name="image"; filename="city_245KB.jpg"
+Content-Type: image/jpeg
 
-< ../assets/eagle_1MB.png
+< ../assets/city_245KB.jpg
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ### Слишком большой файл
 
-POST http://localhost:4200/api/media/image
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+POST {{baseUrl}}/api/media/image
+Authorization: {{token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -26,8 +31,8 @@ Content-Type: image/png
 
 ### Неверный тип контента
 
-POST http://localhost:4200/api/media/image
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+POST {{baseUrl}}/api/media/image
+Authorization: {{token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -39,5 +44,5 @@ Content-Type: application/xml
 
 ### Без контента
 
-POST http://localhost:4200/api/media/image
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+POST {{baseUrl}}/api/media/image
+Authorization: {{token}}

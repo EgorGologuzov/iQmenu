@@ -41,3 +41,9 @@ export function requestEntityTooLarge(res, message = 'Превышен макс�
     .status(413)
     .json(ErrorReturn.build(message).model)
 }
+
+export function internalServerError(res, message = 'При выполнении запроса что-то пошло не так. Попробуйте позже или обратитесь к администратору.') {
+  res
+    .status(500)
+    .json(ErrorReturn.build(message).model)
+}

@@ -1,7 +1,7 @@
 import Router from 'express'
 import { useAuth } from '../middlewares/useAuth.js';
 import { useModel } from '../middlewares/useModel.js';
-import { Menu, MenuCreate, MenuListReturn, MenuReturn, MenuUpdate } from '../models/menuModels.js';
+import { Menu, MenuCreate, MenuListReturn, MenuReturn, MenuUpdate, nextMenuCode } from '../models/menuModels.js';
 import { forbidden, notFound, ok } from '../utils/responses.js';
 import { useIntegerParam } from '../middlewares/useParam.js';
 import { generateQrCode } from '../utils/qr.js';
@@ -42,10 +42,7 @@ r.post("/", useAuth(), useModel(MenuCreate), async (req, res) => {
   const { userId } = req.user;
   const createModel = req.model;
 
-  const foundMax = await Menu.aggregate([{ $group: { _id: null, maxCode: { $max: "$code" }}}]).exec();
-  const nextCode = foundMax && foundMax.length ? foundMax[0].maxCode + 1 : 1;
-
-  createModel.code = nextCode;
+  createModel.code = await nextMenuCode();
   createModel.ownerId = userId;
   createModel.qr = await generateQrCode(createModel.code);
 

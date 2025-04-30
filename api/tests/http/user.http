@@ -1,6 +1,11 @@
-### Auth
+### Переменные
 
-POST http://localhost:4200/api/user/auth
+@baseUrl = http://localhost:4200
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODEyNTkwZmNjNWUyZjgxYzE3YWY0ZDEiLCJpYXQiOjE3NDYwMzI5MTJ9.D_SO3XtVZnqxwnoeqUfezYhe8VZGstJbxAxsJdc1EDA
+
+### Авторизация
+
+POST {{baseUrl}}/api/user/auth
 content-type: application/json
 
 {
@@ -8,33 +13,33 @@ content-type: application/json
   "password": "12345678"
 }
 
-### Reg
+### Регистрация
 
-POST http://localhost:4200/api/user/reg
+POST {{baseUrl}}/api/user/reg
 content-type: application/json
 
 {
-  "phone": " + 7 (000) 000-00-00 ",
+  "phone": " + 7 (000) 000-00-10 ",
   "email": "  example@example.com  ",
   "name": "  Пользователь 1  ",
   "password": "12345678",
   "avatar": "https://example.com/avatar"
 }
 
-### Update
+### Обновление данных аккаунта
 
-PUT http://localhost:4200/api/user/update
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+PUT {{baseUrl}}/api/user/update
+Authorization: {{token}}
 content-type: application/json
 
 {
   "phone": " + 7 (000) 000-00-02 ",
   "email": "  example@example.com  ",
   "name": "  Пользователь 1  ",
-  "avatar": null
+  "avatar": "123"
 }
 
-### Actualize data
+### Актуализация данных аккаунта
 
-GET http://localhost:4200/api/user/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+GET {{baseUrl}}/api/user/me
+Authorization: {{token}}

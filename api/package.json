@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "nodemon src\\index.js",
-    "test": "node tests\\js\\run.js"
+    "test": "node tests\\js\\run.js",
+    "seed": "node scripts\\seed.js"
   },
   "keywords": [],
   "author": "",

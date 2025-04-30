@@ -12,13 +12,13 @@ export async function generateQrCode(menuId) {
   const url = new URL(`/${menuId}`, process.env.BASE_URL).href;
 
   await QrCode.toFile(filePath, url, {
-      color: {
-          dark: '#000000',
-          light: '#ffffff',
-      },
-      width: 512,
-      margin: 10
+    color: {
+      dark: '#000000',
+      light: '#ffffff',
+    },
+    width: 512,
+    margin: 10
   });
-  
+
   return `/public/qrs/${filename}`;
 }

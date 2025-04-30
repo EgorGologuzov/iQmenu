@@ -1,4 +1,3 @@
-import { MenuCreate } from "../../src/models/menuModels.js";
 import { makeModel, mapSchema } from "../../src/utils/schema.js";
 import { test } from "./tools.js";
 

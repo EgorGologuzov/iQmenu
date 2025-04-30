@@ -35,3 +35,9 @@ export function forbidden(res, message = 'Отказано в доступе') {
     .status(403)
     .json(ErrorReturn.build(message).model)
 }
+
+export function requestEntityTooLarge(res, message = 'Превышен максимальный размер контента') {
+  res
+    .status(413)
+    .json(ErrorReturn.build(message).model)
+}

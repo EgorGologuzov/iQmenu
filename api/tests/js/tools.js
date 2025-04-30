@@ -13,7 +13,7 @@ export function runAll(tests) {
       test();
       console.log(`\x1b[42m Passed ${counter}: \x1b[0m`, test.name);
     } catch (e) {
-      // if (!e.isFailedTest) { throw e; }
+      if (!e.isFailedTest) { throw e; }
       console.log(`\x1b[41m Failed ${counter}: \x1b[0m`, test.name, `(${e.message})`);
     }
 

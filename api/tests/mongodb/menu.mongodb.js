@@ -4,7 +4,7 @@
 use('iqmenu')
 
 // Получить все
-// db.menus.find()
+db.menus.find()
 
 // Найти максимальный
 // db.menus.aggregate([
@@ -15,4 +15,4 @@ use('iqmenu')
 // db.menus.dropIndex("id_1")
 
 // Удалить все
-db.menus.deleteMany({})
+// db.menus.deleteMany({})

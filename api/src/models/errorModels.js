@@ -1,5 +1,6 @@
+import { makeModel } from "../utils/schema.js"
 
-export const ErrorReturn = Object.freeze({
+export const ErrorReturn = makeModel({
 
   schema: {
     error: { type: "string", valid: true }
@@ -8,16 +9,22 @@ export const ErrorReturn = Object.freeze({
   build: message => ({ model: { error: message } }),
 })
 
-export const ErrorsReturn = Object.freeze({
+export const ValueErrorReturn = makeModel({
+
+  schema: {
+    given: { type: "any", valid: true },
+    error: { type: "string", valid: true },
+  },
+
+})
+
+export const ErrorsReturn = makeModel({
 
   schema: {
     errors: {
       type: "dict",
       valid: true,
-      itemSchema: {
-        given: { type: "any", valid: true },
-        error: { type: "string", valid: true },
-      }
+      item: { type: ValueErrorReturn }
     }
   },
 

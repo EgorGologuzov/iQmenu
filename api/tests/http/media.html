@@ -1,0 +1,26 @@
+<form id="uploadForm" enctype="multipart/form-data">
+  <input type="file" name="image" accept="image/*">
+  <button type="submit">Загрузить</button>
+</form>
+
+<script>
+  document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData();
+      formData.append('image', e.target.image.files[0]);
+
+      const response = await fetch('http://localhost:4200/api/media/image', {
+        method: 'POST',
+        body: formData
+      });
+
+      // const response = await fetch('http://localhost:4200/api/menu/2', {
+      //   method: 'GET',
+      // });
+      
+      // const result = await response.json();
+      
+      // console.log(response);
+  });
+</script>

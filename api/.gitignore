@@ -1,2 +1,6 @@
-/public/qrs/*.png
-/public/images/*.png
+
+/public/qrs/
+!/public/qrs/.hookfile
+
+/public/images/
+!/public/images/.hookfile

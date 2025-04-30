@@ -8,7 +8,8 @@
   - [Авторизация](#авторизация)
   - [Регистрация](#регистрация)
   - [Обновление](#обновление)
-
+- [Схемы ответов на коды 4**](#схемы-ответов-на-коды-4)
+_Пример запроса_
 ## Пользователи
 
 ### Авторизация
@@ -17,7 +18,9 @@
 
 Метод: `POST` Путь: `/api/user/auth` Авторизация: `нет`
 
-Схема запроса (модель Auth):
+_Схема запроса_:
+
+Модель Auth
 ```js
 {
   phone: { type: "string", required: true, clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ },
@@ -25,7 +28,7 @@
 }
 ```
 
-Пример запроса:
+_Пример запроса_:
 ```http
 POST http://localhost:4200/api/user/auth
 content-type: application/json
@@ -44,7 +47,9 @@ content-type: application/json
 
 **Ответ 200: Авторизация прошла успешно**
 
-Схема ответа (модель UserReturn):
+_Схема ответа_:
+
+Модель UserReturn
 ```js
 {
   id: { type: "string", valid: true },
@@ -65,7 +70,9 @@ content-type: application/json
 
 Метод: `POST` Путь: `/api/user/reg` Авторизация: `нет`
 
-Схема запроса (модель UserCreate):
+_Схема запроса_:
+
+Модель UserCreate
 ```js
 {
   phone: { type: "string", required: true, clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ },
@@ -76,7 +83,7 @@ content-type: application/json
 }
 ```
 
-Пример запроса:
+_Пример запроса_:
 ```http
 POST http://localhost:4200/api/user/reg
 content-type: application/json
@@ -96,7 +103,9 @@ content-type: application/json
 
 **Ответ 200: Регистрация прошла успешно**
 
-Схема ответа (модель UserReturn):
+_Схема ответа_:
+
+Модель UserReturn
 ```js
 {
   id: { type: "string", valid: true },
@@ -117,7 +126,9 @@ content-type: application/json
 
 Метод: `PUT` Путь: `/api/user/update` Авторизация: `есть`
 
-Схема запроса (модель UserUpdate):
+_Схема запроса_:
+
+Модель UserUpdate
 ```js
 {
   phone: { type: "string", notnull: true, clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ },
@@ -133,7 +144,7 @@ content-type: application/json
 - Обновяться только переданные поля, остальные сохранят прежние значения
 - notnull != required, notnull не позволяет передать `"field": null` в json объекте, но позволяет не указывать field вовсе, в таком случае при обновлении неуказанное поле не будет никак изменено. Если атрибут notnull не установлен то при передаче `"field": null` в json объекте поле будет удалено из обновляемого документа в базе данных.
 
-Пример запроса:
+_Пример запроса_:
 ```http
 PUT http://localhost:4200/api/user/update
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWEzN2QzNTQxZGMyYTFjZjYyOWYiLCJpYXQiOjE3NDU3NTQ2ODB9.itiqU7QJdIjhCTQe65oKW9sTKMYvOyjPcKv--uph2RA
@@ -155,7 +166,9 @@ content-type: application/json
 
 **Ответ 200: Обновление прошло успешно**
 
-Схема ответа (модель UserReturn):
+_Схема ответа_:
+
+Модель UserReturn
 ```js
 {
   id: { type: "string", valid: true },
@@ -179,7 +192,7 @@ content-type: application/json
 Особенности:
 - Запрос не требует параметров или тела, Id пользователя берется из токена авторизации (`user.apiAccessToken`)
 
-Пример запроса:
+_Пример запроса_:
 ```http
 GET http://localhost:4200/api/user/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWEzN2QzNTQxZGMyYTFjZjYyOWYiLCJpYXQiOjE3NDU3NTQ2ODB9.itiqU7QJdIjhCTQe65oKW9sTKMYvOyjPcKv--uph2RA
@@ -189,7 +202,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlM
 
 **Ответ 200: Данные найдены и возвращены**
 
-Схема ответа (модель UserReturn):
+_Схема ответа_:
+
+Модель UserReturn
 ```js
 {
   id: { type: "string", valid: true },
@@ -208,7 +223,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlM
 
 **Ответы: 400, 401, 403, 404**
 
-Схема ответа (модель ErrorReturn):
+_Схема ответа_:
+
+Модель ErrorReturn
 ```js
 {
   error: { type: "string", valid: true }
@@ -219,16 +236,22 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlM
 
 Ошибка в полях запроса
 
-Схема ответа (модель ErrorsReturn):
+_Схема ответа_:
+
+Модель ErrorsReturn
 ```js
 {
   errors: { // содержит объект-словарь, с названиями ошибочных полей из запроса в качестве ключей
     type: "dict",
     valid: true,
-    itemSchema: { // каждый ключ ошибочного поля содержит информацию об ошибке в виде такой схемы
-      given: { type: "any", valid: true },    // переданное значение
-      error: { type: "string", valid: true }, // сообщение о проблеме
-    }
+    item: { type: ValueErrorReturn }
   }
+}
+```
+Модель ValueErrorReturn
+```js
+{
+  given: { type: "any", valid: true }, // переданное значение
+  error: { type: "string", valid: true }, // сообщение об ошибке
 }
 ```

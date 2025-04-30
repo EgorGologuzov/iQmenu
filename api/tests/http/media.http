@@ -1,3 +1,43 @@
-###
+### Корректная загрузка изображения
 
 POST http://localhost:4200/api/media/image
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="eagle_1MB.png"
+Content-Type: image/png
+
+< ../assets/eagle_1MB.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Слишком большой файл
+
+POST http://localhost:4200/api/media/image
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="space_6MB.png"
+Content-Type: image/png
+
+< ../assets/space_6MB.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Неверный тип контента
+
+POST http://localhost:4200/api/media/image
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="not_image.html"
+Content-Type: application/xml
+
+< ../assets/not_image.html
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Без контента
+
+POST http://localhost:4200/api/media/image
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBlMWE4YWI2ZWMzMDdmYmNmYWRiYmYiLCJpYXQiOjE3NDU3NTQ3NjJ9.CDj93utoo9VkSkVEYYB29ysZwqkoh_4mQY6E43nXrHA

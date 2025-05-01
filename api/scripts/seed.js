@@ -223,9 +223,9 @@ async function seed() {
 
   await Menu.deleteMany({}).exec();
 
-  menus[0].ownerId = createdUsers[1]._id;
-  menus[1].ownerId = createdUsers[2]._id;
-  menus[2].ownerId = createdUsers[2]._id;
+  menus[0].ownerId = createdUsers[2]._id;
+  menus[1].ownerId = createdUsers[1]._id;
+  menus[2].ownerId = createdUsers[1]._id;
 
   await Menu.create(menus);
 }

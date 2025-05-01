@@ -1,15 +1,39 @@
 # Эндпоинты API
 
-Для настройки и запуска API смотри [api.md](api.md)
-
 ## Содержание
 
+- [Настройка и запуск API](#настройка-и-запуск-api)
 - [Пользователи](#пользователи)
   - [Авторизация](#авторизация)
   - [Регистрация](#регистрация)
-  - [Обновление](#обновление)
+  - [Обновление данных акаунта](#обновление-данных-аккаунта)
+- [Меню](#меню)
+  - [Получить список меню владельца](#получить-список-меню-владельца)
+  - [Получить по id](#получить-по-id)
+  - [Создание меню](#создание-меню)
+  - [Обновление меню](#обновление-меню)
+  - [Удаление меню](#удаление-меню)
+- [Медиа](#медиа)
+  - [Загрузка картинки](#загрузка-картинки)
 - [Схемы ответов на коды 4**](#схемы-ответов-на-коды-4)
-_Пример запроса_
+
+## Настройка и запуск API
+
+- Синхронизировать репозиторий с веткой dev
+- Перейти в папку `api`
+- Добавить файл переменных окружения `.env`, взять его из папки проекта на диске (ЭТОТ ФАЙЛ НЕ ДОЛЖЕН БЫТЬ ОПУБЛИКОВАН ИЛИ ПОПАСТЬ В ПУБЛИЧНЫЙ РЕПОЗИТОРИИ)
+- Установить все зависимости `npm install`
+- Запустить проект командой `npm run start` (должен запуститься на порту 4200)
+
+Для отправки запросов можно использовать расширение для VS Code: `REST Client`
+
+Пример запроса:
+```http
+GET http://localhost:4200/api/menu/1
+```
+
+Больше примеров в папке `/api/tests/http`
+
 ## Пользователи
 
 ### Авторизация
@@ -120,7 +144,7 @@ _Схема ответа_:
 }
 ```
 
-### Обновление
+### Обновление данных аккаунта
 
 Обновление данных пользователя.
 
@@ -139,7 +163,7 @@ _Схема запроса_:
 }
 ```
 
-Особенности:
+_Особенности_:
 - Id пользователя для обновления берется из токена авторизации (`user.apiAccessToken`)
 - Обновяться только переданные поля, остальные сохранят прежние значения
 - notnull != required, notnull не позволяет передать `"field": null` в json объекте, но позволяет не указывать field вовсе, в таком случае при обновлении неуказанное поле не будет никак изменено. Если атрибут notnull не установлен то при передаче `"field": null` в json объекте поле будет удалено из обновляемого документа в базе данных.
@@ -189,7 +213,7 @@ _Схема ответа_:
 
 Метод: `GET` Путь: `/api/user/me` Авторизация: `есть`
 
-Особенности:
+_Особенности_:
 - Запрос не требует параметров или тела, Id пользователя берется из токена авторизации (`user.apiAccessToken`)
 
 _Пример запроса_:
@@ -219,9 +243,489 @@ _Схема ответа_:
 }
 ```
 
+## Меню
+
+### Получить список меню владельца
+
+Получение списка меню, принадлежащих этому владельцу.
+
+Метод: `GET` Путь: `/api/menu/my` Авторизация: `есть`
+
+_Особенности_:
+- Id пользователя для обновления берется из токена авторизации (`user.apiAccessToken`)
+
+_Пример запроса_:
+```http
+GET {{baseUrl}}/api/menu/my
+Authorization: {{token}}
+```
+
+**Ответ 200: Список меню владельца**
+
+_Схема ответа_:
+
+Модель MenuListReturn
+```js
+{
+  menus: {
+    type: "list",
+    item: { type: MinimizedMenuReturn },
+  }
+}
+```
+
+Модель MinimizedMenuReturn
+```js
+{
+  id: { type: "number", valid: true, sourceName: "code" },
+  ownerId: { type: "string", valid: true },
+  isActive: { type: "boolean", valid: true },
+  createAt: { type: "datetime", valid: true },
+  qr: { type: "string", valid: true },
+  companyName: { type: "string", valid: true },
+  menuName: { type: "string", valid: true },
+  image: { type: "string", valid: true }
+}
+```
+
+### Получить по id
+
+Получение меню по id.
+
+Метод: `GET` Путь: `/api/menu/:menuId` Авторизация: `нет`
+
+_Пример запроса_:
+```http
+GET {{baseUrl}}/api/menu/1
+```
+
+**Ответ 404: Меню не найдено**
+
+**Ответ 200: Меню найдено**
+
+_Схема ответа_:
+
+Модель MenuReturn
+```js
+{
+  id: { type: "number", valid: true, sourceName: "code" },
+  ownerId: { type: "string", valid: true },
+  isActive: { type: "boolean", valid: true },
+  createAt: { type: "datetime", valid: true },
+  qr: { type: "string", valid: true },
+  products: {
+    type: "list",
+    item: { type: ProductReturn },
+  },
+  companyName: { type: "string", valid: true },
+  menuName: { type: "string", valid: true },
+  categories: {
+    type: "list",
+    item: { type: "string" },
+  },
+  image: { type: "string", valid: true }
+}
+```
+
+Модель ProductReturn
+```js
+{
+  name: { type: "string", valid: true },
+  price: { type: "number", valid: true },
+  isActive: { type: "boolean", valid: true },
+  categories: {
+    type: "list",
+    item: { type: "string", valid: true },
+  },
+  weight: { type: "number", valid: true },
+  description: { type: "string", valid: true },
+  composition: { type: "string", valid: true },
+  image: { type: "string", valid: true }
+}
+```
+
+### Создание меню
+
+Создание меню.
+
+Метод: `POST` Путь: `/api/menu` Авторизация: `есть`
+
+_Схема запроса_:
+
+Модель MenuCreate
+```js
+{
+  isActive: { type: "boolean", required: true },
+  products: {
+    type: "list",
+    required: true,
+    minLength: 1,
+    maxLength: 100,
+    item: { type: ProductEdit, notnull: true },
+    uniqueItems: true,
+    itemsComparator: (p1, p2) => p1.name == p2.name,
+  },
+  companyName: { type: "string", required: true, trim: true, minLength: 1, maxLength: 100 },
+  menuName: { type: "string", required: true, trim: true, minLength: 1, maxLength: 100 },
+  categories: {
+    type: "list",
+    item: { type: "string", minLength: 1, maxLength: 30, trim: true, notnull: true, sentenseCase: true },
+    maxLength: 30,
+    uniqueItems: true
+  },
+  image: { type: "string", maxLength: 255 }
+}
+```
+
+Модель ProductEdit
+```js
+{
+  name: { type: "string", required: true, minLength: 1, maxLength: 50, trim: true, sentenseCase: true },
+  price: { type: "number", required: true, min: 0, max: 1_000_000, round: true },
+  isActive: { type: "boolean", required: true },
+  categories: {
+    type: "list",
+    item: { type: "string", minLength: 1, maxLength: 15, trim: true, notnull: true, sentenseCase: true },
+    maxLength: 30,
+    uniqueItems: true
+  },
+  weight: { type: "number", min: 0, max: 1_000_000, round: true },
+  description: { type: "string", maxLength: 1000, trim: true },
+  composition: { type: "string", maxLength: 1000, trim: true },
+  image: { type: "string", maxLength: 255 }
+}
+```
+
+_Пример запроса_:
+```http
+POST {{baseUrl}}/api/menu
+Authorization: {{token}}
+content-type: application/json
+
+{
+  "isActive": true,
+  "products": [
+    {
+      "name": "Цезарь с курицей",
+      "price": 420,
+      "isActive": false,
+      "categories": ["Основные"],
+      "weight": 280,
+      "description": "Классический салат с листьями айсберга, куриной грудкой и соусом Цезарь",
+      "composition": "Курица, айсберг, помидоры черри, пармезан, сухарики",
+      "image": "https://menunedeli.ru/wp-content/uploads/2022/07/41322293-5B97-451F-886E-2522AB91F67B-886x700.jpeg"
+    },
+    {
+      "name": "Тирамису",
+      "price": 350,
+      "isActive": true,
+      "categories": ["Десерты"],
+      "weight": 150,
+      "description": "Итальянский десерт с маскарпоне и кофейной пропиткой",
+      "image": "https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
+    }
+  ],
+  "companyName": "Кафе «Уют»",
+  "menuName": "Основное меню",
+  "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
+  "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg"
+}
+```
+
+**Ответ 422: Ошибка в полях запроса**
+
+**Ответ 200: Меню создано**
+
+_Схема ответа_:
+
+Модель MenuReturn
+```js
+{
+  id: { type: "number", valid: true, sourceName: "code" },
+  ownerId: { type: "string", valid: true },
+  isActive: { type: "boolean", valid: true },
+  createAt: { type: "datetime", valid: true },
+  qr: { type: "string", valid: true },
+  products: {
+    type: "list",
+    item: { type: ProductReturn },
+  },
+  companyName: { type: "string", valid: true },
+  menuName: { type: "string", valid: true },
+  categories: {
+    type: "list",
+    item: { type: "string" },
+  },
+  image: { type: "string", valid: true }
+}
+```
+
+Модель ProductReturn
+```js
+{
+  name: { type: "string", valid: true },
+  price: { type: "number", valid: true },
+  isActive: { type: "boolean", valid: true },
+  categories: {
+    type: "list",
+    item: { type: "string", valid: true },
+  },
+  weight: { type: "number", valid: true },
+  description: { type: "string", valid: true },
+  composition: { type: "string", valid: true },
+  image: { type: "string", valid: true }
+}
+```
+
+### Обновление меню
+
+Обновление меню.
+
+Метод: `PUT` Путь: `/api/menu/:menuId` Авторизация: `есть`
+
+_Схема запроса_:
+
+Модель MenuUpdate
+```js
+{
+  isActive: { type: "boolean", notnull: true },
+  products: {
+    type: "list",
+    notnull: true,
+    minLength: 1,
+    maxLength: 100,
+    item: { type: ProductEdit, notnull: true },
+    uniqueItems: true,
+    itemsComparator: (p1, p2) => p1.name == p2.name,
+  },
+  companyName: { type: "string", notnull: true, trim: true, minLength: 1, maxLength: 100 },
+  menuName: { type: "string", notnull: true, trim: true, minLength: 1, maxLength: 100 },
+  categories: {
+    type: "list",
+    item: { type: "string", minLength: 1, maxLength: 30, trim: true, notnull: true, sentenseCase: true },
+    maxLength: 30,
+    uniqueItems: true
+  },
+  image: { type: "string", maxLength: 255 }
+}
+```
+
+Модель ProductEdit
+```js
+{
+  name: { type: "string", required: true, minLength: 1, maxLength: 50, trim: true, sentenseCase: true },
+  price: { type: "number", required: true, min: 0, max: 1_000_000, round: true },
+  isActive: { type: "boolean", required: true },
+  categories: {
+    type: "list",
+    item: { type: "string", minLength: 1, maxLength: 15, trim: true, notnull: true, sentenseCase: true },
+    maxLength: 30,
+    uniqueItems: true
+  },
+  weight: { type: "number", min: 0, max: 1_000_000, round: true },
+  description: { type: "string", maxLength: 1000, trim: true },
+  composition: { type: "string", maxLength: 1000, trim: true },
+  image: { type: "string", maxLength: 255 }
+}
+```
+
+_Пример запроса_:
+```http
+PUT {{baseUrl}}/api/menu/1
+Authorization: {{token}}
+content-type: application/json
+
+{
+  "isActive": false,
+  "createAt": "2024-04-29T12:38:32.609Z",
+  "products": [
+    {
+      "name": "Цезарь с курицей 2",
+      "price": 420,
+      "isActive": false,
+      "categories": ["Основные", "  new category  "],
+      "weight": 280,
+      "description": "Классический салат с листьями айсберга, куриной грудкой и соусом Цезарь",
+      "composition": "Курица, айсберг, помидоры черри, пармезан, сухарики",
+      "image": "https://menunedeli.ru/wp-content/uploads/2022/07/41322293-5B97-451F-886E-2522AB91F67B-886x700.jpeg"
+    },
+    {
+      "name": "Тирамису",
+      "price": 350,
+      "isActive": true,
+      "categories": ["Десерты"],
+      "weight": 150,
+      "description": "Итальянский десерт с маскарпоне и кофейной пропиткой",
+      "image": "https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
+    }
+  ],
+  "companyName": "Кафе «Уют»",
+  "menuName": "Основное меню",
+  "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
+  "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg"
+}
+```
+
+**Ответ 422: Ошибка в полях запроса**
+
+**Ответ 404: Меню с таким id не найдено**
+
+**Ответ 403: Это меню принадлежит другому пользователю**
+
+**Ответ 200: Меню обнолвено**
+
+_Схема ответа_:
+
+Модель MenuReturn
+```js
+{
+  id: { type: "number", valid: true, sourceName: "code" },
+  ownerId: { type: "string", valid: true },
+  isActive: { type: "boolean", valid: true },
+  createAt: { type: "datetime", valid: true },
+  qr: { type: "string", valid: true },
+  products: {
+    type: "list",
+    item: { type: ProductReturn },
+  },
+  companyName: { type: "string", valid: true },
+  menuName: { type: "string", valid: true },
+  categories: {
+    type: "list",
+    item: { type: "string" },
+  },
+  image: { type: "string", valid: true }
+}
+```
+
+Модель ProductReturn
+```js
+{
+  name: { type: "string", valid: true },
+  price: { type: "number", valid: true },
+  isActive: { type: "boolean", valid: true },
+  categories: {
+    type: "list",
+    item: { type: "string", valid: true },
+  },
+  weight: { type: "number", valid: true },
+  description: { type: "string", valid: true },
+  composition: { type: "string", valid: true },
+  image: { type: "string", valid: true }
+}
+```
+
+### Удаление меню
+
+Удаление меню.
+
+Метод: `DELETE` Путь: `/api/menu/:menuId` Авторизация: `есть`
+
+_Пример запроса_:
+```http
+DELETE {{baseUrl}}/api/menu/1
+Authorization: {{token}}
+```
+
+**Ответ 422: Ошибка в полях запроса**
+
+**Ответ 404: Меню с таким id не найдено**
+
+**Ответ 403: Это меню принадлежит другому пользователю**
+
+**Ответ 200: Меню удалено и возвращено в ответе**
+
+_Схема ответа_:
+
+Модель MenuReturn
+```js
+{
+  id: { type: "number", valid: true, sourceName: "code" },
+  ownerId: { type: "string", valid: true },
+  isActive: { type: "boolean", valid: true },
+  createAt: { type: "datetime", valid: true },
+  qr: { type: "string", valid: true },
+  products: {
+    type: "list",
+    item: { type: ProductReturn },
+  },
+  companyName: { type: "string", valid: true },
+  menuName: { type: "string", valid: true },
+  categories: {
+    type: "list",
+    item: { type: "string" },
+  },
+  image: { type: "string", valid: true }
+}
+```
+
+Модель ProductReturn
+```js
+{
+  name: { type: "string", valid: true },
+  price: { type: "number", valid: true },
+  isActive: { type: "boolean", valid: true },
+  categories: {
+    type: "list",
+    item: { type: "string", valid: true },
+  },
+  weight: { type: "number", valid: true },
+  description: { type: "string", valid: true },
+  composition: { type: "string", valid: true },
+  image: { type: "string", valid: true }
+}
+```
+
+## Медиа
+
+### Загрузка картинки
+
+Загрузка файла с изображением.
+
+Метод: `POST` Путь: `/api/media/image` Авторизация: `есть` Тип контента: `multipart/form-data`
+
+_Особенности_:
+- возвращает относитьный путь к изображению (НЕ ПОЛНЫЙ URL)
+- разрешенные форматы файлов: `['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']`
+- максимальный размер файла 5 Мб
+
+_Поля формы_:
+- `image`: файл изображения
+
+_Пример запроса_:
+```http
+POST {{baseUrl}}/api/media/image
+Authorization: {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="city_245KB.jpg"
+Content-Type: image/jpeg
+
+< ../assets/city_245KB.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+```
+
+**Ответ 400: Файл не передан**
+
+**Ответ 400: Недопустимый формат файла**
+
+**Ответ 413: Файл слишком большой**
+
+**Ответ 200: Изображение загружено**
+
+_Схема ответа_:
+
+Модель UploadedFile
+```js
+{
+  url: { type: "string", valid: true }
+}
+```
+
 ## Схемы ответов на коды 4**
 
-**Ответы: 400, 401, 403, 404**
+### Ответы: 400, 401, 403, 404, 413
 
 _Схема ответа_:
 
@@ -232,7 +736,7 @@ _Схема ответа_:
 }
 ```
 
-**Ответы: 422**
+### Ответы: 422
 
 Ошибка в полях запроса
 

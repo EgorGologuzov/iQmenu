@@ -1,5 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import cors from 'cors';
 import { userRouter } from './routes/userRouter.js'
 import { menuRouter } from './routes/menuRouter.js'
 import { mediaRouter } from './routes/mediaRouter.js'
@@ -14,6 +15,10 @@ const main = async () => {
 
   app.use(express.json());
 
+  if (process.env.MODE == "dev") {
+    app.use(cors());
+  }
+  
   app.use('/public', express.static('public'));
 
   app.use("/api/user", userRouter);

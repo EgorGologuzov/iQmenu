@@ -2,63 +2,80 @@ import { Button, Dialog, DialogActions, DialogContent, Divider, List, ListItem, 
 import React, { useEffect, useState } from 'react'
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { MENU_FILTERS_DEFAULT } from '../../values/default';
+import { deepCopy } from '../../utils/utils';
 
-function ProductFiltersDialog({ menu, filters, onClose, onApply, onReset, ...otherProps }) {
+const FILTERS_DEFAULT = Object.freeze({
+  isActiveOnly: MENU_FILTERS_DEFAULT.isActiveOnly,
+  categories: MENU_FILTERS_DEFAULT.categories,
+})
 
-  const [filtersEdit, setFiltersEdit] = useState({ ...filters });
+function ProductFiltersDialog({ filters, categories, onClose, onApply, onReset, ...otherProps }) {
 
+  const [editedFilters, setEditedFilters] = useState(filters || deepCopy(FILTERS_DEFAULT));
+  
   const handleApplyButtonClick = () => {
-    onApply && onApply(filtersEdit);
+    onApply && onApply(editedFilters);
     onClose && onClose();
   }
 
   const handleResetButtonClick = () => {
+    setEditedFilters(deepCopy(FILTERS_DEFAULT));
     onReset && onReset();
     onClose && onClose();
   }
 
-  const handleIsActiveOnlySwitchChange = (event) => setFiltersEdit({ ...filtersEdit, isActiveOnly: event.target.checked });
+  const handleIsActiveOnlySwitchChange = (event) => {
+    setEditedFilters({ ...editedFilters, isActiveOnly: event.target.checked });
+  }
 
   const handleAllCategoriesSwitchChange = (event) => {
     if (event.target.checked) {
-      setFiltersEdit({ ...filtersEdit, category: undefined });
+      setEditedFilters({ ...editedFilters, categories: [] });
     }
   }
 
   const handleCategoryButtonClick = (category) => {
-    setFiltersEdit({ ...filtersEdit, category })
+    if (editedFilters.categories.includes(category)) {
+      setEditedFilters({ ...editedFilters, categories: editedFilters.categories.filter(c => c != category) });
+    } else {
+      setEditedFilters({ ...editedFilters, categories: [...editedFilters.categories, category] });
+    }
   }
 
-  useEffect(() => {
-    setFiltersEdit(filters);
-  }, [filters])
-
   return (
-    <Dialog {...otherProps} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog {...otherProps} onClose={onClose} maxWidth="xs" fullWidth>
 
       <DialogContent sx={{ p: 0 }}>
         <Stack direction="column" spacing={1} sx={{ p: 2 }}>
 
           <Stack direction="row" justifyContent="space-between" alignItems="center" >
             <Typography variant="subtitle1" gutterBottom>Есть в наличии:</Typography>
-            <Switch checked={filtersEdit.isActiveOnly} onChange={handleIsActiveOnlySwitchChange} />
+            <Switch checked={editedFilters.isActiveOnly} onChange={handleIsActiveOnlySwitchChange} />
           </Stack>
 
-          {menu.categories && menu.categories.length && (
+          {categories && categories.length != 0 && (
             <>
               <Divider sx={{ my: 2 }} />
 
               <Stack direction="row" justifyContent="space-between" alignItems="center" >
                 <Typography variant="subtitle1" gutterBottom>Все категории:</Typography>
-                <Switch checked={!filtersEdit.category} onChange={handleAllCategoriesSwitchChange} />
+                <Switch
+                  checked={!editedFilters.categories || editedFilters.categories.length == 0}
+                  onChange={handleAllCategoriesSwitchChange} 
+                />
               </Stack>
 
               <List>
-                {menu.categories.map((category, _) => 
+                {categories.map((category, _) => 
                   <ListItem key={category} disablePadding>
                     <ListItemButton onClick={() => handleCategoryButtonClick(category)}>
                       <ListItemIcon>
-                        {filtersEdit.category == category ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+                        { 
+                          editedFilters.categories && editedFilters.categories.includes(category) 
+                          ? <CheckBoxIcon /> 
+                          : <CheckBoxOutlineBlankIcon />
+                        }
                       </ListItemIcon>
                       <ListItemText primary={category} />
                     </ListItemButton>
@@ -72,8 +89,8 @@ function ProductFiltersDialog({ menu, filters, onClose, onApply, onReset, ...oth
       </DialogContent>
 
       <DialogActions>
-        <Button variant="outlined" sx={{ flexGrow: 1 }} onClick={handleResetButtonClick}>Сбросить</Button>
-        <Button variant="contained" sx={{ flexGrow: 1 }} onClick={handleApplyButtonClick}>Применить</Button>
+        <Button variant="text" onClick={handleResetButtonClick}>Сбросить</Button>
+        <Button variant="contained" onClick={handleApplyButtonClick}>Применить</Button>
       </DialogActions>
 
     </Dialog>

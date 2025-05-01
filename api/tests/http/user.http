@@ -1,0 +1,45 @@
+### Переменные
+
+@baseUrl = http://localhost:4200
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODEyNTkwZmNjNWUyZjgxYzE3YWY0ZDEiLCJpYXQiOjE3NDYwMzI5MTJ9.D_SO3XtVZnqxwnoeqUfezYhe8VZGstJbxAxsJdc1EDA
+
+### Авторизация
+
+POST {{baseUrl}}/api/user/auth
+content-type: application/json
+
+{
+  "phone": "+7 (000) 000-00-02",
+  "password": "12345678"
+}
+
+### Регистрация
+
+POST {{baseUrl}}/api/user/reg
+content-type: application/json
+
+{
+  "phone": " + 7 (000) 000-00-10 ",
+  "email": "  example@example.com  ",
+  "name": "  Пользователь 1  ",
+  "password": "12345678",
+  "avatar": "https://example.com/avatar"
+}
+
+### Обновление данных аккаунта
+
+PUT {{baseUrl}}/api/user/update
+Authorization: {{token}}
+content-type: application/json
+
+{
+  "phone": " + 7 (000) 000-00-02 ",
+  "email": "  example@example.com  ",
+  "name": "  Пользователь 1  ",
+  "avatar": "123"
+}
+
+### Актуализация данных аккаунта
+
+GET {{baseUrl}}/api/user/me
+Authorization: {{token}}

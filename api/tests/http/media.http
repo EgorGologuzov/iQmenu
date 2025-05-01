@@ -1,0 +1,48 @@
+### Переменные
+
+@baseUrl = http://localhost:4200
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODEyNTkwZmNjNWUyZjgxYzE3YWY0ZDEiLCJpYXQiOjE3NDYwMzI5MTJ9.D_SO3XtVZnqxwnoeqUfezYhe8VZGstJbxAxsJdc1EDA
+
+### Корректная загрузка изображения
+
+POST {{baseUrl}}/api/media/image
+Authorization: {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="city_245KB.jpg"
+Content-Type: image/jpeg
+
+< ../assets/city_245KB.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Слишком большой файл
+
+POST {{baseUrl}}/api/media/image
+Authorization: {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="space_6MB.png"
+Content-Type: image/png
+
+< ../assets/space_6MB.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Неверный тип контента
+
+POST {{baseUrl}}/api/media/image
+Authorization: {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="not_image.html"
+Content-Type: application/xml
+
+< ../assets/not_image.html
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Без контента
+
+POST {{baseUrl}}/api/media/image
+Authorization: {{token}}

@@ -2,6 +2,8 @@
   "id": 1,
   "owner": "123e4567-e89b-12d3-a456-426614174000",
   "isActive": true,
+  "createAt": "2025-04-10 22:45:48.198",
+  "qr": "https://assets.turbologo.ru/blog/ru/2020/01/18163037/qr-kod.png",
   "products": [
     {
       "name": "Цезарь с курицей",
@@ -100,14 +102,15 @@
       "isActive": true,
       "categories": ["Алкоголь"],
       "description": "Испанское вино, 2019 год",
-      "image": "--https://rsovin.ru/wp-content/uploads/2022/07/9f624cdd-aeb5-11e9-bde2-ac1f6bb2b39c_7a168021-b5e5-11ed-85d3-ac1f6bb2b39c.png"
+      "image": "https://rsovin.ru/wp-content/uploads/2022/07/9f624cdd-aeb5-11e9-bde2-ac1f6bb2b39c_7a168021-b5e5-11ed-85d3-ac1f6bb2b39c.png"
     },
     {
       "name": "Гуакамоле",
       "price": 210,
       "isActive": true,
       "categories": ["Закуски"],
-      "composition": "Авокадо, лайм, кинза, чили"
+      "composition": "Авокадо, лайм, кинза, чили",
+      "image": "https://receptoriy.ru/upload/Guacamole.jpg"
     },
     {
       "name": "Шоколадный фондан",
@@ -126,7 +129,7 @@
     }
   ],
   "companyName": "Кафе «Уют»",
-  "menuName": "Основное меню",
+  "menuName": "Основное меню Основное меню Основное меню",
   "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
-  "image": "https://example.com/images/menu-cover.jpg"
+  "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg"
 }

@@ -1,17 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { ROLES } from '../../values/roles';
+import { GUEST_DATA_DEFAULT } from '../../values/default';
 
 const USER_DATA_LOCAL_STORAGE_KEY = "userSlice/user";
-
-const DEFAULT_GUEST_DATA = {
-  role: ROLES.GUEST.NAME,
-  apiAccessToken: undefined,
-  id: undefined,
-  phone: undefined,
-  email: undefined,
-  name: undefined,
-  avatar: undefined, 
-}
 
 const readUserFromLocalStorage = () => {
   const user = localStorage.getItem(USER_DATA_LOCAL_STORAGE_KEY);
@@ -30,7 +20,7 @@ const USER_DATA_FROM_LOCAL_STORAGE = readUserFromLocalStorage();
 
 const userSlice = createSlice({
   name: "user",
-  initialState: USER_DATA_FROM_LOCAL_STORAGE ?? DEFAULT_GUEST_DATA,
+  initialState: USER_DATA_FROM_LOCAL_STORAGE ?? GUEST_DATA_DEFAULT,
   reducers: {
     setUserData: (state, action) => {
       writeUserToLocalStorage(action.payload);
@@ -38,7 +28,7 @@ const userSlice = createSlice({
     },
     clearUserData: (state, action) => {
       removeUserFromLocalStorage();
-      return DEFAULT_GUEST_DATA;
+      return GUEST_DATA_DEFAULT;
     },
   }
 })

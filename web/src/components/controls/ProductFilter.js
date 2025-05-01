@@ -3,46 +3,31 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Button, ButtonGroup } from '@mui/material';
 import ProductFiltersDialog from '../dialogs/ProductFiltersDialog';
+import { deepCopy } from '../../utils/utils';
+import { MENU_FILTERS_DEFAULT } from '../../values/default';
 
-const OPTIONS = Object.freeze({ NONE: -1, FILTERS: 0, FAVORITES: 1 });
+function ProductFilter({ filters, categories, onChange }) {
 
-const FILTERS_DEFAULT = Object.freeze({
-  isActiveOnly: false,
-  category: undefined,
-});
-
-function ProductFilter({ menu, onFilter }) {
-
-  const [selectedOption, setSelectedOption] = useState(OPTIONS.NONE);
-  const [filters, setFilters] = useState({ ...FILTERS_DEFAULT });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isFiltersApplied, setIsFiltersApplied] = useState(false);
 
-  const handleFilterButtonClick = () => {
-    setIsDialogOpen(true);
+  const dialogFilters = { 
+    isActiveOnly: filters.isActiveOnly,
+    categories: filters.categories,
+  };
+
+  const changeFiltersAttrs = (newAttrs) => {
+    onChange && onChange({ ...filters, ...newAttrs });
   }
 
-  const handleFavoriteButtonClick = () => {
-    if (selectedOption != OPTIONS.FAVORITES) {
-      setSelectedOption(OPTIONS.FAVORITES);
-    } else {
-      setSelectedOption(OPTIONS.NONE);
-    }
+  const handleOnApply = (dialogFilters) => {
+    changeFiltersAttrs(dialogFilters);
+    setIsFiltersApplied(true);
   }
 
-  const handleFiltersApply = (filters) => {
-    setSelectedOption(OPTIONS.FILTERS);
-    setFilters(filters);
-  }
-
-  const handleFiltersReset = () => {
-    setFilters({ ...FILTERS_DEFAULT });
-    if (selectedOption == OPTIONS.FILTERS) {
-      setSelectedOption(OPTIONS.NONE);
-    }
-  }
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
+  const handleOnReset = () => {
+    changeFiltersAttrs(deepCopy(MENU_FILTERS_DEFAULT));
+    setIsFiltersApplied(false);
   }
 
   return (
@@ -50,30 +35,30 @@ function ProductFilter({ menu, onFilter }) {
       <ButtonGroup sx={{ width: "100%" }}>
         <Button
           startIcon={<FilterListIcon />}
-          variant={ selectedOption == OPTIONS.FILTERS ? "contained" : "outlined" }
+          variant={ isFiltersApplied ? "contained" : "outlined" }
           sx={{ flexGrow: 1 }}
-          onClick={handleFilterButtonClick}
+          onClick={() => setIsDialogOpen(true)}
         >
           Фильтры
         </Button>
         <Button
           startIcon={<FavoriteIcon />}
-          variant={ selectedOption == OPTIONS.FAVORITES ? "contained" : "outlined" }
+          variant={ filters.favoritesOnly ? "contained" : "outlined" }
           color="error"
           sx={{ flexGrow: 1 }}
-          onClick={handleFavoriteButtonClick}
+          onClick={() => changeFiltersAttrs({ favoritesOnly: !filters.favoritesOnly })}
         >
           Избранное
         </Button>
       </ButtonGroup>
 
       <ProductFiltersDialog
-        menu={menu}
+        filters={dialogFilters}
+        categories={categories}
         open={isDialogOpen}
-        filters={filters}
-        onClose={handleDialogClose}
-        onApply={handleFiltersApply}
-        onReset={handleFiltersReset}
+        onClose={() => setIsDialogOpen(false)}
+        onApply={handleOnApply}
+        onReset={handleOnReset}
       />
     </>
   )

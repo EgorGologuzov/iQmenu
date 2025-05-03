@@ -18,6 +18,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { setUserData } from '../../store/slices/userSlice';
 import { IMaskInput } from 'react-imask'
+import PhoneInputMask from '../../components/inputs/PhoneInputMask';
 
 function Reg() {
   const navigate = useNavigate();
@@ -46,20 +47,6 @@ function Reg() {
       })
   }
 
-  const PHONE_MASK = "+{7}(000)00-00-00";
-  function PhoneInputMask(props) {
-    const { inputRef, onChange, ...other } = props;
-    return (
-      <IMaskInput
-        {...other}
-        mask={PHONE_MASK}
-        inputRef={inputRef}
-        onAccept={(value) => onChange({ target: { value } })}
-        overwrite
-      />
-    );
-  }
-
   return (
     <Stack spacing={2} width={'100%'} maxWidth="sm" borderRadius={'10px 10px 5px 5px'} bgcolor={'white'} padding={'10px'} boxShadow={'0 30px 40px rgba(0,0,0,.2)'}>
       <Stack bgcolor="#444444" alignContent={'center'} alignItems={'center'} borderRadius={'10px 10px 0px 0px'}>
@@ -75,13 +62,6 @@ function Reg() {
             fullWidth
             color='primary'
             >
-            {/* <TextField id="phone" label="Телефон" size='small' required
-            error={errors.phone && errors.phone.type === 'pattern'}
-            helperText={errors.phone && errors.phone.type === 'pattern' && errors.phone.message}
-            {...register('phone',{pattern:{
-              value: /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/,
-              message: 'Введите российский номер.'
-            }})}/> */}
                 <Controller
               name="phone"
               control={control}
@@ -98,8 +78,6 @@ function Reg() {
               )}
             />
           </FormControl>
-
-          
 
           <FormControl
             fullWidth

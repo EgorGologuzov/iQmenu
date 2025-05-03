@@ -18,6 +18,8 @@ import Logo from '../../components/icons/Logo';
 import PasswordInput from '../../components/inputs/PasswordInput';
 import { useNavigate } from 'react-router';
 import { setUserData } from '../../store/slices/userSlice';
+import PhoneInputMask from '../../components/inputs/PhoneInputMask';
+
 
 function Auth() {
   const navigate = useNavigate();
@@ -44,21 +46,7 @@ function Auth() {
     }
   })
   }
-
-  const PHONE_MASK = "+{7}(000)00-00-00";
-  function PhoneInputMask(props) {
-    const { inputRef, onChange, ...other } = props;
-    return (
-      <IMaskInput
-        {...other}
-        mask={PHONE_MASK}
-        inputRef={inputRef}
-        onAccept={(value) => onChange({ target: { value } })}
-        overwrite
-      />
-    );
-  }
-
+  
   return (
     <Stack spacing={2} width={'100%'} maxWidth="sm" borderRadius={1} bgcolor={'white'} padding={'10px'} boxShadow={'0 30px 40px rgba(0,0,0,.2)'}>
       <Stack bgcolor="#444444" alignContent={'center'} alignItems={'center'} borderRadius={'10px 10px 0px 0px'}>

@@ -40,7 +40,6 @@ function Auth() {
   const onSubmit = async () => {
     authorizeUser(getValues(),{onSuccess: (data)=> 
     {
-      console.log(localStorage.getItem('userSlice/user'))
       dispatch(setUserData(data))
       navigate('/o');
     }

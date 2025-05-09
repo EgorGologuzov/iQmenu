@@ -15,13 +15,7 @@ import { ThemeProvider } from "@emotion/react";
 import { APP_THEME } from "./values/theme";
 import { Provider } from "react-redux"
 import { APP_STORE } from "./store/store";
-import { setUserData } from './store/slices/userSlice'
-import { GUEST_USER_DATA_FOR_TEST, OWNER_USER_DATA_FOR_TEST } from './values/roles'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-
-// Для тестирования ролей
-const CURRENT_USER = OWNER_USER_DATA_FOR_TEST; // установить данные для тестирования пользователя определенной роли здесь
-APP_STORE.dispatch(setUserData(CURRENT_USER));
 
 // Инициализация React Query
 const QUERY_CLIENT = new QueryClient();

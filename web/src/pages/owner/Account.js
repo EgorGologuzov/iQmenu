@@ -1,7 +1,7 @@
 import { Avatar, Grid, Icon, Typography, IconButton, FormControl, TextField, Stack, Button, FormHelperText, Alert } from '@mui/material'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { styled } from '@mui/material/styles';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import useIQmenuApi from '../../hooks/useIQmenuApi';
@@ -16,8 +16,7 @@ import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
 import { useNavigate } from 'react-router';
 
 function Account() {
-  const { name, avatar, email, phone } = useSelector(state => state.user);
-  const user=useSelector(state=>state.user)
+  const user = useSelector(state => state.user)
   const dispatch = useDispatch();
   const api = useIQmenuApi();
   const navigate = useNavigate();
@@ -37,19 +36,22 @@ function Account() {
     reset,
     watch,
     formState: { errors, isDirty, dirtyFields }
-  } = useForm({ defaultValues: { name, avatar, phone:phone, email, password:undefined }, mode: 'onChange' ,criteriaMode:'all'});
+  } = useForm({ defaultValues: user, mode: 'onChange', criteriaMode: 'all'});
+
+  const currentValues = watch();
+  const [savedValues, setSavedValues] = useState(currentValues);
+  const hasChanges = JSON.stringify(currentValues) !== JSON.stringify(savedValues);
 
   const { mutate: updateUser, isPending: isMutationPending } = useMutation({
     mutationFn: (data) => api.user.update(data),
     mutationKey: ['Update'],
   })
 
-
   const onSubmit = async () => {
     updateUser(getValues(), {
       onSuccess: (data) => {
-        console.log(data)
-        dispatch(setUserData(data))
+        setSavedValues(currentValues);
+        dispatch(setUserData(data));
       }
     })
   }
@@ -69,9 +71,14 @@ function Account() {
     width: 1,
   });
 
-  const onLeave=()=>{
-    dispatch(clearUserData())
-    navigate('/')
+  const onReset = () => {
+    reset();
+    setSavedValues(currentValues);
+  }
+
+  const onLeave = async () => {
+    await navigate('/auth');
+    setTimeout(() => dispatch(clearUserData()), 1500);  
   }
 
   return (
@@ -89,6 +96,10 @@ function Account() {
             }}
           />
         </IconButton>
+
+        {!hasChanges
+        ?<Alert severity="success">Изменения сохранены</Alert>
+        :<Alert severity="warning">Не забудьте сохранить изменения</Alert>}
 
         <FormControl
           fullWidth
@@ -157,18 +168,14 @@ function Account() {
               {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat.types.validate}</FormHelperText>}
               {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat.types.minLength}</FormHelperText>}
           </FormControl>
-        <Button variant='contained' disabled={!isDirty} loading={isMutationPending} type='submit'>Применить</Button>
-        <Button variant='outlined' disabled={!isDirty} onClick={() => reset()}>Отменить изменения</Button>
+        <Button variant='contained' disabled={!hasChanges || isMutationPending} loading={isMutationPending} type='submit'>Применить изменения</Button>
+        <Button variant='outlined' disabled={!hasChanges || isMutationPending} onClick={onReset}>Отменить изменения</Button>
+        <Button variant='outlined' disabled={isMutationPending} onClick={() => navigate(-1)}>Назад</Button>
 
-        {!isDirty
-        ?<Alert severity="success">Изменения сохранены</Alert>
-        :<Alert severity="warning">Не забудьте сохранить изменения</Alert>}
-
-        <Button startIcon={<ExitToAppIcon/>} color='warning' variant='contained' onClick={()=>(onLeave())}>
+        <Button disabled={isMutationPending} startIcon={<ExitToAppIcon/>} color='error' variant='contained' onClick={()=>(onLeave())}>
           Выйти из аккаунта
         </Button>
 
-        <Button onClick={()=>console.log(dirtyFields)}></Button>
       </Stack>
     </form>
   )

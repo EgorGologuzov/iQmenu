@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import useIQmenuApi from '../../hooks/useIQmenuApi'
 import EditIcon from '@mui/icons-material/Edit';
 import QrCodeIcon from '@mui/icons-material/QrCode';
@@ -10,11 +10,14 @@ import { useNavigate } from 'react-router'
 import withStackContainerShell from '../../hoc/withStackContainerShell'
 import useTitle from '../../hooks/useTitle'
 import FastfoodIcon from '@mui/icons-material/Fastfood';
+import MenuQrCodeDialog from '../../components/dialogs/MenuQrCodeDialog';
 
 function MenuList() {
   const api = useIQmenuApi()
   const userId = useSelector(state => state.user.id)
   const navigate = useNavigate();
+  const [isDialogOpen,setIsDialogOpen]=useState(false);
+  const [currentQrCode,setCurrentQrCode]=useState(null);
 
   const { data: menus, isLoading } = useQuery({
     queryKey: ["MenuList/getUsersMenus"],
@@ -25,6 +28,16 @@ function MenuList() {
 
   if (isLoading) {
     return <CircularProgress />
+  }
+
+  const showQrDialog=(menuQr)=>{
+    setIsDialogOpen(true)
+    setCurrentQrCode(menuQr)
+  }
+
+  const hideQrDialog=()=>{
+    setIsDialogOpen(false)
+    setCurrentQrCode(null)
   }
 
   return (
@@ -61,7 +74,7 @@ function MenuList() {
                 <IconButton aria-label="add to favorites" size='large' onClick={() => navigate(`/o/menu/${menu.id}/edit`)}>
                   <EditIcon />
                 </IconButton>
-                <IconButton aria-label="share" size='large'>
+                <IconButton aria-label="share" size='large' onClick={()=>showQrDialog(menu.qr)}>
                   <QrCodeIcon />
                 </IconButton>
               </CardActions>
@@ -70,6 +83,7 @@ function MenuList() {
           </Grid>
         )}
       </Grid>
+      <MenuQrCodeDialog qr={currentQrCode} open={isDialogOpen} onClose={()=>hideQrDialog()}/>
     </>
   )
 }

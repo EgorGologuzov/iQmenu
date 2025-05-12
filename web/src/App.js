@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router";
 import EmptyLayout from './pages/layouts/EmptyLayout'
 import RoleDependentLayout from './pages/layouts/RoleDependentLayout'
 import OwnerLayout from './pages/layouts/OwnerLayout'
@@ -33,32 +33,28 @@ function App() {
 }
 
 function AppRouting() {
-  return (
-    <BrowserRouter>
-      <Routes>
+  return <RouterProvider router={createBrowserRouter(createRoutesFromElements(
+    <>
+      <Route path="/o" element={<OwnerLayout />} >
+        <Route index element={<Navigate to="menu" replace />} />
+        <Route path="menu" element={<MenuList />} />
+        <Route path="menu/new" element={<MenuCreate />} />
+        <Route path="menu/:menuId/edit" element={<MenuEdit />} />
+        <Route path="me" element={<Account />} />
+      </Route>
 
-        <Route path="/o" element={<OwnerLayout />} >
-          <Route index element={<Navigate to="menu" replace />} />
-          <Route path="menu" element={<MenuList />} />
-          <Route path="menu/new" element={<MenuCreate />} />
-          <Route path="menu/:menuId/edit" element={<MenuEdit />} />
-          <Route path="me" element={<Account />} />
-        </Route>
+      <Route path="/" element={<RoleDependentLayout />} >
+        <Route index element={<Presentation />} />
+        <Route path=":menuId" element={<MenuView />} />
+      </Route>
 
-        <Route path="/" element={<RoleDependentLayout />} >
-          <Route index element={<Presentation />} />
-          <Route path=":menuId" element={<MenuView />} />
-        </Route>
-
-        <Route path="/" element={<EmptyLayout />} >
-          <Route path="auth" element={<Auth />} />
-          <Route path="reg" element={<Reg />} />
-          <Route path="*" element={<E404 />} />
-        </Route>
-
-      </Routes>
-    </BrowserRouter>
-  )
+      <Route path="/" element={<EmptyLayout />} >
+        <Route path="auth" element={<Auth />} />
+        <Route path="reg" element={<Reg />} />
+        <Route path="*" element={<E404 />} />
+      </Route>
+    </>
+  ))} />
 }
 
 export default App;

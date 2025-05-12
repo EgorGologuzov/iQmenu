@@ -3,7 +3,7 @@ import useIQmenuApi from '../../hooks/useIQmenuApi'
 import EditIcon from '@mui/icons-material/Edit';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Card, Grid, CardMedia, CardContent, Typography, IconButton, CardActions, Stack, Button, CircularProgress, Box, Avatar } from '@mui/material'
+import { Card, Grid, CardContent, Typography, IconButton, CardActions, Stack, Button, CircularProgress, Box, Avatar } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -11,6 +11,7 @@ import withStackContainerShell from '../../hoc/withStackContainerShell'
 import useTitle from '../../hooks/useTitle'
 import FastfoodIcon from '@mui/icons-material/Fastfood';
 import MenuQrCodeDialog from '../../components/dialogs/MenuQrCodeDialog';
+import { joinWithApiBaseUrl } from '../../utils/utils';
 
 function MenuList() {
   const api = useIQmenuApi()
@@ -22,6 +23,7 @@ function MenuList() {
   const { data: menus, isLoading } = useQuery({
     queryKey: ["MenuList/getUsersMenus"],
     queryFn: () => api.menu.getUsersMenus(userId),
+    refetchOnWindowFocus: false,
   })
 
   useTitle({ general: "Ваши меню" })
@@ -54,7 +56,7 @@ function MenuList() {
               <Box sx={{ width: "100%", aspectRatio: "1 / 1" }}>
                 <Avatar
                   variant="square"
-                  src={menu.image}
+                  src={joinWithApiBaseUrl(menu.image)}
                   sx={{ width: "100%", height: "100%" }}
                 >
                   <FastfoodIcon sx={{ width: 80, height: 80 }} />

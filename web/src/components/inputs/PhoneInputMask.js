@@ -1,6 +1,6 @@
 import { IMaskInput } from "react-imask";
 
-const PHONE_MASK = "+{7} (000) 00-00-00";
+const PHONE_MASK = "+{7} (000) 000-00-00";
 
   function PhoneInputMask(props) {
     const { inputRef, onChange, ...other } = props;

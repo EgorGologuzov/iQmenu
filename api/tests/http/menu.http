@@ -1,11 +1,11 @@
 ### Переменные
 
 @baseUrl = http://localhost:4200
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODEyNTkwZmNjNWUyZjgxYzE3YWY0ZDEiLCJpYXQiOjE3NDYwMzI5MTJ9.D_SO3XtVZnqxwnoeqUfezYhe8VZGstJbxAxsJdc1EDA
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODEzMmRiMjc3OTJkN2RmMjBkMTVkODYiLCJpYXQiOjE3NDYwODczNDd9.KvwZcDKmzuBUmkoT2nXCyhR1Sd5ykCtWDDDXagn66C0
 
 ### Get by id
 
-GET {{baseUrl}}/api/menu/1
+GET {{baseUrl}}/api/menu/3
 
 ### Create
 

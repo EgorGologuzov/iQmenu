@@ -22,12 +22,13 @@ r.get("/my", useAuth(), async (req, res) => {
 
 // get by id
 
-r.get("/:menuId", useIntegerParam("menuId"), async (req, res) => {
+r.get("/:menuId", useAuth({ required: false }), useIntegerParam("menuId"), async (req, res) => {
 
   const menuId = req.menuId;
+  const isOwner = !!req.user;
   const foundMenu = await Menu.findOne({ code: menuId }).exec();
 
-  if (!foundMenu || !foundMenu.isActive) {
+  if (!foundMenu || !isOwner && !foundMenu.isActive) {
     return notFound(res, "Меню не найдено");
   }
 

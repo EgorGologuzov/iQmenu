@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { deepCopy } from '../../utils/utils'
+import { deepCopy, joinWithApiBaseUrl } from '../../utils/utils'
 import { MENU_CREATE_TEMPLATE } from '../../values/default'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
 import { Alert, Button, Divider, Stack, TextField } from '@mui/material';
@@ -15,6 +15,7 @@ import { validateMenu } from '../../data/models/validation';
 import { processMenu } from '../../data/models/processing';
 import { compareMenu } from '../../data/models/comparation';
 import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
+import { API_BASE_URL } from '../../values/urls';
 
 function MenuCreate() {
   const [menu, setMenu] = useState(deepCopy(MENU_CREATE_TEMPLATE));
@@ -27,8 +28,8 @@ function MenuCreate() {
 
   const { mutate: createMenu, error: mutationError, isPending: isMutationPending } = useMutation({
     mutationFn: (menuData) => api.menu.create(menuData),
-    mutationKey: ["MenuCreate/api.menu.create"],
-    onSuccess: () => navigate(`/o/menu`, { replace: true })
+    mutationKey: ["api.menu.create"],
+    onSuccess: () => navigate(`/o/menu?ignoreUnsavedChanges=true`, { replace: true }),
   });
 
   const buildedMenu = processMenu({ ...menu, image: image, categories: categories, products: products });

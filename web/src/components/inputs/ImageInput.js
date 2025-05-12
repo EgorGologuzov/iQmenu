@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { Box, Button, Typography, Stack, Link } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { fileToDataUrl } from '../../utils/utils';
+import { fileToDataUrl, joinWithApiBaseUrl } from '../../utils/utils';
 import withInputShell from '../../hoc/withInputShell';
 
 function ImageInput({ image, onChange }) {
@@ -45,10 +45,12 @@ function ImageInput({ image, onChange }) {
   }, [onChange])
 
   const syncImageWithImageUrl = async () => {
-    if (!image) return;
+    if (!image) {
+      setImageUrl(null);
+    }
 
     if (typeof image == "string") {
-      setImageUrl(image);
+      setImageUrl(joinWithApiBaseUrl(image));
     }
     
     if (image instanceof File) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
-import { Alert, Button, CircularProgress, Divider, Stack, TextField} from '@mui/material';
+import { Alert, Button, CircularProgress, Divider, Stack, TextField } from '@mui/material';
 import useTitle from '../../hooks/useTitle';
 import ImageInput from '../../components/inputs/ImageInput';
 import SwitchInput from '../../components/inputs/SwitchInput';
@@ -14,71 +14,85 @@ import { processMenu } from '../../data/models/processing';
 import QrView from '../../components/controls/QrView';
 import { compareMenu } from '../../data/models/comparation';
 import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
+import { joinWithApiBaseUrl } from '../../utils/utils';
 
 const SaveStatus = ({ isSaved }) => {
   return isSaved
-  ? <Alert severity="success">Изменения сохранены</Alert>
-  : <Alert severity="warning">Не забудьте сохранить изменения</Alert>
+    ? <Alert severity="success">Изменения сохранены</Alert>
+    : <Alert severity="warning">Не забудьте сохранить изменения</Alert>
 }
 
 function MenuEdit() {
-  const [menu, setMenu] = useState(null);
-  const [image, setImage] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [products, setProducts] = useState(null);
-  const [lastError, setLastError] = useState(null);
+  const [savedMenu, setSavedMenu] = useState();
+  const [menu, setMenu] = useState();
+  const [image, setImage] = useState();
+  const [categories, setCategories] = useState();
+  const [products, setProducts] = useState();
+  const [lastError, setLastError] = useState();
 
   const api = useIQmenuApi();
   const navigate = useNavigate();
 
   const { menuId } = useParams();
 
-  const { data: loadedMenu, isLoading: isMenuLoading, error: loadingError } = useQuery({
-    queryKey: ["MenuEdit/api.menu.getById", menuId],
-    queryFn: () => api.menu.getById(menuId),
-  })
-
-  const { mutate: updateMenu, data: updatedMenu, isPending: isUpdatePending, error: updateError, } = useMutation({
-    mutationFn: (data) => api.menu.update(data.id, data.menu),
-    mutationKey: ["MenuEdit/api.menu.update"],
-    onSuccess: () => setLastError(null),
-  });
-
-  const { mutate: deleteMenu, error: deleteError, isPending: isDeletePending,  } = useMutation({
-    mutationFn: (data) => api.menu.delete(data.id),
-    mutationKey: ["MenuEdit/api.menu.delete"],
-    onSuccess: () => navigate("/o/menu"),
-  });
-
   const buildedMenu = processMenu({ ...(menu ?? {}), image: image, categories: categories, products: products });
   const { isValid, errors } = validateMenu(buildedMenu);
-  const isChanged = !compareMenu(buildedMenu, loadedMenu) && !compareMenu(buildedMenu, updatedMenu);
+  const isChanged = !compareMenu(buildedMenu, processMenu(savedMenu));
 
-  const title = loadedMenu ? [loadedMenu.companyName, loadedMenu.menuName, "Редактирование"].filter(Boolean).join(" / ") : undefined;
+  const saveMenu = (menuData) => {
+    if (!menuData) return;
+    setSavedMenu(menuData);
+    setMenu(menuData);
+    setImage(menuData.image);
+    setCategories(menuData.categories);
+    setProducts(menuData.products);
+  }
+
+  const { data: loadedMenu, isLoading: isMenuLoading, error: loadingError } = useQuery({
+    queryKey: ["api.menu.getById", menuId],
+    queryFn: () => api.menu.getById(menuId),
+    refetchOnWindowFocus: false,
+    refetchOnMount: "always",
+    staleTime: 0,
+    gcTime: 0,
+  })
+
+  const { mutate: updateMenu, isPending: isUpdatePending } = useMutation({
+    mutationFn: (menu) => api.menu.update(menu.id, menu.menu),
+    mutationKey: ["api.menu.update"],
+    onSuccess: (menu) => { saveMenu(menu); setLastError(null); },
+    onError: (error) => setLastError(error),
+  });
+
+  const { mutate: deleteMenu, isPending: isDeletePending } = useMutation({
+    mutationFn: (menu) => api.menu.delete(menu.id),
+    mutationKey: ["api.menu.delete"],
+    onSuccess: () => navigate("/o/menu?ignoreUnsavedChanges=true", { replace: true }),
+    onError: (error) => setLastError(error),
+  });
+
+  const handleUpdateButtonClick = () => {
+    updateMenu({ id: buildedMenu.id, menu: buildedMenu })
+  }
+
+  const handleDeleteButtonClick = () => {
+    if (window.confirm("Вы уверенны что хотите удалить меню? Восстановить его будет невозможно!")) {
+      deleteMenu(buildedMenu);
+    }
+  }
+
+  const title = savedMenu ? [savedMenu.companyName, savedMenu.menuName, "Редактирование"].filter(Boolean).join(" / ") : undefined;
   useTitle({ general: title }, [title]);
 
   useUnsavedChangesWarning(menu && !isChanged);
 
-  useEffect(() => setLastError(updateError ?? null), [updateError]);
-  useEffect(() => setLastError(deleteError ?? null), [deleteError]);
-
-  if (isMenuLoading) {
-    return <CircularProgress />
-  }
+  useEffect(() => { saveMenu(loadedMenu) }, [loadedMenu]);
 
   if (loadingError) {
     return <Alert severity="error">{loadingError.message}</Alert>
   }
 
-  if (!loadedMenu) {
-    return <Alert severity="info">Меню не найдено...</Alert>
-  }
-
-  if (!menu) {
-    setMenu(loadedMenu);
-    setImage(loadedMenu.image);
-    setCategories(loadedMenu.categories);
-    setProducts(loadedMenu.products);
+  if (isMenuLoading || !menu) {
     return <CircularProgress />
   }
 
@@ -151,7 +165,7 @@ function MenuEdit() {
         variant="contained"
         loadingPosition="center"
         loading={isUpdatePending}
-        onClick={() => updateMenu({ id: buildedMenu.id, menu: buildedMenu })}
+        onClick={handleUpdateButtonClick}
         disabled={isUpdatePending || isDeletePending || !isValid || !isChanged}
       >
         Сохранить изменения
@@ -170,7 +184,7 @@ function MenuEdit() {
         loadingPosition="center"
         color="error"
         loading={isDeletePending}
-        onClick={() => deleteMenu(buildedMenu)}
+        onClick={handleDeleteButtonClick}
         disabled={isUpdatePending || isDeletePending}
       >
         Удалить меню
@@ -179,7 +193,7 @@ function MenuEdit() {
       <Divider />
 
       <QrView
-        src={loadedMenu.qr}
+        src={menu.qr}
         label="QR-код для доступа к меню"
       />
 

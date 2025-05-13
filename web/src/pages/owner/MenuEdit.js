@@ -10,17 +10,10 @@ import useIQmenuApi from '../../hooks/useIQmenuApi';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router';
 import { validateMenu } from '../../data/models/validation';
-import { processMenu } from '../../data/models/processing';
 import QrView from '../../components/controls/QrView';
 import { compareMenu } from '../../data/models/comparation';
 import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
-import { joinWithApiBaseUrl } from '../../utils/utils';
-
-const SaveStatus = ({ isSaved }) => {
-  return isSaved
-    ? <Alert severity="success">Изменения сохранены</Alert>
-    : <Alert severity="warning">Не забудьте сохранить изменения</Alert>
-}
+import SaveStatus from '../../components/utils/SaveStatus';
 
 function MenuEdit() {
   const [savedMenu, setSavedMenu] = useState();
@@ -35,9 +28,9 @@ function MenuEdit() {
 
   const { menuId } = useParams();
 
-  const buildedMenu = processMenu({ ...(menu ?? {}), image: image, categories: categories, products: products });
+  const buildedMenu = { ...(menu ?? {}), image: image, categories: categories, products: products };
   const { isValid, errors } = validateMenu(buildedMenu);
-  const isChanged = !compareMenu(buildedMenu, processMenu(savedMenu));
+  const isChanged = !compareMenu(buildedMenu, savedMenu);
 
   const saveMenu = (menuData) => {
     if (!menuData) return;

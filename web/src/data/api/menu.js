@@ -15,7 +15,7 @@ export const MENU_SERVICE = {
         }
       }
 
-      throw logAndReturnError('При отправке запроса что-то пошло не так');
+      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
     }
   },
 
@@ -53,7 +53,7 @@ export const MENU_SERVICE = {
         }
       }
 
-      throw logAndReturnError('При отправке запроса что-то пошло не так');
+      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
     }
   },
 
@@ -74,7 +74,7 @@ export const MENU_SERVICE = {
 
       const productsWithFileImages = menuData.products.filter(product => product.image instanceof File);
       await Promise.all(productsWithFileImages.map(async (product) => product.image = (await uploadImage(product.image)).url));
-      
+
     } catch (error) {
       throw error;
     }
@@ -95,7 +95,7 @@ export const MENU_SERVICE = {
         }
       }
 
-      throw logAndReturnError('При отправке запроса что-то пошло не так');
+      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
     }
   },
 
@@ -116,7 +116,7 @@ export const MENU_SERVICE = {
         }
       }
 
-      throw logAndReturnError('При отправке запроса что-то пошло не так');
+      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
     }
   },
 
@@ -125,7 +125,7 @@ export const MENU_SERVICE = {
       const response = await MENU_SERVICE.http.get("/menu/my");
       return response.data.menus;
     } catch (error) {
-      throw logAndReturnError('При отправке запроса что-то пошло не так');
+      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
     }
   },
 }

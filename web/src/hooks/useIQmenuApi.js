@@ -6,7 +6,7 @@ import { USER_SERVICE as REAL_USER_SERVICE } from "../data/api/user"
 import { MEDIA_SERVICE as REAL_MEDIA_SERVICE } from "../data/api/media"
 import { useSelector } from "react-redux"
 import { useMemo } from "react"
-import { API_BASE_URL } from "../values/urls"
+import { API_BASE_URL } from "../values/consts"
 import axios from "axios"
 
 

@@ -1,7 +1,7 @@
-import { Avatar, Grid, Icon, Typography, IconButton, FormControl, TextField, Stack, Button, FormHelperText, Alert } from '@mui/material'
+import { Avatar, IconButton, FormControl, TextField, Stack, Button, FormHelperText, Alert } from '@mui/material'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { styled } from '@mui/material/styles';
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import useIQmenuApi from '../../hooks/useIQmenuApi';
@@ -14,165 +14,144 @@ import PhoneInputMask from '../../components/inputs/PhoneInputMask';
 import useTitle from '../../hooks/useTitle';
 import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
 import { useNavigate } from 'react-router';
+import SaveStatus from '../../components/utils/SaveStatus';
+import { compareUser } from '../../data/models/comparation';
+import ImageInput from '../../components/inputs/ImageInput';
+import { processUser } from '../../data/models/processing';
+import { validateUserUpdate } from '../../data/models/validation'
 
 function Account() {
+
   const user = useSelector(state => state.user)
   const dispatch = useDispatch();
   const api = useIQmenuApi();
   const navigate = useNavigate();
 
-  useTitle({general: 'Ваш профиль'})
+  const [avatar, setAvatar] = useState(user.avatar);
 
-  useEffect(()=>{
-    reset()
-  },[])
+  useTitle({ general: 'Ваш профиль' }, [])
 
   const {
     register,
     handleSubmit,
     getValues,
-    setValue,
     control,
-    reset,
     watch,
-    formState: { errors, isDirty, dirtyFields }
-  } = useForm({ defaultValues: user, mode: 'onChange', criteriaMode: 'all'});
+    setValue,
+  } = useForm({ defaultValues: user, mode: 'onChange', criteriaMode: 'all' });
 
-  const currentValues = watch();
-  const [savedValues, setSavedValues] = useState(currentValues);
-  const hasChanges = JSON.stringify(currentValues) !== JSON.stringify(savedValues);
+  const buildedUser = { ...user, ...watch(), avatar: avatar };
+  const updateData = { ...getValues(), avatar: avatar };
+  const hasChanges = !compareUser(buildedUser, user);
+  const { errors, isValid } = validateUserUpdate(updateData);
 
-  const { mutate: updateUser, isPending: isMutationPending } = useMutation({
+  const saveUser = user => {
+    dispatch(setUserData(user));
+    setAvatar(user.avatar);
+    setValue("password", "");
+    setValue("passwordRepeat", "");
+  }
+
+  const { mutate: updateUser, isPending: isMutationPending, error: mutationError } = useMutation({
     mutationFn: (data) => api.user.update(data),
-    mutationKey: ['Update'],
+    mutationKey: ['api.user.update'],
+    onSuccess: (user) => { saveUser(user) },
   })
 
   const onSubmit = async () => {
-    updateUser(getValues(), {
-      onSuccess: (data) => {
-        setSavedValues(currentValues);
-        dispatch(setUserData(data));
-      }
-    })
+    updateUser(processUser(updateData));
   }
 
-  useUnsavedChangesWarning(!isDirty)
-
-  const preview = watch('avatar')
-  const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-  });
-
-  const onReset = () => {
-    reset();
-    setSavedValues(currentValues);
-  }
+  useUnsavedChangesWarning(!hasChanges);
 
   const onLeave = async () => {
     await navigate('/auth');
-    setTimeout(() => dispatch(clearUserData()), 1500);  
+    setTimeout(() => dispatch(clearUserData()), 1500);
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%", justifyItems:'center'}}>
+    <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%", justifyItems: 'center' }}>
       <Stack direction="column" spacing={2} sx={{ width: "100%", maxWidth: "sm" }}>
 
-        <IconButton sx={{ width: '100%', aspectRatio: '1/1', maxWidth: '200px', alignSelf: 'center' }} component='label' tabIndex={-1}>
-          <Avatar src={preview} sx={{ width: '100%', height: '100%' }} />
-          <VisuallyHiddenInput
-            type="file"
-            accept="image/png, image/jpeg"
-            {...register('avatar')}
-            onChange={(e) => {
-              setValue('avatar', URL.createObjectURL(e.target.files[0]), { shouldDirty: true })
-            }}
-          />
-        </IconButton>
-
-        {!hasChanges
-        ?<Alert severity="success">Изменения сохранены</Alert>
-        :<Alert severity="warning">Не забудьте сохранить изменения</Alert>}
+        <SaveStatus isSaved={!hasChanges} />
 
         <FormControl
           fullWidth
           color='primary'>
           <TextField id="name" size='small' label="ФИО"
-            {...register('name')} />
+            {...register('name')}
+            error={errors.name}
+            helperText={errors.name}
+          />
         </FormControl>
-        
-          <FormControl
-            fullWidth
-            color='primary'
-            >
-                <Controller
-              name="phone"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Телефон"
-                  variant="outlined"
-                  size='small'
-                  slotProps={{inputLabel:{shrink:true}, input:{inputComponent:PhoneInputMask}}}
-                  required
-                />
-              )}
-            />
-          </FormControl>
+
+        <FormControl
+          fullWidth
+          color='primary'
+        >
+          <Controller
+            name="phone"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Телефон"
+                variant="outlined"
+                size='small'
+                slotProps={{ inputLabel: { shrink: true }, input: { inputComponent: PhoneInputMask } }}
+                error={errors.phone}
+                helperText={errors.phone}
+              />
+            )}
+          />
+        </FormControl>
 
         <FormControl
           fullWidth
           color='primary'>
           <TextField id="email" label="Email" size='small'
-            error={errors.email && errors.email.type === 'pattern'}
-            {...register('email', {
-              required: true, pattern: {
-                value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                message: 'Неправильный адрес электронной почты.',
-              }
-            })}
-            helperText={errors.email && errors.email.type === 'pattern' && errors.email.message} />
+            {...register('email')}
+            error={errors.email}
+            helperText={errors.email}
+          />
         </FormControl>
 
         <FormControl
-            fullWidth
-            color='primary'
-            error={errors.passwordRepeat}>
-            <PasswordInput id="password" label="Пароль" size='small'
-            {...register('password',{deps:'passwordRepeat'})}/>
-          </FormControl>
+          fullWidth
+          color='primary'
+          error={errors.password}
+        >
+          <PasswordInput id="password" label="Пароль" size='small'
+            {...register('password')}
+          />
+          {errors.password && <FormHelperText>{errors.password}</FormHelperText>}
+        </FormControl>
 
-          <FormControl
-            fullWidth
-            color='primary'
-            error={errors.passwordRepeat}>
-            <PasswordInput id="passwordRepeat" label="Повторите пароль" size='small'
-            {...register('passwordRepeat',{validate:(value)=>{
-              if (watch('password')!==value){
-                return 'Пароли не совпадают'
-              }
-            },
-            minLength:{
-              value:8,
-              message: 'Минимальная длина пароля: 8 символов'
-            }})}
-            />
-              {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat.types.validate}</FormHelperText>}
-              {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat.types.minLength}</FormHelperText>}
-          </FormControl>
-        <Button variant='contained' disabled={!hasChanges || isMutationPending} loading={isMutationPending} type='submit'>Применить изменения</Button>
-        <Button variant='outlined' disabled={!hasChanges || isMutationPending} onClick={onReset}>Отменить изменения</Button>
+        <FormControl
+          fullWidth
+          color='primary'
+          error={errors.passwordRepeat}
+        >
+          <PasswordInput id="passwordRepeat" label="Повторите пароль" size='small'
+            {...register('passwordRepeat')}
+          />
+          {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat}</FormHelperText>}
+        </FormControl>
+
+        <ImageInput
+          image={avatar}
+          onChange={setAvatar}
+          label="Аватар"
+        />
+
+        <SaveStatus isSaved={!hasChanges} />
+
+        {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
+
+        <Button variant='contained' disabled={!hasChanges || isMutationPending || !isValid} loading={isMutationPending} type='submit'>Сохрнаить изменения</Button>
         <Button variant='outlined' disabled={isMutationPending} onClick={() => navigate(-1)}>Назад</Button>
 
-        <Button disabled={isMutationPending} startIcon={<ExitToAppIcon/>} color='error' variant='contained' onClick={()=>(onLeave())}>
+        <Button disabled={isMutationPending} startIcon={<ExitToAppIcon />} color='error' variant='contained' onClick={() => (onLeave())}>
           Выйти из аккаунта
         </Button>
 

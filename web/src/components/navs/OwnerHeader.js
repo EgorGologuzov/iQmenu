@@ -6,6 +6,7 @@ import { Avatar, Box, Container, IconButton, Stack } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router';
 import CLink from '../utils/CLink';
+import { joinWithApiBaseUrl } from '../../utils/utils';
 
 function OwnerHeader() {
   const title = useSelector(state => state.page.headerTitle);
@@ -15,7 +16,7 @@ function OwnerHeader() {
       <Container sx={{ pl: 1, pr: 2 }}>
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ pl: 1 }}>
 
-          <CLink to="/" noStyles>
+          <CLink to="/o" noStyles>
             <IconButton size="large" edge="start" sx={{ p: 1 }}>
               <Logo />
             </IconButton>
@@ -38,8 +39,8 @@ function OwnerHeader() {
               <Typography variant="body1" component="div" noWrap sx={{ display: { xs: 'none', sm: 'block' } }}>
                 {name}
               </Typography>
-              {avatar && <Avatar alt={name} src={avatar} />}
-              {!avatar && <Avatar sx={{ bgcolor: "secondary.main" }}>{name[0]}</Avatar>}
+              {avatar && <Avatar alt={name} src={joinWithApiBaseUrl(avatar)} sx={{ width: "35px", height: "35px" }} />}
+              {!avatar && <Avatar sx={{ bgcolor: "secondary.main", width: "35px", height: "35px" }}> {name[0]} </Avatar>}
             </Stack>
           </CLink>
 

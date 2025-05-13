@@ -118,6 +118,8 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
           <ImageInput
             image={typeof editedProduct.image == "string" ? joinWithApiBaseUrl(editedProduct.image) : editedProduct.image}
             onChange={handleImageChange}
+            error={errors.image}
+            helperText={errors.image}
           />
 
           <SwitchInput

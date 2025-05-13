@@ -24,7 +24,7 @@ export const MEDIA_SERVICE = {
         }
       }
 
-      throw logAndReturnError('При отправке запроса что-то пошло не так');
+      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
     }
   },
 }

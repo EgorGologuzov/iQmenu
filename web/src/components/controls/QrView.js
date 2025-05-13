@@ -4,7 +4,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import LinkIcon from '@mui/icons-material/Link';
 import withInputShell from '../../hoc/withInputShell';
-import { API_BASE_URL } from '../../values/urls';
+import { API_BASE_URL } from '../../values/consts';
 
 const ActionButton = ({ icon, onClick, noCopy }) => {
 

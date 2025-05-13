@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router";
+import { Route, Navigate, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router";
 import EmptyLayout from './pages/layouts/EmptyLayout'
 import RoleDependentLayout from './pages/layouts/RoleDependentLayout'
 import OwnerLayout from './pages/layouts/OwnerLayout'
@@ -16,16 +16,32 @@ import { APP_THEME } from "./values/theme";
 import { Provider } from "react-redux"
 import { APP_STORE } from "./store/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useUserRefresh } from "./hooks/useUserRefresh";
 
 // Инициализация React Query
 const QUERY_CLIENT = new QueryClient();
 
 function App() {
   return (
+    <AppWrappers>
+      <AppOnLoad>
+        <AppRouting />
+      </AppOnLoad>
+    </AppWrappers>
+  );
+}
+
+function AppOnLoad({ children }) {
+  useUserRefresh();
+  return children;
+}
+
+function AppWrappers({ children }) {
+  return (
     <QueryClientProvider client={QUERY_CLIENT}>
       <Provider store={APP_STORE} >
         <ThemeProvider theme={APP_THEME}>
-          <AppRouting />
+          { children }
         </ThemeProvider>
       </Provider>
     </QueryClientProvider>

@@ -15,7 +15,6 @@ import { validateMenu } from '../../data/models/validation';
 import { processMenu } from '../../data/models/processing';
 import { compareMenu } from '../../data/models/comparation';
 import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
-import { API_BASE_URL } from '../../values/urls';
 
 function MenuCreate() {
   const [menu, setMenu] = useState(deepCopy(MENU_CREATE_TEMPLATE));

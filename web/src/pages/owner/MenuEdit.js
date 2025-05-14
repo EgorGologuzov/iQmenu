@@ -32,6 +32,8 @@ function MenuEdit() {
   const { isValid, errors } = validateMenu(buildedMenu);
   const isChanged = !compareMenu(buildedMenu, savedMenu);
 
+  const navigateWithBlocker = useUnsavedChangesWarning(menu && !isChanged);
+
   const saveMenu = (menuData) => {
     if (!menuData) return;
     setSavedMenu(menuData);
@@ -60,7 +62,7 @@ function MenuEdit() {
   const { mutate: deleteMenu, isPending: isDeletePending } = useMutation({
     mutationFn: (menu) => api.menu.delete(menu.id),
     mutationKey: ["api.menu.delete"],
-    onSuccess: () => navigate("/o/menu?ignoreUnsavedChanges=true", { replace: true }),
+    onSuccess: () => navigateWithBlocker("/o/menu", { replace: true, ignoreBlock: true }),
     onError: (error) => setLastError(error),
   });
 
@@ -76,8 +78,6 @@ function MenuEdit() {
 
   const title = savedMenu ? [savedMenu.companyName, savedMenu.menuName, "Редактирование"].filter(Boolean).join(" / ") : undefined;
   useTitle({ general: title }, [title]);
-
-  useUnsavedChangesWarning(menu && !isChanged);
 
   useEffect(() => { saveMenu(loadedMenu) }, [loadedMenu]);
 

@@ -1,10 +1,11 @@
 import Router from 'express'
-import { Auth, User, UserCreate, UserReturn, UserTokenData, UserUpdate } from '../models/userModels.js'
+import { Auth, extractImagesFromUserModel, User, UserCreate, UserReturn, UserTokenData, UserUpdate } from '../models/userModels.js'
 import { badRequest, forbidden, notFound, ok, unauthorized } from '../utils/responses.js';
 import { generateToken } from '../utils/jwt.js';
 import { useAuth } from '../middlewares/useAuth.js';
 import { useModel } from '../middlewares/useModel.js';
 import { hashPassword } from '../utils/cryptography.js';
+import { tryDeleteUnusedImages } from '../utils/images.js';
 
 
 const r = new Router();
@@ -12,7 +13,7 @@ const r = new Router();
 // auth
 
 r.post("/auth", useModel(Auth), async (req, res) => {
-  
+
   const { phone, password } = req.model;
 
   const foundUser = await User.findOne({ phone: phone }).exec();
@@ -58,7 +59,7 @@ r.post("/reg", useModel(UserCreate), async (req, res) => {
 // update
 
 r.put("/update", useAuth(), useModel(UserUpdate), async (req, res) => {
-  
+
   const { userId } = req.user;
   const updateModel = req.model;
 
@@ -74,6 +75,10 @@ r.put("/update", useAuth(), useModel(UserUpdate), async (req, res) => {
     return badRequest(res, "Пользователь с таким номером телефона уже существует");
   }
 
+  const oldImages = extractImagesFromUserModel(foundById);
+  const newImages = extractImagesFromUserModel(updateModel);
+  await tryDeleteUnusedImages(oldImages, newImages);
+
   Object.assign(foundById, updateModel);
   await foundById.save();
 
@@ -86,7 +91,7 @@ r.put("/update", useAuth(), useModel(UserUpdate), async (req, res) => {
 // me
 
 r.get("/me", useAuth(), async (req, res) => {
-  
+
   const { userId } = req.user;
 
   const foundUser = await User.findById(userId);

@@ -67,8 +67,9 @@ function AppRouting() {
       <Route path="/" element={<EmptyLayout />} >
         <Route path="auth" element={<Auth />} />
         <Route path="reg" element={<Reg />} />
-        <Route path="*" element={<E404 />} />
       </Route>
+
+      <Route path="*" element={<E404 />} />
     </>
   ))} />
 }

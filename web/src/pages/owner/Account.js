@@ -1,6 +1,5 @@
-import { Avatar, IconButton, FormControl, TextField, Stack, Button, FormHelperText, Alert } from '@mui/material'
+import { FormControl, TextField, Stack, Button, FormHelperText, Alert, Divider } from '@mui/material'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { styled } from '@mui/material/styles';
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
@@ -29,8 +28,6 @@ function Account() {
 
   const [avatar, setAvatar] = useState(user.avatar);
 
-  useTitle({ general: 'Ваш профиль' }, [])
-
   const {
     register,
     handleSubmit,
@@ -44,6 +41,8 @@ function Account() {
   const updateData = { ...getValues(), avatar: avatar };
   const hasChanges = !compareUser(buildedUser, user);
   const { errors, isValid } = validateUserUpdate(updateData);
+
+  const navigateWithBlocker = useUnsavedChangesWarning(!hasChanges);
 
   const saveUser = user => {
     dispatch(setUserData(user));
@@ -62,11 +61,13 @@ function Account() {
     updateUser(processUser(updateData));
   }
 
-  useUnsavedChangesWarning(!hasChanges);
+  useTitle({ general: 'Ваш профиль' }, [])
 
-  const onLeave = async () => {
-    await navigate('/auth');
-    setTimeout(() => dispatch(clearUserData()), 1500);
+  const onLeave = () => {
+    navigateWithBlocker('/auth', {
+      replace: true,
+      onNavigate: () => setTimeout(() => dispatch(clearUserData()), 1000),
+    });
   }
 
   return (
@@ -144,12 +145,14 @@ function Account() {
           label="Аватар"
         />
 
+        <Divider />
+
         <SaveStatus isSaved={!hasChanges} />
 
         {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
 
         <Button variant='contained' disabled={!hasChanges || isMutationPending || !isValid} loading={isMutationPending} type='submit'>Сохрнаить изменения</Button>
-        <Button variant='outlined' disabled={isMutationPending} onClick={() => navigate(-1)}>Назад</Button>
+        <Button variant='outlined' disabled={isMutationPending} onClick={() => navigate(-1)}>Вернуться назад</Button>
 
         <Button disabled={isMutationPending} startIcon={<ExitToAppIcon />} color='error' variant='contained' onClick={() => (onLeave())}>
           Выйти из аккаунта

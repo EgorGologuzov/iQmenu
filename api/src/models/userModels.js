@@ -97,3 +97,21 @@ export const UserUpdate = makeModel({
 
   build: source => mapSchema(source, UserUpdate.schema, UserUpdate.setDefaults),
 })
+
+// Полезные функции
+
+// Извелечение всех путей к изображениям
+
+export function extractImagesFromUserModel(userModel) {
+  if (!userModel) {
+    return;
+  }
+
+  const images = [];
+
+  if (userModel.avatar) {
+    images.push(userModel.avatar);
+  }
+
+  return images;
+}

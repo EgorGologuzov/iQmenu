@@ -5,7 +5,7 @@ import { userRouter } from './routes/userRouter.js'
 import { menuRouter } from './routes/menuRouter.js'
 import { mediaRouter } from './routes/mediaRouter.js'
 import mongoose from 'mongoose'
-import { internalServerError, notFound } from './utils/responses.js'
+import { badRequest, internalServerError, notFound } from './utils/responses.js'
 
 dotenv.config();
 
@@ -18,16 +18,21 @@ const main = async () => {
   if (process.env.MODE == "dev") {
     app.use(cors());
   }
-  
+
   app.use('/public', express.static('public'));
 
   app.use("/api/user", userRouter);
   app.use("/api/menu", menuRouter);
   app.use("/api/media", mediaRouter);
-  
+
   app.all('/*notfound', (req, res) => notFound(res, "Такого эндпоинта нет..."));
 
   app.use((err, req, res, next) => {
+
+    if (err.type === 'entity.parse.failed') {
+      return badRequest(res, "Ошибка парсинга JSON из тела запроса, проверьте корректность синтаксиса JSON");
+    }
+
     console.error(err);
     return internalServerError(res);
   })

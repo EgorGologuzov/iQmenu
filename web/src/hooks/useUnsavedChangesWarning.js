@@ -1,21 +1,40 @@
-import { useEffect } from 'react';
-import { useBlocker } from 'react-router';
+import { useCallback, useEffect } from 'react';
+import { useBlocker, useNavigate } from 'react-router';
 
 const UNSAVE_ALERT_MESSAGE = 'У вас есть несохраненные изменения. Вы уверены, что хотите уйти?';
+const BLOCKER_OPTIONS_KEY = 'useUnsavedChangesWarning/blockerOptions';
 
 const useUnsavedChangesWarning = (isSaved = true) => {
 
-  useBlocker((props) => {
-    if (isSaved) return false;
+  useBlocker((args) => {
 
-    const params = new URLSearchParams(props.nextLocation.search);
-    const ignoreUnsavedChanges = params.get('ignoreUnsavedChanges');
+    const { ignoreBlock, onNavigate, onCancel } = window[BLOCKER_OPTIONS_KEY] ?? {};
 
-    if (ignoreUnsavedChanges == "true") {
+    const navigate = () => {
+      window[BLOCKER_OPTIONS_KEY] = undefined;
+      onNavigate && onNavigate();
       return false;
     }
 
-    return !window.confirm(UNSAVE_ALERT_MESSAGE);
+    const cancel = () => {
+      window[BLOCKER_OPTIONS_KEY] = undefined;
+      onCancel && onCancel();
+      return true;
+    }
+
+    if (isSaved) {
+      return navigate();
+    }
+
+    if (ignoreBlock) {
+      return navigate();
+    }
+
+    if (window.confirm(UNSAVE_ALERT_MESSAGE)) {
+      return navigate();
+    }
+
+    return cancel();
   })
 
   useEffect(() => {
@@ -34,6 +53,14 @@ const useUnsavedChangesWarning = (isSaved = true) => {
     };
   }, [isSaved]);
 
+  const navigate = useNavigate();
+
+  const navigateWithBlocker = useCallback((to, { ignoreBlock, onNavigate, onCancel, ...otherOptions }) => {
+    window[BLOCKER_OPTIONS_KEY] = { ignoreBlock, onNavigate, onCancel };
+    navigate(to, otherOptions);
+  }, [])
+
+  return navigateWithBlocker;
 }
 
 export default useUnsavedChangesWarning;

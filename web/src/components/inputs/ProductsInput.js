@@ -32,7 +32,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import FastfoodIcon from '@mui/icons-material/Fastfood';
 import { CSS } from '@dnd-kit/utilities';
 import ProductEditDialog from '../dialogs/ProductsEditDialog';
-import { deepCopy, fileToDataUrl } from '../../utils/utils';
+import { deepCopy, fileToDataUrl, joinWithApiBaseUrl } from '../../utils/utils';
 import { PRODUCT_CREATE_TEMPLATE } from '../../values/default';
 import withInputShell from '../../hoc/withInputShell';
 
@@ -48,10 +48,12 @@ const SortableItemContent = memo(({ product, actions, listeners }) => {
   };
 
   const syncImageWithImageUrl = async () => {
-    if (!product.image) return;
+    if (!product.image) {
+      setImageUrl(null);
+    }
 
     if (typeof product.image == "string") {
-      setImageUrl(product.image);
+      setImageUrl(joinWithApiBaseUrl(product.image));
     }
 
     if (product.image instanceof File) {

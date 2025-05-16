@@ -9,7 +9,7 @@ POST {{baseUrl}}/api/user/auth
 content-type: application/json
 
 {
-  "phone": "+7 (000) 000-00-02",
+  "phone": "+7 (000) 000-00-01",
   "password": "12345678"
 }
 

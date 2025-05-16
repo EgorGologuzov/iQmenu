@@ -185,6 +185,8 @@ export const MenuUpdate = makeModel({
 
 // Полезные функции
 
+// Генерация кода (id)
+
 let maxMenuCode;
 let findMaxQuery;
 
@@ -206,4 +208,28 @@ export async function nextMenuCode() {
 
   await findMaxQuery;
   return await nextMenuCode();
+}
+
+// Извелечение всех путей к изображениям
+
+export function extractImagesFromMenuModel(menuModel) {
+  if (!menuModel) {
+    return;
+  }
+
+  const images = [];
+
+  if (menuModel.image) {
+    images.push(menuModel.image);
+  }
+
+  if (menuModel.products) {
+    menuModel.products.forEach(product => {
+      if (product.image) {
+        images.push(product.image);
+      }
+    })
+  }
+
+  return images;
 }

@@ -17,7 +17,7 @@ const users = [
     createAt: new Date(),
     apiAccessToken: "not-set",
     role: "owner",
-    avatar: "https://example.com/avatar",
+    avatar: "/public/images/3935f51c-4852-488c-8d0d-509602b7a22b.jpg",
   },
   {
     phone: "+70000000001",
@@ -28,7 +28,7 @@ const users = [
     createAt: new Date(),
     apiAccessToken: "not-set",
     role: "owner",
-    avatar: "https://example.com/avatar",
+    avatar: "/public/images/2009257e-be9b-405e-abfe-40a6e38f1a59.jpg",
   },
   {
     phone: "+70000000002",
@@ -39,7 +39,7 @@ const users = [
     createAt: new Date(),
     apiAccessToken: "not-set",
     role: "owner",
-    avatar: "https://example.com/avatar",
+    avatar: "/public/images/39606893-bf68-4423-a975-d5a0b735362c.jpg",
   },
 ]
 
@@ -173,7 +173,7 @@ const menus = [
     "code": 1,
     "isActive": true,
     "createAt": new Date(),
-    "qr": "https://assets.turbologo.ru/blog/ru/2020/01/18163037/qr-kod.png",
+    "qr": "/public/qrs/1.png",
     "products": products,
     "companyName": "Кафе «Уют»",
     "menuName": "Основное меню",
@@ -184,7 +184,7 @@ const menus = [
     "code": 2,
     "isActive": true,
     "createAt": new Date(),
-    "qr": "https://assets.turbologo.ru/blog/ru/2020/01/18163037/qr-kod.png",
+    "qr": "/public/qrs/2.png",
     "products": products.filter((_, index) => index % 2 == 0),
     "companyName": "Кафе Егора",
     "menuName": "Основное меню",
@@ -195,7 +195,7 @@ const menus = [
     "code": 3,
     "isActive": false,
     "createAt": new Date(),
-    "qr": "https://assets.turbologo.ru/blog/ru/2020/01/18163037/qr-kod.png",
+    "qr": "/public/qrs/3.png",
     "products": products.filter((_, index) => index % 2 != 0),
     "companyName": "Кафе Егора",
     "menuName": "Новогоднее меню",

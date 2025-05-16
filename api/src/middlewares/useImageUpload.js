@@ -1,43 +1,6 @@
-import multer from "multer";
+import { multerConfig } from "../utils/images.js";
 import { badRequest, requestEntityTooLarge } from "../utils/responses.js";
-import { randomUUID } from 'crypto';
 import path from 'path';
-
-
-const FILE_MAX_SIZE_MEGABYTES = 5;
-
-const __dirname = path.resolve();
-const imagesDir = path.join(__dirname, 'public', 'images');
-
-
-const multerConfig = multer({
-
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, imagesDir);
-    },
-    filename: function (req, file, cb) {
-      const uniqueName = randomUUID();
-      cb(null, uniqueName + path.extname(file.originalname));
-    }
-  }),
-
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      const e = new Error(`Недопустимый тип файла. Разрешены только изображения (JPEG, PNG, GIF, WEBP, SVG)`);
-      e.code = 'MIMETYPE_NOT_ALLOWED';
-      cb(e, false);
-    }
-  },
-
-  limits: {
-    fileSize: FILE_MAX_SIZE_MEGABYTES * 1024 * 1024
-  }
-});
-
 
 export function useSingleImageUpload(fieldName, required = false) {
   const upload = multerConfig.single(fieldName);
@@ -61,7 +24,7 @@ export function useSingleImageUpload(fieldName, required = false) {
         }
       }
 
-      req.file.url = `/public/images/${req.file.filename}`;
+      req.file.url = path.join(process.env.IMAGES_DIR, req.file.filename);
       return next();
     });
   };

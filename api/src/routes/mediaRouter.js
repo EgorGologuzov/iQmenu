@@ -1,6 +1,6 @@
 import Router from 'express'
 import { useSingleImageUpload } from '../middlewares/useImageUpload.js';
-import { UploadedFile } from '../models/mediaModel.js';
+import { UploadedFile } from '../models/mediaModels.js';
 import { ok } from '../utils/responses.js';
 import { useAuth } from '../middlewares/useAuth.js';
 

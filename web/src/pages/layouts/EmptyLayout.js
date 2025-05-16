@@ -10,7 +10,8 @@ function EmptyLayout() {
       alignContent: 'center',
       placeContent: 'center',
       flexWrap: 'wrap',
-      bgcolor: 'grey.200'
+      bgcolor: 'grey.200',
+      maxWidth: '100% !important'
     }}>
       <Outlet />
     </Container>

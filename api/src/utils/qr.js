@@ -1,14 +1,17 @@
 
 import QrCode from 'qrcode';
 import path from 'path';
+import dotenv from 'dotenv';
+import fs from 'fs/promises';
 
-const __dirname = path.resolve();
-const qrCodesDir = path.join(__dirname, 'public', 'qrs');
+dotenv.config();
+
+const qrCodesDir = () => path.join(path.resolve(), process.env.QRS_DIR)
 
 export async function generateQrCode(menuId) {
 
-  const filename = `${menuId}.png`;
-  const filePath = path.join(qrCodesDir, filename);
+  const filename = generateFileName(menuId);
+  const filePath = path.join(qrCodesDir(), filename);
   const url = new URL(`/${menuId}`, process.env.BASE_URL).href;
 
   await QrCode.toFile(filePath, url, {
@@ -20,5 +23,21 @@ export async function generateQrCode(menuId) {
     margin: 10
   });
 
-  return `/public/qrs/${filename}`;
+  return path.join(process.env.QRS_DIR, filename);
+}
+
+export async function tryDeleteQrImage(menuId) {
+
+  const filename = generateFileName(menuId);
+  const filePath = path.join(qrCodesDir(), filename);
+
+  try {
+    await fs.unlink(filePath);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function generateFileName(menuId) {
+  return `${menuId}.png`;
 }

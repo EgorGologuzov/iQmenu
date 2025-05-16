@@ -1,10 +1,11 @@
 import Router from 'express'
 import { useAuth } from '../middlewares/useAuth.js';
 import { useModel } from '../middlewares/useModel.js';
-import { Menu, MenuCreate, MenuListReturn, MenuReturn, MenuUpdate, nextMenuCode } from '../models/menuModels.js';
+import { extractImagesFromMenuModel, Menu, MenuCreate, MenuListReturn, MenuReturn, MenuUpdate, nextMenuCode } from '../models/menuModels.js';
 import { forbidden, notFound, ok } from '../utils/responses.js';
 import { useIntegerParam } from '../middlewares/useParam.js';
-import { generateQrCode } from '../utils/qr.js';
+import { generateQrCode, tryDeleteQrImage } from '../utils/qr.js';
+import { tryDeleteUnusedImages } from '../utils/images.js';
 
 
 const r = new Router();
@@ -22,13 +23,18 @@ r.get("/my", useAuth(), async (req, res) => {
 
 // get by id
 
-r.get("/:menuId", useIntegerParam("menuId"), async (req, res) => {
+r.get("/:menuId", useAuth({ required: false }), useIntegerParam("menuId"), async (req, res) => {
 
   const menuId = req.menuId;
+  const user = req.user;
   const foundMenu = await Menu.findOne({ code: menuId }).exec();
 
-  if (!foundMenu || !foundMenu.isActive) {
+  if (!foundMenu) {
     return notFound(res, "Меню не найдено");
+  }
+
+  if (!foundMenu.isActive && (!user || user.userId !== foundMenu.ownerId)) {
+    return forbidden(res, "Меню снято с публикации и доступно только владельцу");
   }
 
   const result = MenuReturn.build(foundMenu).model;
@@ -55,7 +61,7 @@ r.post("/", useAuth(), useModel(MenuCreate), async (req, res) => {
 // update
 
 r.put("/:menuId", useAuth(), useIntegerParam("menuId"), useModel(MenuUpdate), async (req, res) => {
-  
+
   const { userId } = req.user;
   const menuId = req.menuId;
   const updateModel = req.model;
@@ -70,6 +76,10 @@ r.put("/:menuId", useAuth(), useIntegerParam("menuId"), useModel(MenuUpdate), as
     return forbidden(res, "Отказано в доступе. Это меню принадлежит другому пользователю.")
   }
 
+  const oldImages = extractImagesFromMenuModel(foundMenu);
+  const newImages = extractImagesFromMenuModel(updateModel);
+  await tryDeleteUnusedImages(oldImages, newImages);
+
   Object.assign(foundMenu, updateModel);
   await foundMenu.save();
 
@@ -79,8 +89,8 @@ r.put("/:menuId", useAuth(), useIntegerParam("menuId"), useModel(MenuUpdate), as
 
 // delete
 
-r.delete("/:menuId", useAuth(), useIntegerParam("menuId"), async  (req, res) => {
-  
+r.delete("/:menuId", useAuth(), useIntegerParam("menuId"), async (req, res) => {
+
   const { userId } = req.user;
   const menuId = req.menuId;
 
@@ -93,6 +103,10 @@ r.delete("/:menuId", useAuth(), useIntegerParam("menuId"), async  (req, res) => 
   if (foundMenu.ownerId !== userId) {
     return forbidden(res, "Отказано в доступе. Это меню принадлежит другому пользователю.")
   }
+
+  const oldImages = extractImagesFromMenuModel(foundMenu);
+  await tryDeleteUnusedImages(oldImages, []);
+  await tryDeleteQrImage(foundMenu.code);
 
   await Menu.findOneAndDelete({ code: menuId }).exec();
 

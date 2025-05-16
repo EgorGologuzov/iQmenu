@@ -23,10 +23,15 @@ export function processMenu(m) {
   m = { ...m };
 
   m.isActive = !!m.isActive;
+  m.products = m.products && m.products.length ? m.products : undefined;
   m.menuName = m.menuName ? asInSentense(m.menuName.trim()) : undefined;
   m.companyName = m.companyName ? asInSentense(m.companyName.trim()) : undefined;
   m.categories = m.categories && m.categories.length ? m.categories : undefined;
   m.image = m.image ? m.image : undefined;
+
+  if (m.products) {
+    m.products = m.products.map(product => ({ ...product, id: undefined }));
+  }
 
   return m;
 }
@@ -34,4 +39,22 @@ export function processMenu(m) {
 export function processCategory(c) {
   if (!c) return;
   return asInSentense(c.trim());
+}
+
+export function processUser(u) {
+  if (!u) return;
+
+  u = { ...u };
+
+  u.phone = u.phone ? u.phone.replace(/[^\d+]/g, "") : undefined;
+  u.email = u.email ? u.email.trim() : undefined;
+  u.name = u.name ? u.name.trim() : undefined;
+  u.createAt = u.createAt ? u.createAt : undefined;
+  u.apiAccessToken = u.apiAccessToken ? u.apiAccessToken : undefined;
+  u.role = u.role ? u.role : undefined;
+  u.avatar = u.avatar ? u.avatar : undefined;
+  u.password = u.password ? u.password : undefined;
+  u.passwordRepeat = u.passwordRepeat ? u.passwordRepeat : undefined;
+
+  return u;
 }

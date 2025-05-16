@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { deepCopy } from '../../utils/utils'
+import { deepCopy, joinWithApiBaseUrl } from '../../utils/utils'
 import { MENU_CREATE_TEMPLATE } from '../../values/default'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
 import { Alert, Button, Divider, Stack, TextField } from '@mui/material';
@@ -25,19 +25,19 @@ function MenuCreate() {
   const api = useIQmenuApi();
   const navigate = useNavigate();
 
-  const { mutate: createMenu, error: mutationError, isPending: isMutationPending } = useMutation({
-    mutationFn: (menuData) => api.menu.create(menuData),
-    mutationKey: ["MenuCreate/api.menu.create"],
-    onSuccess: () => navigate(`/o/menu`, { replace: true })
-  });
-
   const buildedMenu = processMenu({ ...menu, image: image, categories: categories, products: products });
   const { isValid, errors } = validateMenu(buildedMenu);
   const isChanged = !compareMenu(buildedMenu, MENU_CREATE_TEMPLATE);
 
-  useTitle({ general: "Новое меню" }, []);
+  const navigateWithBlocker = useUnsavedChangesWarning(menu && !isChanged);
 
-  useUnsavedChangesWarning(menu && !isChanged);
+  const { mutate: createMenu, error: mutationError, isPending: isMutationPending } = useMutation({
+    mutationFn: (menuData) => api.menu.create(menuData),
+    mutationKey: ["api.menu.create"],
+    onSuccess: () => navigateWithBlocker(`/o/menu`, { replace: true, ignoreBlock: true }),
+  });
+
+  useTitle({ general: "Новое меню" }, []);
 
   return (
     <Stack direction="column" spacing={2} sx={{ width: "100%", maxWidth: "sm" }}>

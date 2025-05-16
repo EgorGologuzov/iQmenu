@@ -4,12 +4,12 @@ import { deepCopy } from "../../utils/utils";
 
 const OWNER_TEST_CREDENTIALS = [
   {
-  phone: "+7(000)00-00-00",
-  password: "12345678",
+    phone: "+7 (000) 00-00-00",
+    password: "12345678",
   },
   {
-    phone: "+7(999)99-99-99",
-    password: "1234",
+    phone: "+7 (999) 99-99-99",
+    password: "12345678",
   },
 ]
 

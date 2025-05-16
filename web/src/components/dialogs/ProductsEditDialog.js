@@ -15,6 +15,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import { validateProduct } from '../../data/models/validation';
 import ImageInput from '../inputs/ImageInput';
 import { processProduct } from '../../data/models/processing';
+import { joinWithApiBaseUrl } from '../../utils/utils';
 
 const TextField = memo(TextFieldOriginal);
 const SwitchInput = memo(SwitchInputOriginal);
@@ -115,8 +116,10 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
         <Stack spacing={2} sx={{ pt: 1 }}>
 
           <ImageInput
-            image={editedProduct.image}
+            image={typeof editedProduct.image == "string" ? joinWithApiBaseUrl(editedProduct.image) : editedProduct.image}
             onChange={handleImageChange}
+            error={errors.image}
+            helperText={errors.image}
           />
 
           <SwitchInput

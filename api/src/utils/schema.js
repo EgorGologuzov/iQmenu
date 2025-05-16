@@ -84,7 +84,7 @@ function tryCast(v, p) {
     }
   }
 
-  return [v, undefined, error("Неверный тип данных")];
+  return [v, undefined, error(v, "Неверный тип данных")];
 }
 
 function processValue(v, p, vType) {

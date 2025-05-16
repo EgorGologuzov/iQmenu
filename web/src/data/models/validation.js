@@ -1,4 +1,5 @@
-import { processCategory, processMenu, processProduct } from "./processing";
+import { processCategory, processMenu, processProduct, processUser } from "./processing";
+import { MAX_IMAGE_SIZE } from '../../values/consts';
 
 // const validationResultTemplate = {
 //   isValid: false,
@@ -34,6 +35,10 @@ export function validateProduct(p) {
     errors.composition = "Максмальная длина 1000";
   }
 
+  if (p.image instanceof File && p.image.size > MAX_IMAGE_SIZE) {
+    errors.image = "Файл слишком большой";
+  }
+
   return { isValid: !Object.keys(errors).length, errors: errors };
 }
 
@@ -63,6 +68,10 @@ export function validateMenu(m) {
     errors.products = "Максимальное кол-во продуктов 100";
   }
 
+  if (m.image instanceof File && m.image.size > MAX_IMAGE_SIZE) {
+    errors.image = "Файл слишком большой";
+  }
+
   return { isValid: !Object.keys(errors).length, errors: errors };
 }
 
@@ -74,6 +83,39 @@ export function validateCategory(c) {
 
   if (c.length > 30 || c.length == 0) {
     errors.category = "Длина должна быть от 1 до 30 символов";
+  }
+
+  return { isValid: !Object.keys(errors).length, errors: errors };
+}
+
+export function validateUserUpdate(u) {
+  if (!u) return;
+
+  const errors = {};
+  u = processUser(u);
+
+  if (!u.phone || !/^\+\d{11,15}$/.test(u.phone)) {
+    errors.phone = "Обязательное поле в формате +7 (000) 000-00-00";
+  }
+
+  if (!u.email || !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(u.email)) {
+    errors.email = "Обязательное поле в формате Email";
+  }
+
+  if (!u.name || u.name.length < 2 || u.name.length > 50) {
+    errors.name = "Обязательное поле, длина от 2 до 50 символов";
+  }
+
+  if (u.avatar instanceof File && u.avatar.size > MAX_IMAGE_SIZE) {
+    errors.avatar = "Файл слишком большой";
+  }
+
+  if (u.password && (u.password.length < 8 || u.password.length > 100)) {
+    errors.password = "Длина пароля от 8 до 100 символов";
+  }
+
+  if (u.password !== u.passwordRepeat) {
+    errors.passwordRepeat = "Пароли не совпадают";
   }
 
   return { isValid: !Object.keys(errors).length, errors: errors };

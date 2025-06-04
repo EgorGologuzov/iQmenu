@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "../values/consts";
 
 export function sleep(miliseconds) {
   return new Promise((resolve, _) => setTimeout(() => resolve(), miliseconds));
@@ -36,5 +35,5 @@ export function logAndReturnError(message) {
 
 export function joinWithApiBaseUrl(url) {
   if (!url) return;
-  return new URL(url, API_BASE_URL).toString();
+  return new URL(url, process.env.REACT_APP_API_BASE_URL).toString();
 }

@@ -1,5 +1,4 @@
 import { processCategory, processMenu, processProduct, processUser } from "./processing";
-import { MAX_IMAGE_SIZE } from '../../values/consts';
 
 // const validationResultTemplate = {
 //   isValid: false,
@@ -35,7 +34,7 @@ export function validateProduct(p) {
     errors.composition = "Максмальная длина 1000";
   }
 
-  if (p.image instanceof File && p.image.size > MAX_IMAGE_SIZE) {
+  if (p.image instanceof File && p.image.size > process.env.REACT_APP_MAX_IMAGE_SIZE) {
     errors.image = "Файл слишком большой";
   }
 
@@ -68,7 +67,7 @@ export function validateMenu(m) {
     errors.products = "Максимальное кол-во продуктов 100";
   }
 
-  if (m.image instanceof File && m.image.size > MAX_IMAGE_SIZE) {
+  if (m.image instanceof File && m.image.size > process.env.REACT_APP_MAX_IMAGE_SIZE) {
     errors.image = "Файл слишком большой";
   }
 
@@ -106,7 +105,7 @@ export function validateUserUpdate(u) {
     errors.name = "Обязательное поле, длина от 2 до 50 символов";
   }
 
-  if (u.avatar instanceof File && u.avatar.size > MAX_IMAGE_SIZE) {
+  if (u.avatar instanceof File && u.avatar.size > process.env.REACT_APP_MAX_IMAGE_SIZE) {
     errors.avatar = "Файл слишком большой";
   }
 

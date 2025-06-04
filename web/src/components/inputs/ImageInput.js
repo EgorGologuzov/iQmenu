@@ -5,7 +5,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { fileToDataUrl, joinWithApiBaseUrl } from '../../utils/utils';
 import withInputShell from '../../hoc/withInputShell';
-import { MAX_IMAGE_SIZE } from '../../values/consts';
 
 function ImageInput({ image, onChange }) {
   const [imageUrl, setImageUrl] = useState(null);
@@ -106,7 +105,7 @@ function ImageInput({ image, onChange }) {
           Перетащите изображение сюда или <Link color="secondary" >выберите файл</Link>
         </Typography>
         <Typography variant="caption" component="div" color="text.secondary" gutterBottom>
-          Поддерживаемые форматы: JPG, PNG (до { MAX_IMAGE_SIZE / 1024 / 1024 }MB)
+          Поддерживаемые форматы: JPG, PNG (до { process.env.REACT_APP_MAX_IMAGE_SIZE / 1024 / 1024 }MB)
         </Typography>
       </Stack>
 

@@ -15,7 +15,7 @@ const main = async () => {
 
   app.use(express.json());
 
-  if (process.env.MODE == "dev") {
+  if (process.env.NODE_ENV == "development") {
     app.use(cors());
   }
 

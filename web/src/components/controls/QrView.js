@@ -4,7 +4,6 @@ import SaveIcon from '@mui/icons-material/Save';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import LinkIcon from '@mui/icons-material/Link';
 import withInputShell from '../../hoc/withInputShell';
-import { API_BASE_URL } from '../../values/consts';
 
 const ActionButton = ({ icon, onClick, noCopy }) => {
 
@@ -49,7 +48,7 @@ const ActionButton = ({ icon, onClick, noCopy }) => {
 
 const QrView = ({ src }) => {
 
-  src = (new URL(src, API_BASE_URL)).toString();
+  src = (new URL(src, process.env.REACT_APP_API_BASE_URL)).toString();
 
   const handleSaveButtonClick = async () => {
     const response = await fetch(src);

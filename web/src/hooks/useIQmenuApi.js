@@ -6,7 +6,6 @@ import { USER_SERVICE as REAL_USER_SERVICE } from "../data/api/user"
 import { MEDIA_SERVICE as REAL_MEDIA_SERVICE } from "../data/api/media"
 import { useSelector } from "react-redux"
 import { useMemo } from "react"
-import { API_BASE_URL } from "../values/consts"
 import axios from "axios"
 
 
@@ -26,7 +25,7 @@ function useIQmenuApi() {
     }
 
     const http = axios.create({
-      baseURL: API_BASE_URL,
+      baseURL: process.env.REACT_APP_API_BASE_URL,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': apiAccessToken ? `Bearer ${apiAccessToken}` : '',

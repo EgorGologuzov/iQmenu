@@ -4,6 +4,7 @@ import { hashPassword } from '../src/utils/cryptography.js';
 import { User, UserTokenData } from '../src/models/userModels.js';
 import { generateToken } from '../src/utils/jwt.js';
 import { Menu } from '../src/models/menuModels.js';
+import { generateQrCode } from '../src/utils/qr.js';
 
 dotenv.config();
 
@@ -173,7 +174,6 @@ const menus = [
     "code": 1,
     "isActive": true,
     "createAt": new Date(),
-    "qr": "/public/qrs/1.png",
     "products": products,
     "companyName": "Кафе «Уют»",
     "menuName": "Основное меню",
@@ -184,7 +184,6 @@ const menus = [
     "code": 2,
     "isActive": true,
     "createAt": new Date(),
-    "qr": "/public/qrs/2.png",
     "products": products.filter((_, index) => index % 2 == 0),
     "companyName": "Кафе Егора",
     "menuName": "Основное меню",
@@ -195,7 +194,6 @@ const menus = [
     "code": 3,
     "isActive": false,
     "createAt": new Date(),
-    "qr": "/public/qrs/3.png",
     "products": products.filter((_, index) => index % 2 != 0),
     "companyName": "Кафе Егора",
     "menuName": "Новогоднее меню",
@@ -224,8 +222,13 @@ async function seed() {
   await Menu.deleteMany({}).exec();
 
   menus[0].ownerId = createdUsers[2]._id;
+  menus[0].qr = await generateQrCode(1);
+
   menus[1].ownerId = createdUsers[1]._id;
+  menus[1].qr = await generateQrCode(2);
+  
   menus[2].ownerId = createdUsers[1]._id;
+  menus[2].qr = await generateQrCode(3);
 
   await Menu.create(menus);
 }

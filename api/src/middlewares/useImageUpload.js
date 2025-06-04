@@ -24,7 +24,7 @@ export function useSingleImageUpload(fieldName, required = false) {
         }
       }
 
-      req.file.url = path.join(process.env.IMAGES_DIR, req.file.filename);
+      req.file.url = path.join(process.env.IMAGES_BASE_URL, req.file.filename);
       return next();
     });
   };

@@ -61,6 +61,6 @@ export async function tryDeleteUnusedImages(oldImages, newImages) {
 
 function getOnlyImagesFilesNames(pathsList) {
   return pathsList
-    .filter(imagePath => imagePath.replaceAll("\\", "/").startsWith(process.env.IMAGES_DIR))
+    .filter(imagePath => imagePath.replaceAll("\\", "/").startsWith(process.env.IMAGES_BASE_URL))
     .map(imagePath => path.basename(imagePath));
 }

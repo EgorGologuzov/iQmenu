@@ -151,7 +151,7 @@ function Account() {
 
         {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
 
-        <Button variant='contained' disabled={!hasChanges || isMutationPending || !isValid} loading={isMutationPending} type='submit'>Сохрнаить изменения</Button>
+        <Button variant='contained' disabled={!hasChanges || isMutationPending || !isValid} loading={isMutationPending} type='submit'>Сохранить изменения</Button>
         <Button variant='outlined' disabled={isMutationPending} onClick={() => navigate(-1)}>Вернуться назад</Button>
 
         <Button disabled={isMutationPending} startIcon={<ExitToAppIcon />} color='error' variant='contained' onClick={() => (onLeave())}>

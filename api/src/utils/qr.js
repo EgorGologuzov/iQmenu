@@ -23,7 +23,7 @@ export async function generateQrCode(menuId) {
     margin: 10
   });
 
-  return path.join(process.env.QRS_DIR, filename);
+  return path.join(process.env.QRS_BASE_URL, filename);
 }
 
 export async function tryDeleteQrImage(menuId) {

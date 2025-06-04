@@ -19,7 +19,7 @@ const main = async () => {
     app.use(cors());
   }
 
-  app.use('api//public', express.static('public'));
+  app.use('/api/public', express.static('public'));
 
   app.use("/api/user", userRouter);
   app.use("/api/menu", menuRouter);

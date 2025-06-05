@@ -46,3 +46,33 @@ Content-Type: application/xml
 
 POST {{baseUrl}}/api/media/image
 Authorization: {{token}}
+
+
+
+
+
+### Корректная загрузка изображения
+
+POST https://egor-gologuzov.ru/api/media/image
+Authorization: {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="city_245KB.jpg"
+Content-Type: image/jpeg
+
+< ../assets/city_245KB.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Слишком большой файл
+
+POST https://egor-gologuzov.ru/api/media/image
+Authorization: {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="space_6MB.png"
+Content-Type: image/png
+
+< ../assets/space_6MB.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

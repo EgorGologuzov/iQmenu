@@ -143,6 +143,8 @@ function Account() {
           image={avatar}
           onChange={setAvatar}
           label="Аватар"
+          error={errors.avatar}
+          helperText={errors.avatar}
         />
 
         <Divider />

@@ -1,5 +1,8 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { hashPassword } from '../src/utils/cryptography.js';
 import { User, UserTokenData } from '../src/models/userModels.js';
 import { generateToken } from '../src/utils/jwt.js';
@@ -7,6 +10,13 @@ import { Menu } from '../src/models/menuModels.js';
 import { generateQrCode } from '../src/utils/qr.js';
 
 dotenv.config();
+
+const __dirname = path.resolve();
+
+// Пути к папкам
+const imagesDir = path.join(__dirname, '/public/images');
+const qrsDir = path.join(__dirname, '/public/qrs');
+const seedImagesDir = path.join(__dirname, '/public/seed-images');
 
 const users = [
   {
@@ -201,10 +211,35 @@ const menus = [
   },
 ]
 
+async function clearDirectory(dir) {
+  const files = await fs.readdir(dir);
+  await Promise.all(files.map(file => fs.unlink(path.join(dir, file))));
+  console.log(`All files deleted from: ${dir}`);
+}
+
+async function copySeedImages() {
+  const files = await fs.readdir(seedImagesDir);
+  await Promise.all(
+    files.map(file => 
+      fs.copyFile(
+        path.join(seedImagesDir, file),
+        path.join(imagesDir, file)
+      )
+    )
+  );
+  console.log(`Seed images copied to images folder`);
+}
+
 async function seed() {
 
   await mongoose.connect(process.env.MONGODB_CONNECTION_URL);
   console.log("Successfully connected to MongoDB!");
+
+  // public
+
+  await clearDirectory(imagesDir);
+  await clearDirectory(qrsDir);
+  await copySeedImages();
 
   // users
 

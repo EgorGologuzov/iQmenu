@@ -3,10 +3,11 @@ import useIQmenuApi from '../../hooks/useIQmenuApi'
 import EditIcon from '@mui/icons-material/Edit';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
 import { Card, Grid, CardContent, Typography, IconButton, CardActions, Stack, Button, CircularProgress, Box, Avatar, Alert } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import withStackContainerShell from '../../hoc/withStackContainerShell'
 import useTitle from '../../hooks/useTitle'
 import FastfoodIcon from '@mui/icons-material/Fastfood';
@@ -78,11 +79,17 @@ function MenuList() {
                 </CardContent>
 
                 <CardActions disableSpacing sx={{ placeContent: 'space-around', p: 0 }}>
-                  <IconButton aria-label="add to favorites" size='large' onClick={() => navigate(`/o/menu/${menu.id}/edit`)}>
-                    <EditIcon />
-                  </IconButton>
+                  <Link to={`/${menu.id}`} target="_blank">
+                    <IconButton aria-label="share" size='large'>
+                      <OndemandVideoIcon />
+                    </IconButton>
+                  </Link>
+
                   <IconButton aria-label="share" size='large' onClick={() => showQrDialog(menu.qr)}>
                     <QrCodeIcon />
+                  </IconButton>
+                  <IconButton aria-label="add to favorites" size='large' onClick={() => navigate(`/o/menu/${menu.id}/edit`)}>
+                    <EditIcon />
                   </IconButton>
                 </CardActions>
 

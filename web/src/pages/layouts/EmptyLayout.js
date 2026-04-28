@@ -10,8 +10,11 @@ function EmptyLayout() {
       alignContent: 'center',
       placeContent: 'center',
       flexWrap: 'wrap',
-      bgcolor: 'grey.200',
-      maxWidth: '100% !important'
+      maxWidth: '100% !important',
+      backgroundImage: `url(${process.env.PUBLIC_URL + '/bg_empty-layout.jpg'})`,
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center'
     }}>
       <Outlet />
     </Container>

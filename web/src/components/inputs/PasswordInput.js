@@ -1,52 +1,38 @@
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
+import { useState } from 'react';
 import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useState } from 'react';
-import { FilledInput, Input, InputLabel, OutlinedInput } from '@mui/material';
 
 const PasswordInput = ({ id, label, size, ...otherProps }) => {
-
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
-  const handleMouseUpPassword = (event) => {
-    event.preventDefault();
-  };
-
   return (
-    <>
-      <InputLabel htmlFor={id} size={size} >{label}</InputLabel>
-      <OutlinedInput
-        {...otherProps}
-        id={id}
-        size={size}
-        label={label}
-        type={showPassword ? 'text' : 'password'}
-        endAdornment={
+    <TextField
+      {...otherProps}
+      id={id}
+      label={label}
+      size={size}
+      type={showPassword ? 'text' : 'password'}
+      InputProps={{
+        endAdornment: (
           <InputAdornment position="end">
             <IconButton
-              aria-label={
-                showPassword ? 'Скрыть пароль' : 'Показать пароль'
-              }
+              aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
               onClick={handleClickShowPassword}
-              onMouseDown={handleMouseDownPassword}
-              onMouseUp={handleMouseUpPassword}
+              onMouseDown={(e) => e.preventDefault()}
               edge="end"
             >
               {showPassword ? <VisibilityOff /> : <Visibility />}
             </IconButton>
           </InputAdornment>
-        }
-      />
-    </>
-  )
-}
+        ),
+      }}
+    />
+  );
+};
 
-export default PasswordInput
+export default PasswordInput;

@@ -1,4 +1,4 @@
-import { processCategory, processMenu, processProduct, processUser } from "./processing";
+import { processCategory, processMenu, processProduct, processRegData, processUser } from "./processing";
 
 // const validationResultTemplate = {
 //   isValid: false,
@@ -97,7 +97,7 @@ export function validateUserUpdate(u) {
     errors.phone = "Обязательное поле в формате +7 (000) 000-00-00";
   }
 
-  if (!u.email || !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(u.email)) {
+  if (!u.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(u.email)) {
     errors.email = "Обязательное поле в формате Email";
   }
 
@@ -114,6 +114,35 @@ export function validateUserUpdate(u) {
   }
 
   if (u.password !== u.passwordRepeat) {
+    errors.passwordRepeat = "Пароли не совпадают";
+  }
+
+  return { isValid: !Object.keys(errors).length, errors: errors };
+}
+
+export function validateRegData(d) {
+  if (!d) return;
+
+  const errors = {};
+  d = processRegData(d);
+
+  if (!d.phone || !/^\+\d{11,15}$/.test(d.phone)) {
+    errors.phone = "Обязательное поле в формате +7 (000) 000-00-00";
+  }
+
+  if (!d.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) {
+    errors.email = "Обязательное поле в формате Email";
+  }
+
+  if (!d.name || d.name.length < 2 || d.name.length > 50) {
+    errors.name = "Обязательное поле, длина от 2 до 50 символов";
+  }
+
+  if (!d.password || (d.password.length < 8 || d.password.length > 100)) {
+    errors.password = "Обязательное поле, длина пароля от 8 до 100 символов";
+  }
+
+  if (d.password !== d.passwordRepeat) {
     errors.passwordRepeat = "Пароли не совпадают";
   }
 

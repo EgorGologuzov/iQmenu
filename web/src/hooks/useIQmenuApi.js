@@ -14,14 +14,17 @@ function useIQmenuApi() {
   const apiAccessToken = useSelector(state => state.user.apiAccessToken);
 
   return useMemo(() => {
-    const menuService = REAL_MENU_SERVICE;
-    const userService = REAL_USER_SERVICE;
-    const mediaService = REAL_MEDIA_SERVICE;
 
-    const services = {
-      menu: menuService,
-      user: userService,
-      media: mediaService,
+    const services = {}
+
+    if (process.env.REACT_APP_USE_LOCAL_DATA_SOURCE === "true") {
+      services.menu = FAKE_MENU_SERVICE;
+      services.user = FAKE_USER_SERVICE;
+      services.media = FAKE_MEDIA_SERVICE;
+    } else {
+      services.menu = REAL_MENU_SERVICE;
+      services.user = REAL_USER_SERVICE;
+      services.media = REAL_MEDIA_SERVICE;
     }
 
     const http = axios.create({
@@ -37,9 +40,9 @@ function useIQmenuApi() {
       service.http = http;
     }
 
-    prepareService(menuService);
-    prepareService(userService);
-    prepareService(mediaService);
+    prepareService(services.menu);
+    prepareService(services.user);
+    prepareService(services.media);
 
     return services;
   }, [apiAccessToken]);

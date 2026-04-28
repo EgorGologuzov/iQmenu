@@ -4,11 +4,11 @@ import { deepCopy } from "../../utils/utils";
 
 const OWNER_TEST_CREDENTIALS = [
   {
-    phone: "+7 (000) 00-00-00",
+    phone: "+7 (000) 000-00-00",
     password: "12345678",
   },
   {
-    phone: "+7 (999) 99-99-99",
+    phone: "+7 (999) 999-99-99",
     password: "12345678",
   },
 ]
@@ -36,13 +36,17 @@ export const USER_SERVICE = {
 
     throw new Error("Тестовая ошибка: пользователь с таким телефоном уже существует")
   },
+  
   async update(userData){
     await sleep(1000);
-      const data=deepCopy(OWNER_USER_DATA_FOR_TEST)
+      const data = deepCopy(OWNER_USER_DATA_FOR_TEST)
       data.avatar=userData.avatar;
       data.email=userData.email;
       data.name=userData.name;
-      
       return data;
+  },
+
+  async refresh() {
+    return OWNER_USER_DATA_FOR_TEST;
   },
 }

@@ -58,3 +58,17 @@ export function processUser(u) {
 
   return u;
 }
+
+export function processRegData(d) {
+  if (!d) return;
+
+  d = { ...d };
+
+  d.phone = d.phone ? d.phone.replace(/[^\d+]/g, "") : undefined;
+  d.email = d.email ? d.email.trim() : undefined;
+  d.name = d.name ? d.name.trim() : undefined;
+  d.password = d.password ? d.password : undefined;
+  d.passwordRepeat = d.passwordRepeat ? d.passwordRepeat : undefined;
+
+  return d;
+}

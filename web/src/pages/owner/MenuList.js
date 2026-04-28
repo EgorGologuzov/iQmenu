@@ -43,6 +43,10 @@ function MenuList() {
     setCurrentQrCode(null)
   }
 
+  const navigateMenuEdit = (menuId) => {
+    navigate(`/o/menu/${menuId}/edit`)
+  }
+
   return (
     <>
       <Button variant='outlined' startIcon={<AddCircleIcon />} onClick={() => navigate('/o/menu/new')} sx={{ width: "100%", maxWidth: "sm" }}>
@@ -63,13 +67,14 @@ function MenuList() {
                   <Avatar
                     variant="square"
                     src={joinWithApiBaseUrl(menu.image)}
-                    sx={{ width: "100%", height: "100%" }}
+                    onClick={() => navigateMenuEdit(menu.id)}
+                    sx={{ width: "100%", height: "100%", cursor: "pointer" }}
                   >
                     <FastfoodIcon sx={{ width: 80, height: 80 }} />
                   </Avatar>
                 </Box>
 
-                <CardContent sx={{ p: 1 }}>
+                <CardContent sx={{ p: 1, cursor: "pointer" }} onClick={() => navigateMenuEdit(menu.id)}>
                   <Typography variant="subtitle2" component="div" noWrap>
                     {menu.menuName}
                   </Typography>
@@ -88,7 +93,7 @@ function MenuList() {
                   <IconButton aria-label="share" size='large' onClick={() => showQrDialog(menu.qr)}>
                     <QrCodeIcon />
                   </IconButton>
-                  <IconButton aria-label="add to favorites" size='large' onClick={() => navigate(`/o/menu/${menu.id}/edit`)}>
+                  <IconButton aria-label="add to favorites" size='large' onClick={() => navigateMenuEdit(menu.id)}>
                     <EditIcon />
                   </IconButton>
                 </CardActions>

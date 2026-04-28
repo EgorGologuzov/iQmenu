@@ -62,7 +62,7 @@ export const UserCreate = makeModel({
 
   schema: {
     phone: { type: "string", required: true, clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ },
-    email: { type: "string", required: true, trim: true, regExp: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/ },
+    email: { type: "string", required: true, trim: true, regExp: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
     name: { type: "string", required: true, trim: true, minLength: 2, maxLength: 50 },
     avatar: { type: "string", required: false, maxLength: 255 },
     password: { type: "string", required: true, minLength: 8, maxLength: 100 },
@@ -83,7 +83,7 @@ export const UserUpdate = makeModel({
 
   schema: {
     phone: { type: "string", notnull: true, clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ },
-    email: { type: "string", notnull: true, trim: true, regExp: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/ },
+    email: { type: "string", notnull: true, trim: true, regExp: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ },
     name: { type: "string", notnull: true, trim: true, minLength: 2, maxLength: 50 },
     avatar: { type: "string", maxLength: 255 },
     password: { type: "string", notnull: true, minLength: 8, maxLength: 100 },

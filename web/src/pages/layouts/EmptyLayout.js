@@ -11,10 +11,8 @@ function EmptyLayout() {
       placeContent: 'center',
       flexWrap: 'wrap',
       maxWidth: '100% !important',
-      backgroundImage: `url(${process.env.PUBLIC_URL + '/bg_empty-layout.jpg'})`,
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center'
+      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${process.env.PUBLIC_URL + '/bg_empty-layout.jpg'})`,
+      backgroundRepeat: 'repeat'
     }}>
       <Outlet />
     </Container>

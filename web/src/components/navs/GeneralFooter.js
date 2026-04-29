@@ -10,6 +10,7 @@ function GeneralFooter() {
       color: "primary.contrastText",
       py: 1,
       mt: "auto",
+      width: "100%"
     }}>
       <Container>
         <Box

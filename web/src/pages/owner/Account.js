@@ -1,10 +1,11 @@
-import { FormControl, TextField, Stack, Button, FormHelperText, Alert, Divider } from '@mui/material'
+import { FormControl, TextField, Stack, Button, FormHelperText, Alert, Divider, ButtonGroup, Tooltip } from '@mui/material'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import useIQmenuApi from '../../hooks/useIQmenuApi';
-import { useForm, Controller } from 'react-hook-form'
 import { useMutation } from '@tanstack/react-query'
 import { setUserData, clearUserData } from '../../store/slices/userSlice';
 import withStackContainerShell from '../../hoc/withStackContainerShell';
@@ -21,34 +22,21 @@ import { validateUserUpdate } from '../../data/models/validation'
 
 function Account() {
 
-  const user = useSelector(state => state.user)
-  const dispatch = useDispatch();
+  const savedUser = useSelector(state => state.user);
+  const [user, setUser] = useState(savedUser);
+
   const api = useIQmenuApi();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [avatar, setAvatar] = useState(user.avatar);
-
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    control,
-    watch,
-    setValue,
-  } = useForm({ defaultValues: user, mode: 'onChange', criteriaMode: 'all' });
-
-  const buildedUser = { ...user, ...watch(), avatar: avatar };
-  const updateData = { ...getValues(), avatar: avatar };
-  const hasChanges = !compareUser(buildedUser, user);
-  const { errors, isValid } = validateUserUpdate(updateData);
+  const hasChanges = !compareUser(user, savedUser);
+  const { errors, isValid } = validateUserUpdate(user);
 
   const navigateWithBlocker = useUnsavedChangesWarning(!hasChanges);
 
   const saveUser = user => {
     dispatch(setUserData(user));
-    setAvatar(user.avatar);
-    setValue("password", "");
-    setValue("passwordRepeat", "");
+    setUser({ ...user, password: "", passwordRepeat: "" });
   }
 
   const { mutate: updateUser, isPending: isMutationPending, error: mutationError } = useMutation({
@@ -57,30 +45,66 @@ function Account() {
     onSuccess: (user) => { saveUser(user) },
   })
 
-  const onSubmit = async () => {
-    updateUser(processUser(updateData));
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    if (!isMutationPending) {
+      updateUser(processUser(user));
+    }
   }
 
   useTitle({ general: 'Ваш профиль' }, [])
 
   const onLeave = () => {
-    navigateWithBlocker('/auth', {
-      replace: true,
-      onNavigate: () => setTimeout(() => dispatch(clearUserData()), 1000),
-    });
+    if (window.confirm("Вы уверены, что хотите выйти из аккаунта?")) {
+      navigateWithBlocker('/auth', {
+        replace: true,
+        onNavigate: () => setTimeout(() => dispatch(clearUserData()), 1000),
+      });
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} style={{ width: "100%", justifyItems: 'center' }}>
-      <Stack direction="column" spacing={2} sx={{ width: "100%", maxWidth: "sm" }}>
+    <form onSubmit={onSubmit} style={{ width: "100%", justifyItems: 'center' }}>
+      <Stack 
+        direction="column" 
+        spacing={2} 
+        sx={{ width: '100%', minWidth: { xs: '100%', sm: '600px' }, maxWidth: 'sm' }}>
+
+        <ButtonGroup sx={{ width: "100%" }}>
+          <Tooltip title="Назад">
+            <Button
+              variant='outlined'
+              disabled={isMutationPending}
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate(-1)}
+              sx={{ flexGrow: 1 }}
+            />
+          </Tooltip>
+          <Tooltip title="Сохранить изменения">
+            <Button
+              variant='contained'
+              disabled={!hasChanges || isMutationPending || !isValid}
+              startIcon={<CheckRoundedIcon />}
+              loading={isMutationPending}
+              type='submit'
+              sx={{ flexGrow: 1 }}
+            />
+          </Tooltip>
+        </ButtonGroup>
 
         <SaveStatus isSaved={!hasChanges} />
+
+        <Divider />
 
         <FormControl
           fullWidth
           color='primary'>
-          <TextField id="name" size='small' label="ФИО"
-            {...register('name')}
+          <TextField 
+            label="Как к вам обращаться?"
+            size='small'
+            required
+            value={user.name}
+            onChange={(event) => setUser({ ...user, name: event.target.value })}
             error={errors.name}
             helperText={errors.name}
           />
@@ -88,30 +112,29 @@ function Account() {
 
         <FormControl
           fullWidth
-          color='primary'
-        >
-          <Controller
-            name="phone"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Телефон"
-                variant="outlined"
-                size='small'
-                slotProps={{ inputLabel: { shrink: true }, input: { inputComponent: PhoneInputMask } }}
-                error={errors.phone}
-                helperText={errors.phone}
-              />
-            )}
+          color='primary'>
+          <TextField
+            name="login"
+            label="Телефон"
+            size='small'
+            slotProps={{ inputLabel: { shrink: true }, input: { inputComponent: PhoneInputMask } }}
+            required
+            value={user.phone}
+            onChange={(event) => setUser({ ...user, phone: event.target.value })}
+            error={errors.phone}
+            helperText={errors.phone}
           />
         </FormControl>
 
         <FormControl
           fullWidth
           color='primary'>
-          <TextField id="email" label="Email" size='small'
-            {...register('email')}
+          <TextField 
+            label="E-mail"
+            size='small'
+            required
+            value={user.email}
+            onChange={(event) => setUser({ ...user, email: event.target.value })}
             error={errors.email}
             helperText={errors.email}
           />
@@ -119,30 +142,35 @@ function Account() {
 
         <FormControl
           fullWidth
-          color='primary'
-          error={errors.password}
-        >
-          <PasswordInput id="password" label="Пароль" size='small'
-            {...register('password')}
+          color='primary'>
+          <PasswordInput
+            name="password"
+            label="Пароль"
+            size='small'
+            value={user.password}
+            onChange={(event) => setUser({ ...user, password: event.target.value })}
+            error={errors.password}
+            helperText={errors.password}
           />
-          {errors.password && <FormHelperText>{errors.password}</FormHelperText>}
         </FormControl>
 
         <FormControl
           fullWidth
-          color='primary'
-          error={errors.passwordRepeat}
-        >
-          <PasswordInput id="passwordRepeat" label="Повторите пароль" size='small'
-            {...register('passwordRepeat')}
+          color='primary'>
+          <PasswordInput
+            label="Повторите пароль"
+            size='small'
+            value={user.passwordRepeat}
+            onChange={(event) => setUser({ ...user, passwordRepeat: event.target.value })}
+            error={errors.passwordRepeat}
+            helperText={errors.passwordRepeat}
           />
-          {errors.passwordRepeat && <FormHelperText>{errors.passwordRepeat}</FormHelperText>}
         </FormControl>
 
         <ImageInput
-          image={avatar}
-          onChange={setAvatar}
+          image={user.avatar}
           label="Аватар"
+          onChange={(avatar) => setUser({ ...user, avatar: avatar })}
           error={errors.avatar}
           helperText={errors.avatar}
         />
@@ -153,10 +181,12 @@ function Account() {
 
         {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
 
-        <Button variant='contained' disabled={!hasChanges || isMutationPending || !isValid} loading={isMutationPending} type='submit'>Сохранить изменения</Button>
-        <Button variant='outlined' disabled={isMutationPending} onClick={() => navigate(-1)}>Вернуться назад</Button>
-
-        <Button disabled={isMutationPending} startIcon={<ExitToAppIcon />} color='error' variant='contained' onClick={() => (onLeave())}>
+        <Button
+          disabled={isMutationPending}
+          startIcon={<ExitToAppIcon />}
+          color='error'
+          variant='contained'
+          onClick={() => (onLeave())}>
           Выйти из аккаунта
         </Button>
 

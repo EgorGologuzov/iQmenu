@@ -14,15 +14,19 @@ function GeneralHeader() {
       <Container sx={{ pl: 1, pr: 2 }}>
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ pl: 1 }}>
 
-          <CLink to="/" noStyles >
-            <IconButton size="large" edge="start" sx={{ p: 1 }}>
-              <Logo />
-            </IconButton>
-          </CLink>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <CLink to="/" noStyles >
+              <IconButton size="large" edge="start" sx={{ p: 1 }}>
+                <Logo />
+              </IconButton>
+            </CLink>
 
-          <Typography variant="h6" component="div" sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: title ? "unset" : 1 }}>
-            iQmenu
-          </Typography>
+            <CLink to="/" noStyles>
+              <Typography variant="h6" component="div" sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: title ? "unset" : 1 }}>
+                iQmenu
+              </Typography>
+            </CLink>
+          </Stack>
 
           {title && <Typography variant="subtitle1" component="div" sx={{ display: { xs: 'none', sm: 'block' } }}>
             /

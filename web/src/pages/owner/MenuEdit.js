@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
-import { Alert, Button, CircularProgress, Divider, Stack, TextField } from '@mui/material';
+import { Alert, Button, ButtonGroup, CircularProgress, Divider, Stack, TextField, Tooltip } from '@mui/material';
 import useTitle from '../../hooks/useTitle';
 import ImageInput from '../../components/inputs/ImageInput';
 import SwitchInput from '../../components/inputs/SwitchInput';
@@ -14,6 +14,9 @@ import QrView from '../../components/controls/QrView';
 import { compareMenu } from '../../data/models/comparation';
 import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
 import SaveStatus from '../../components/utils/SaveStatus';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function MenuEdit() {
   const [savedMenu, setSavedMenu] = useState();
@@ -67,7 +70,13 @@ function MenuEdit() {
   });
 
   const handleUpdateButtonClick = () => {
-    updateMenu({ id: buildedMenu.id, menu: buildedMenu })
+    if (!isUpdatePending && !isDeletePending) {
+      if (!isValid) {
+        alert("Форма заполнена с ошибками");
+        return;
+      }
+      updateMenu({ id: buildedMenu.id, menu: buildedMenu })
+    }
   }
 
   const handleDeleteButtonClick = () => {
@@ -86,13 +95,47 @@ function MenuEdit() {
   }
 
   if (isMenuLoading || !menu) {
-    return <CircularProgress />
+    return <CircularProgress sx={{ alignSelf: 'center' }} />
   }
 
   return (
-    <Stack direction="column" spacing={2} sx={{ width: "100%", maxWidth: "sm" }}>
+    <>
+      <ButtonGroup sx={{ width: "100%", minHeight: '35px' }}>
+        <Tooltip title="Назад">
+          <Button
+            variant="outlined"
+            disabled={isUpdatePending || isDeletePending}
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate(-1)}
+            sx={{ flexGrow: 1 }}
+          />
+        </Tooltip>
+        <Tooltip title="Удалить меню">
+          <Button
+            variant="contained"
+            color="error"
+            loading={isDeletePending}
+            onClick={handleDeleteButtonClick}
+            disabled={isUpdatePending || isDeletePending}
+            startIcon={<DeleteIcon />}
+            sx={{ flexGrow: 1 }}
+          />
+        </Tooltip>
+        <Tooltip title="Создать меню">
+          <Button
+            variant="contained"
+            loading={isUpdatePending}
+            onClick={handleUpdateButtonClick}
+            disabled={isUpdatePending || isDeletePending || !isChanged}
+            startIcon={<CheckRoundedIcon />}
+            sx={{ flexGrow: 1 }}
+          />
+        </Tooltip>
+      </ButtonGroup>
 
       <SaveStatus isSaved={!isChanged} />
+
+      <Divider />
 
       <SwitchInput
         id="isActive"
@@ -159,28 +202,8 @@ function MenuEdit() {
         loadingPosition="center"
         loading={isUpdatePending}
         onClick={handleUpdateButtonClick}
-        disabled={isUpdatePending || isDeletePending || !isValid || !isChanged}
-      >
+        disabled={isUpdatePending || isDeletePending || !isChanged}>
         Сохранить изменения
-      </Button>
-
-      <Button
-        variant="outlined"
-        onClick={() => navigate(-1)}
-        disabled={isUpdatePending || isDeletePending}
-      >
-        Вернуться назад
-      </Button>
-
-      <Button
-        variant="contained"
-        loadingPosition="center"
-        color="error"
-        loading={isDeletePending}
-        onClick={handleDeleteButtonClick}
-        disabled={isUpdatePending || isDeletePending}
-      >
-        Удалить меню
       </Button>
 
       <Divider />
@@ -189,8 +212,7 @@ function MenuEdit() {
         src={menu.qr}
         label="QR-код для доступа к меню"
       />
-
-    </Stack>
+    </>
   )
 }
 

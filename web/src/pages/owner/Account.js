@@ -45,9 +45,12 @@ function Account() {
     onSuccess: (user) => { saveUser(user) },
   })
 
-  const onSubmit = async (event) => {
-    event.preventDefault();
+  const saveChanges = async () => {
     if (!isMutationPending) {
+      if (!isValid) {
+        alert("Форма заполнена с ошибками");
+        return;
+      }
       updateUser(processUser(user));
     }
   }
@@ -64,134 +67,127 @@ function Account() {
   }
 
   return (
-    <form onSubmit={onSubmit} style={{ width: "100%", justifyItems: 'center' }}>
-      <Stack 
-        direction="column" 
-        spacing={2} 
-        sx={{ width: '100%', minWidth: { xs: '100%', sm: '600px' }, maxWidth: 'sm' }}>
-
-        <ButtonGroup sx={{ width: "100%" }}>
-          <Tooltip title="Назад">
-            <Button
-              variant='outlined'
-              disabled={isMutationPending}
-              startIcon={<ArrowBackIcon />}
-              onClick={() => navigate(-1)}
-              sx={{ flexGrow: 1 }}
-            />
-          </Tooltip>
-          <Tooltip title="Сохранить изменения">
-            <Button
-              variant='contained'
-              disabled={!hasChanges || isMutationPending || !isValid}
-              startIcon={<CheckRoundedIcon />}
-              loading={isMutationPending}
-              type='submit'
-              sx={{ flexGrow: 1 }}
-            />
-          </Tooltip>
-        </ButtonGroup>
-
-        <SaveStatus isSaved={!hasChanges} />
-
-        <Divider />
-
-        <FormControl
-          fullWidth
-          color='primary'>
-          <TextField 
-            label="Как к вам обращаться?"
-            size='small'
-            required
-            value={user.name}
-            onChange={(event) => setUser({ ...user, name: event.target.value })}
-            error={errors.name}
-            helperText={errors.name}
+    <>
+      <ButtonGroup sx={{ width: "100%", minHeight: '35px' }}>
+        <Tooltip title="Назад">
+          <Button
+            variant='outlined'
+            disabled={isMutationPending}
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate(-1)}
+            sx={{ flexGrow: 1 }}
           />
-        </FormControl>
-
-        <FormControl
-          fullWidth
-          color='primary'>
-          <TextField
-            name="login"
-            label="Телефон"
-            size='small'
-            slotProps={{ inputLabel: { shrink: true }, input: { inputComponent: PhoneInputMask } }}
-            required
-            value={user.phone}
-            onChange={(event) => setUser({ ...user, phone: event.target.value })}
-            error={errors.phone}
-            helperText={errors.phone}
+        </Tooltip>
+        <Tooltip title="Сохранить изменения">
+          <Button
+            variant='contained'
+            disabled={!hasChanges || isMutationPending}
+            startIcon={<CheckRoundedIcon />}
+            loading={isMutationPending}
+            onClick={saveChanges}
+            sx={{ flexGrow: 1 }}
           />
-        </FormControl>
+        </Tooltip>
+      </ButtonGroup>
 
-        <FormControl
-          fullWidth
-          color='primary'>
-          <TextField 
-            label="E-mail"
-            size='small'
-            required
-            value={user.email}
-            onChange={(event) => setUser({ ...user, email: event.target.value })}
-            error={errors.email}
-            helperText={errors.email}
-          />
-        </FormControl>
+      <SaveStatus isSaved={!hasChanges} />
 
-        <FormControl
-          fullWidth
-          color='primary'>
-          <PasswordInput
-            name="password"
-            label="Пароль"
-            size='small'
-            value={user.password}
-            onChange={(event) => setUser({ ...user, password: event.target.value })}
-            error={errors.password}
-            helperText={errors.password}
-          />
-        </FormControl>
+      <Divider />
 
-        <FormControl
-          fullWidth
-          color='primary'>
-          <PasswordInput
-            label="Повторите пароль"
-            size='small'
-            value={user.passwordRepeat}
-            onChange={(event) => setUser({ ...user, passwordRepeat: event.target.value })}
-            error={errors.passwordRepeat}
-            helperText={errors.passwordRepeat}
-          />
-        </FormControl>
-
-        <ImageInput
-          image={user.avatar}
-          label="Аватар"
-          onChange={(avatar) => setUser({ ...user, avatar: avatar })}
-          error={errors.avatar}
-          helperText={errors.avatar}
+      <FormControl
+        fullWidth
+        color='primary'>
+        <TextField 
+          label="Как к вам обращаться?"
+          size='small'
+          required
+          value={user.name}
+          onChange={(event) => setUser({ ...user, name: event.target.value })}
+          error={errors.name}
+          helperText={errors.name}
         />
+      </FormControl>
 
-        <Divider />
+      <FormControl
+        fullWidth
+        color='primary'>
+        <TextField
+          name="login"
+          label="Телефон"
+          size='small'
+          slotProps={{ inputLabel: { shrink: true }, input: { inputComponent: PhoneInputMask } }}
+          required
+          value={user.phone}
+          onChange={(event) => setUser({ ...user, phone: event.target.value })}
+          error={errors.phone}
+          helperText={errors.phone}
+        />
+      </FormControl>
 
-        <SaveStatus isSaved={!hasChanges} />
+      <FormControl
+        fullWidth
+        color='primary'>
+        <TextField 
+          label="E-mail"
+          size='small'
+          required
+          value={user.email}
+          onChange={(event) => setUser({ ...user, email: event.target.value })}
+          error={errors.email}
+          helperText={errors.email}
+        />
+      </FormControl>
 
-        {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
+      <FormControl
+        fullWidth
+        color='primary'>
+        <PasswordInput
+          name="password"
+          label="Пароль"
+          size='small'
+          value={user.password}
+          onChange={(event) => setUser({ ...user, password: event.target.value })}
+          error={errors.password}
+          helperText={errors.password}
+        />
+      </FormControl>
 
-        <Button
-          disabled={isMutationPending}
-          startIcon={<ExitToAppIcon />}
-          color='error'
-          variant='contained'
-          onClick={() => (onLeave())}>
-          Выйти из аккаунта
-        </Button>
+      <FormControl
+        fullWidth
+        color='primary'>
+        <PasswordInput
+          label="Повторите пароль"
+          size='small'
+          value={user.passwordRepeat}
+          onChange={(event) => setUser({ ...user, passwordRepeat: event.target.value })}
+          error={errors.passwordRepeat}
+          helperText={errors.passwordRepeat}
+        />
+      </FormControl>
 
-      </Stack>
-    </form>
+      <ImageInput
+        image={user.avatar}
+        label="Аватар"
+        onChange={(avatar) => setUser({ ...user, avatar: avatar })}
+        error={errors.avatar}
+        helperText={errors.avatar}
+      />
+
+      <Divider />
+
+      <SaveStatus isSaved={!hasChanges} />
+
+      {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
+
+      <Button
+        disabled={isMutationPending}
+        startIcon={<ExitToAppIcon />}
+        color='error'
+        variant='contained'
+        onClick={() => (onLeave())}>
+        Выйти из аккаунта
+      </Button>
+    </>
   )
 }
 

@@ -6,7 +6,7 @@ const CLink = ({ children, to, options, color="secondary", noStyles=false }) => 
 
   if (noStyles) {
     return (
-      <div onClick={() => navigate(to, options)} >
+      <div onClick={() => navigate(to, options)} style={{ cursor: 'pointer' }} >
         {children}
       </div>
     )

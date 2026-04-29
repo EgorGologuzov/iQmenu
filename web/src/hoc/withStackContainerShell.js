@@ -4,11 +4,12 @@ import React from 'react'
 function withStackContainerShell(Component) {
   return function (props) {
     return (
-      <Container sx={{ py: 2 }}>
-        <Stack direction="column" spacing={2} alignItems="center">
-          <Component {...props} />
-        </Stack>
-      </Container>
+      <Stack
+        direction="column"
+        spacing={2}
+        sx={{ p: 2, width: { xs: 'calc(100vw - 8px)', sm: '600px' } }}>
+        <Component {...props} />
+      </Stack>
     )
   }
 }

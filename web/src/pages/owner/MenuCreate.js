@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { deepCopy, joinWithApiBaseUrl } from '../../utils/utils'
 import { MENU_CREATE_TEMPLATE } from '../../values/default'
 import withStackContainerShell from '../../hoc/withStackContainerShell';
-import { Alert, Button, Divider, Stack, TextField } from '@mui/material';
+import { Alert, Button, ButtonGroup, Divider, Stack, TextField, Tooltip } from '@mui/material';
 import useTitle from '../../hooks/useTitle';
 import ImageInput from '../../components/inputs/ImageInput';
 import SwitchInput from '../../components/inputs/SwitchInput';
@@ -15,6 +15,8 @@ import { validateMenu } from '../../data/models/validation';
 import { processMenu } from '../../data/models/processing';
 import { compareMenu } from '../../data/models/comparation';
 import useUnsavedChangesWarning from '../../hooks/useUnsavedChangesWarning';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 
 function MenuCreate() {
   const [menu, setMenu] = useState(deepCopy(MENU_CREATE_TEMPLATE));
@@ -37,10 +39,43 @@ function MenuCreate() {
     onSuccess: () => navigateWithBlocker(`/o/menu`, { replace: true, ignoreBlock: true }),
   });
 
+  const onCreateClick = () => {
+    if (!isMutationPending) {
+      if (!isValid) {
+        alert("Форма заполнена с ошибками");
+        return;
+      }
+      createMenu(buildedMenu);
+    }
+  }
+
   useTitle({ general: "Новое меню" }, []);
 
   return (
-    <Stack direction="column" spacing={2} sx={{ width: "100%", maxWidth: "sm" }}>
+    <>
+      <ButtonGroup sx={{ width: "100%", minHeight: '35px' }}>
+        <Tooltip title="Назад">
+          <Button
+            variant="outlined"
+            disabled={isMutationPending}
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate(-1)}
+            sx={{ flexGrow: 1 }}
+          />
+        </Tooltip>
+        <Tooltip title="Создать меню">
+          <Button
+            variant="contained"
+            startIcon={<CheckRoundedIcon />}
+            onClick={onCreateClick}
+            loading={isMutationPending}
+            disabled={isMutationPending}
+            sx={{ flexGrow: 1 }}
+          />
+        </Tooltip>
+      </ButtonGroup>
+
+      <Divider />
 
       <SwitchInput
         id="isActive"
@@ -102,23 +137,13 @@ function MenuCreate() {
 
       <Button
         variant="contained"
-        onClick={() => createMenu(buildedMenu)}
+        onClick={onCreateClick}
         loading={isMutationPending}
         loadingPosition="center"
-        disabled={isMutationPending || !isValid}
-      >
+        disabled={isMutationPending}>
         Создать меню
       </Button>
-
-      <Button
-        variant="outlined"
-        onClick={() => navigate(-1)}
-        disabled={isMutationPending}
-      >
-        Вернуться назад
-      </Button>
-
-    </Stack>
+    </>
   )
 }
 

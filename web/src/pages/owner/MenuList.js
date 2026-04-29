@@ -30,7 +30,7 @@ function MenuList() {
   useTitle({ general: "Ваши меню" }, []);
 
   if (isLoading) {
-    return <CircularProgress />
+    return <CircularProgress sx={{ alignSelf: 'center' }} />
   }
 
   const showQrDialog = (menuQr) => {
@@ -47,62 +47,94 @@ function MenuList() {
     navigate(`/o/menu/${menuId}/edit`)
   }
 
+  const navigateMenuCreate = () => {
+    navigate('/o/menu/new')
+  }
+
   return (
     <>
-      <Button variant='outlined' startIcon={<AddCircleIcon />} onClick={() => navigate('/o/menu/new')} sx={{ width: "100%", maxWidth: "sm" }}>
-        Создать меню
-      </Button>
-
       {(!menus || !menus.length) &&
         <Alert severity="info">Вы еще не создали ни одного меню. Создайте сейчас!</Alert>
       }
 
-      {menus && menus.length != 0 && (
-        <Grid container width={'100%'} spacing={1}>
-          {menus.map(menu =>
-            <Grid size={{ xs: 6, sm: 4, md: 3 }} key={menu.id}>
-              <Card sx={{ maxWidth: '100%', maxHeight: 'min-content', textAlign: 'center' }}>
+      <Grid container width={'100%'} spacing={1}>
 
-                <Box sx={{ width: "100%", aspectRatio: "1 / 1" }}>
-                  <Avatar
-                    variant="square"
-                    src={joinWithApiBaseUrl(menu.image)}
-                    onClick={() => navigateMenuEdit(menu.id)}
-                    sx={{ width: "100%", height: "100%", cursor: "pointer" }}
-                  >
-                    <FastfoodIcon sx={{ width: 80, height: 80 }} />
-                  </Avatar>
-                </Box>
-
-                <CardContent sx={{ p: 1, cursor: "pointer" }} onClick={() => navigateMenuEdit(menu.id)}>
-                  <Typography variant="subtitle2" component="div" noWrap>
-                    {menu.menuName}
-                  </Typography>
-                  <Typography variant="subtitle2" noWrap sx={{ color: 'text.secondary' }}>
-                    {menu.companyName}
-                  </Typography>
-                </CardContent>
-
-                <CardActions disableSpacing sx={{ placeContent: 'space-around', p: 0 }}>
-                  <Link to={`/${menu.id}`} target="_blank">
-                    <IconButton aria-label="share" size='large'>
-                      <OndemandVideoIcon />
-                    </IconButton>
-                  </Link>
-
-                  <IconButton aria-label="share" size='large' onClick={() => showQrDialog(menu.qr)}>
-                    <QrCodeIcon />
-                  </IconButton>
-                  <IconButton aria-label="add to favorites" size='large' onClick={() => navigateMenuEdit(menu.id)}>
-                    <EditIcon />
-                  </IconButton>
-                </CardActions>
-
-              </Card>
-            </Grid>
-          )}
+        <Grid size={{ xs: 6, md: 4 }}>
+          <Card sx={{
+              maxWidth: '100%',
+              textAlign: 'center',
+              border: '2px solid transparent',
+              '&:hover': {
+                borderColor: 'primary.main',
+                boxShadow: 3,
+              },
+            }}>
+            <Box sx={{ width: "100%", aspectRatio: "1 / 1" }}>
+              <Avatar
+                variant="square"
+                onClick={navigateMenuCreate}
+                sx={{ width: "100%", height: "100%", cursor: "pointer" }}>
+                <AddCircleIcon sx={{ width: 80, height: 80 }} />
+              </Avatar>
+            </Box>
+            <Stack
+              direction="column"
+              sx={{ p: 1, cursor: "pointer", height: "108px", justifyContent: 'center' }}
+              onClick={navigateMenuCreate}>
+              <Typography variant="subtitle2" component="div" noWrap>
+                Создать новое меню
+              </Typography>
+            </Stack>
+          </Card>
         </Grid>
-      )}
+
+        {menus && menus.length != 0 && menus.map(menu =>
+          <Grid size={{ xs: 6, md: 4 }} key={menu.id}>
+            <Card sx={{
+                maxWidth: '100%',
+                maxHeight: 'min-content',
+                textAlign: 'center',
+                border: '2px solid transparent',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  boxShadow: 3,
+                },
+              }}>
+              <Box sx={{ width: "100%", aspectRatio: "1 / 1" }}>
+                <Avatar
+                  variant="square"
+                  src={joinWithApiBaseUrl(menu.image)}
+                  onClick={() => navigateMenuEdit(menu.id)}
+                  sx={{ width: "100%", height: "100%", cursor: "pointer" }}>
+                  <FastfoodIcon sx={{ width: 80, height: 80 }} />
+                </Avatar>
+              </Box>
+
+              <CardContent sx={{ p: 1, cursor: "pointer" }} onClick={() => navigateMenuEdit(menu.id)}>
+                <Typography variant="subtitle2" component="div" noWrap>
+                  {menu.menuName}
+                </Typography>
+                <Typography variant="subtitle2" noWrap sx={{ color: 'text.secondary' }}>
+                  {menu.companyName}
+                </Typography>
+              </CardContent>
+
+              <CardActions disableSpacing sx={{ placeContent: 'space-around', p: 0 }}>
+                <Link to={`/${menu.id}`} target="_blank">
+                  <IconButton aria-label="share" size='large'>
+                    <OndemandVideoIcon />
+                  </IconButton>
+                </Link>
+                <IconButton aria-label="share" size='large' onClick={() => showQrDialog(menu.qr)}>
+                  <QrCodeIcon />
+                </IconButton>
+              </CardActions>
+
+            </Card>
+          </Grid>
+        )}
+
+      </Grid>
 
       <MenuQrCodeDialog qr={currentQrCode} open={isDialogOpen} onClose={() => hideQrDialog()} />
     </>

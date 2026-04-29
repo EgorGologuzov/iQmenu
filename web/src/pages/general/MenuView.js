@@ -25,7 +25,7 @@ const CardGrid = memo(({ displayGroups, onCardClick }) => {
                 </Typography>
               </Grid>
               {group.products.map((product, _) =>
-                <Grid key={product.name} size={{ xs: 6, sm: 4, md: 3 }}>
+                <Grid key={product.name} size={{ xs: 6, md: 4 }}>
                   <ProductViewCard product={product} onClick={onCardClick} />
                 </Grid>
               )}
@@ -145,7 +145,7 @@ function MenuView() {
   });
 
   if (isLoading) {
-    return <CircularProgress />
+    return <CircularProgress sx={{ alignSelf: 'center' }} />
   }
 
   if (error) {
@@ -168,7 +168,7 @@ function MenuView() {
         <Alert severity="info">Ни один продукт не прошел фильтры... Попробуйет сбросить их!</Alert>
       }
 
-      {isPrerender && <CircularProgress />}
+      {isPrerender && <CircularProgress sx={{ alignSelf: 'center' }} />}
 
       {!isPrerender &&
         <CardGrid

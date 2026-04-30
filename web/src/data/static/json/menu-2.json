@@ -1,29 +1,46 @@
 {
-  "id": 2,
+  "id": 1,
   "owner": "123e4567-e89b-12d3-a456-426614174000",
   "isActive": true,
-  "createAt": "2025-04-10 22:45:48.198",
+  "createAt": { "$date": "2025-04-10 22:45:48.198" },
+  "companyName": "Кафе «Уют»",
+  "menuName": "Летнее меню",
+  "categories": [
+    "Основные",
+    "Десерты",
+    "Напитки",
+    "Закуски",
+    "Гарниры",
+    "Алкоголь",
+    "Салаты",
+    "Супы"
+  ],
+  "image": "https://images.assetsdelivery.com/compings_v2/vectorchef/vectorchef1507/vectorchef150709093.jpg",
   "qr": "https://assets.turbologo.ru/blog/ru/2020/01/18163037/qr-kod.png",
   "products": [
     {
+      "id": 1,
       "name": "Цезарь с курицей",
       "price": 420,
       "isActive": false,
-      "categories": ["Основные"],
+      "categories": [],
       "weight": 280,
       "description": "Классический салат с листьями айсберга, куриной грудкой и соусом Цезарь",
-      "composition": "Курица, айсберг, помидоры черри, пармезан, сухарики"
+      "composition": "Курица, айсберг, помидоры черри, пармезан, сухарики",
+      "image": "https://menunedeli.ru/wp-content/uploads/2022/07/41322293-5B97-451F-886E-2522AB91F67B-886x700.jpeg"
     },
     {
+      "id": 2,
       "name": "Тирамису",
       "price": 350,
       "isActive": true,
       "categories": ["Десерты"],
       "weight": 150,
       "description": "Итальянский десерт с маскарпоне и кофейной пропиткой",
-      "image": "--https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
+      "image": "https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
     },
     {
+      "id": 3,
       "name": "Латте",
       "price": 220,
       "isActive": true,
@@ -32,6 +49,7 @@
       "image": "https://coffee61.ru/wa-data/public/photos/68/03/368/368.970.jpg"
     },
     {
+      "id": 4,
       "name": "Брускетта с томатами",
       "price": 180,
       "isActive": true,
@@ -40,37 +58,25 @@
       "image": "https://eda.ru/images/RecipePhoto/390x390/brusketta-s-pomidorami-i-mocarelloj_41582_photo_33956.jpg"
     },
     {
-      "name": "Стейк Рибай",
-      "price": 890,
-      "isActive": true,
-      "categories": ["Основные"],
-      "weight": 300,
-      "composition": "Говядина, соль, перец",
-      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_TYkd9mIf4PYkGVy45ElwUEtuvvYYPZe-hg&s"
-    },
-    {
-      "name": "Картофель фри",
-      "price": 150,
-      "isActive": false,
-      "categories": ["Гарниры"],
-      "description": "Хрустящий картофель с солью",
-      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQESjIDOn4TZW75bmLjyCvT_D9dPZ37ZB7V1w&s"
-    },
-    {
+      "id": 5,
       "name": "Крем-суп из грибов",
       "price": 240,
       "isActive": true,
       "categories": ["Основные"],
-      "weight": 200    },
+      "weight": 200,
+      "image": "https://eda.ru/images/RecipePhoto/390x390/krem-sup-iz-shampinonov-s-timyanom-i-soevym-sousom_125761_photo_149129.jpg"
+    },
     {
+      "id": 6,
       "name": "Мохито",
       "price": 320,
       "isActive": true,
       "categories": ["Напитки", "Алкоголь"],
       "composition": "Ром, лайм, мята, содовая",
-      "image": "--https://ist.say7.info/img0007/11/711_01303xh_3913_1024.jpg"
+      "image": "https://ist.say7.info/img0007/11/711_01303xh_3913_1024.jpg"
     },
     {
+      "id": 7,
       "name": "Чизкейк Нью-Йорк",
       "price": 380,
       "isActive": true,
@@ -78,6 +84,7 @@
       "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8Xi9QxCSIz-2kCv59Hd1NbBVSP0NhEvDnmQ&s"
     },
     {
+      "id": 8,
       "name": "Салат Греческий",
       "price": 290,
       "isActive": true,
@@ -86,46 +93,154 @@
       "image": "https://art-lunch.ru/content/uploads/2018/07/Greek_salad_01.jpg"
     },
     {
-      "name": "Пицца Маргарита",
-      "price": 450,
-      "isActive": true,
-      "categories": ["Основные"],
-      "weight": 400,
-      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZBz8TcV074DnRF_I2oNUdjxiHVxEfGoHVng&s"
-    },
-    {
+      "id": 9,
       "name": "Вино красное сухое",
       "price": 520,
       "isActive": true,
       "categories": ["Алкоголь"],
       "description": "Испанское вино, 2019 год",
-      "image": "https://rsovin.ru/wp-content/uploads/2022/07/9f624cdd-aeb5-11e9-bde2-ac1f6bb2b39c_7a168021-b5e5-11ed-85d3-ac1f6bb2b39c.png"
+      "image": "https://media.uteka.ru/media/512/202311/2_4539.jpg"
     },
     {
+      "id": 10,
       "name": "Гуакамоле",
       "price": 210,
       "isActive": true,
       "categories": ["Закуски"],
-      "composition": "Авокадо, лайм, кинза, чили"
+      "composition": "Авокадо, лайм, кинза, чили",
+      "image": "https://receptoriy.ru/upload/Guacamole.jpg"
     },
     {
-      "name": "Шоколадный фондан",
-      "price": 310,
+      "id": 11,
+      "name": "Паста Карбонара",
+      "price": 490,
+      "isActive": true,
+      "categories": ["Основные"],
+      "weight": 320,
+      "description": "Спагетти с беконом в сливочно-яичном соусе",
+      "composition": "Спагетти, бекон, пармезан, яйцо, сливки",
+      "image": "https://i.ytimg.com/vi/0jRxAf7GpUs/maxresdefault.jpg"
+    },
+    {
+      "id": 12,
+      "name": "Спринг-роллы",
+      "price": 260,
+      "isActive": true,
+      "categories": ["Закуски"],
+      "weight": 180,
+      "description": "Рисовые роллы с овощами и соусом чили",
+      "composition": "Рисовая бумага, морковь, огурец, перец, кунжут, соус чили",
+      "image": "https://porusski.me/wp-content/uploads/2020/09/IMG-5843.jpg"
+    },
+    {
+      "id": 13,
+      "name": "Рататуй",
+      "price": 370,
       "isActive": false,
-      "categories": ["Десерты"],
-      "description": "Тёплый шоколадный кекс с жидкой сердцевиной",
-      "image": "--https://eda.ru/images/RecipePhoto/390x390/shokoladnij-fondan_49755_photo_53437.jpg"
+      "categories": ["Основные"],
+      "weight": 250,
+      "description": "Запечённые овощи с травами Прованса",
+      "composition": "Кабачок, баклажан, томат, болгарский перец, прованские травы",
+      "image": "https://eda.rambler.ru/images/RecipePhoto/1280x1280/ratatuy-s-sousom_51981_photo_60330.jpg"
     },
     {
-      "name": "Эспрессо",
-      "price": 150,
+      "id": 14,
+      "name": "Начос с сыром",
+      "price": 280,
+      "isActive": true,
+      "categories": ["Закуски"],
+      "weight": 200,
+      "description": "Кукурузные чипсы с расплавленным сырным соусом",
+      "composition": "Чипсы начос, сыр чеддер, халапеньо, зелень",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8ydIAi2Rs5n9rhtRxk04KXSYyw4mRKjIK9Q&s"
+    },
+    {
+      "id": 15,
+      "name": "Куриные крылышки BBQ",
+      "price": 360,
+      "isActive": true,
+      "categories": ["Закуски"],
+      "weight": 280,
+      "description": "Запечённые крылышки в пряном соусе",
+      "composition": "Куриные крылья, соус BBQ, паприка, чеснок",
+      "image": "https://baku32.ru/catalog/zakuski-k-pivo/units/kurinie-krilishki/images/kurinie-krilishki"
+    },
+    {
+      "id": 16,
+      "name": "Панна котта",
+      "price": 330,
+      "isActive": true,
+      "categories": ["Десерты"],
+      "weight": 130,
+      "description": "Нежный сливочный десерт с ягодным соусом",
+      "composition": "Сливки, сахар, ваниль, желатин, ягодный соус",
+      "image": "https://lasunka.com/Blog/2023/dietychna-panna-kotta-zi-smetany-bez-vershkiv.jpg"
+    },
+    {
+      "id": 17,
+      "name": "Лимонад Манго-маракуйя",
+      "price": 290,
       "isActive": true,
       "categories": ["Напитки"],
-      "image": "https://e1.edimdoma.ru/data/ingredients/0000/2850/2850-ed4_wide.jpg?1515762750"
+      "weight": 350,
+      "description": "Освежающий лимонад с экзотическими фруктами",
+      "composition": "Манго, маракуйя, лайм, мята, газированная вода",
+      "image": "https://foodfriends.ru/assets/image-cache/files/images/old/images/ff-images/%D0%A0%D0%95%D0%A6%D0%95%D0%9F%D0%A2%D0%AB/Mango_marakuya.Turandot.6707353c.jpg"
+    },
+    {
+      "id": 18,
+      "name": "Сырники со сметаной",
+      "price": 320,
+      "isActive": false,
+      "categories": ["Десерты"],
+      "weight": 210,
+      "description": "Классические сырники из творога с домашней сметаной",
+      "composition": "Творог, яйцо, мука, сахар, сметана",
+      "image": "https://s1.eda.ru/StaticContent/Photos/120131085305/1711131155020/p_O.jpg"
+    },
+    {
+      "id": 19,
+      "name": "Глинтвейн",
+      "price": 380,
+      "isActive": true,
+      "categories": ["Напитки", "Алкоголь"],
+      "weight": 250,
+      "description": "Горячий напиток с красным вином и специями",
+      "composition": "Красное вино, апельсин, корица, гвоздика, имбирь, мёд",
+      "image": "https://static.vkusnyblog.com/full/uploads/2009/07/glintwein-new.jpg"
+    },
+    {
+      "id": 20,
+      "name": "Цезарь с креветками",
+      "price": 520,
+      "isActive": true,
+      "categories": ["Салаты"],
+      "weight": 270,
+      "description": "Салат с тигровыми креветками и соусом Цезарь",
+      "composition": "Креветки, айсберг, помидоры черри, пармезан, сухарики",
+      "image": "https://www.arise-app.com/images/dishes/ru/salat-cezar-s-krevetkami-i-lososem-y10qbi.webp"
+    },
+    {
+      "id": 21,
+      "name": "Гречка по-купечески",
+      "price": 290,
+      "isActive": true,
+      "categories": ["Основные"],
+      "weight": 280,
+      "description": "Гречневая каша с грибами, луком и мясом",
+      "composition": "Гречка, курица, шампиньоны, лук, морковь",
+      "image": "https://www.russianfood.com/dycontent/images_upl/549/big_548793.jpg"
+    },
+    {
+      "id": 22,
+      "name": "Милкшейк клубничный",
+      "price": 270,
+      "isActive": true,
+      "categories": ["Напитки"],
+      "weight": 350,
+      "description": "Густой молочный коктейль со свежей клубникой",
+      "composition": "Мороженое, молоко, клубника, взбитые сливки",
+      "image": "https://barlist.ru/media/uploads/str_milkshake.jpg"
     }
-  ],
-  "companyName": "Кафе «Уют»",
-  "menuName": "Летнее меню",
-  "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
-  "image": "https://cdn3.vectorstock.com/i/1000x1000/91/22/new-summer-menu-calligraphic-cafe-board-vector-9239122.jpg"
+  ]
 }

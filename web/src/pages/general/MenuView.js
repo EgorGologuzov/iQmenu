@@ -62,7 +62,7 @@ function MenuView() {
 
     if (filters.favoritesOnly) {
       if (favorites && favorites.products) {
-        result = result.filter(product => favorites.products.includes(product.name));
+        result = result.filter(product => favorites.products.includes(product.id));
       } else {
         result = result.filter(_ => false);
       }
@@ -79,23 +79,13 @@ function MenuView() {
     return result;
   }
 
-  const sortProducts = (products) => {
-    return products.toSorted((p1, p2) => {
-      if (p1.isActive != p2.isActive) {
-        return p1.isActive ? -1 : 1;
-      }
-
-      return p1.name < p2.name ? -1 : 1;
-    })
-  }
-
   const groupProducts = (products) => {
     const groups = [];
 
     menu.categories && menu.categories.length && menu.categories.forEach(
       category => groups.push({
         groupName: category,
-        products: sortProducts(products.filter(product => product.categories.includes(category))),
+        products: products.filter(product => product.categories.includes(category)),
       })
     )
 
@@ -175,6 +165,12 @@ function MenuView() {
           displayGroups={displayGroups}
           onCardClick={showProductDialog}
         />
+      }
+
+      {!isPrerender &&
+        <Typography variant="caption" sx={{ color: 'primary.main' }}>
+          {`* ${title}`}
+        </Typography>
       }
 
       <ProductInfoDialog product={selectedProduct} open={isDialogOpen} onClose={hideProductDialog} />

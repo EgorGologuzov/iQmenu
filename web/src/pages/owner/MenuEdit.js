@@ -69,6 +69,14 @@ function MenuEdit() {
     onError: (error) => setLastError(error),
   });
 
+  const onCategoriesChange = (categories) => {
+    setCategories(categories);
+    setProducts(products.map(p => {
+      const actualProductCategories = p.categories.filter(c => categories.includes(c));
+      return actualProductCategories.length === p.categories.length ? p : { ...p, categories: actualProductCategories };
+    }));
+  }
+
   const handleUpdateButtonClick = () => {
     if (!isUpdatePending && !isDeletePending) {
       if (!isValid) {
@@ -176,7 +184,7 @@ function MenuEdit() {
 
       <CategoriesInput
         categories={categories}
-        onChange={setCategories}
+        onChange={onCategoriesChange}
         label="Категории"
         error={errors.categories}
         helperText={errors.categories}

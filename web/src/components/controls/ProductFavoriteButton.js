@@ -13,14 +13,14 @@ function ProductFavoriteButton({ product }) {
 
   const inFavorites = useSelector(state => {
     const record = state.favorite.find(record => record.menuId == menuId);
-    return record && record.products.indexOf(product.name) != -1;
+    return record && record.products.indexOf(product.id) != -1;
   });
 
   const handleClick = () => {
     if (inFavorites) {
-      dispatch(remove({ menuId: menuId, productName: product.name }));
+      dispatch(remove({ menuId: menuId, productId: product.id }));
     } else {
-      dispatch(add({ menuId: menuId, productName: product.name }));
+      dispatch(add({ menuId: menuId, productId: product.id }));
     }
   }
 

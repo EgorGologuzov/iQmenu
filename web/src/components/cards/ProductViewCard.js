@@ -10,7 +10,13 @@ function ProductViewCard({ product, onClick }) {
   }
 
   return (
-    <Card>
+    <Card sx={{
+        border: '2px solid transparent',
+        '&:hover': {
+          borderColor: 'primary.main',
+          boxShadow: 3,
+        },
+      }}>
 
       <Box position="relative">
 
@@ -48,9 +54,27 @@ function ProductViewCard({ product, onClick }) {
           <ProductFavoriteButton product={product} />
         </Stack>
 
-        <Typography variant="subtitle2" component="div" noWrap onClick={onClickHandler} sx={{ cursor: "pointer" }}>
-          {product.name}
-        </Typography>
+        <Stack
+          direction="column"
+          sx={{
+            justifyContent: 'center',
+            minHeight: '45px',
+          }}>
+          <Typography
+            variant="subtitle2"
+            component="div"
+            onClick={onClickHandler}
+            sx={{
+              cursor: 'pointer',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: '2',
+              WebkitBoxOrient: 'vertical',
+            }}>
+            {product.name}
+          </Typography>
+        </Stack>
 
       </Stack>
 

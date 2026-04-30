@@ -29,8 +29,6 @@ export const USER_SERVICE = {
     await sleep(1000);
 
     if (!OWNER_TEST_CREDENTIALS.find((owner)=>owner.phone===regData.phone)){
-      // {код вставки пользователя в бд}
-      // ниже будем возвращать нового зареганого пользователя(пока будет фейковый)
       return OWNER_USER_DATA_FOR_TEST;
     }
 

@@ -29,10 +29,6 @@ export function processMenu(m) {
   m.categories = m.categories && m.categories.length ? m.categories : undefined;
   m.image = m.image ? m.image : undefined;
 
-  if (m.products) {
-    m.products = m.products.map(product => ({ ...product, id: undefined }));
-  }
-
   return m;
 }
 

@@ -39,6 +39,14 @@ function MenuCreate() {
     onSuccess: () => navigateWithBlocker(`/o/menu`, { replace: true, ignoreBlock: true }),
   });
 
+  const onCategoriesChange = (categories) => {
+    setCategories(categories);
+    setProducts(products.map(p => {
+      const actualProductCategories = p.categories.filter(c => categories.includes(c));
+      return actualProductCategories.length === p.categories.length ? p : { ...p, categories: actualProductCategories };
+    }));
+  }
+
   const onCreateClick = () => {
     if (!isMutationPending) {
       if (!isValid) {
@@ -116,7 +124,7 @@ function MenuCreate() {
 
       <CategoriesInput
         categories={categories}
-        onChange={setCategories}
+        onChange={onCategoriesChange}
         label="Категории"
         error={errors.categories}
         helperText={errors.categories}

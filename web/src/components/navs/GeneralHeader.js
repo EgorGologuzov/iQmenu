@@ -22,7 +22,7 @@ function GeneralHeader() {
             </CLink>
 
             <CLink to="/" noStyles>
-              <Typography variant="h6" component="div" sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: title ? "unset" : 1 }}>
+              <Typography variant="h6" component="div" sx={{ flexGrow: title ? "unset" : 1 }}>
                 iQmenu
               </Typography>
             </CLink>
@@ -32,7 +32,7 @@ function GeneralHeader() {
             /
           </Typography>}
 
-          {title && <Typography variant="subtitle1" noWrap component="h1" sx={{ flexGrow: 1 }}>
+          {title && <Typography variant="subtitle1" noWrap component="h1" sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: 1 }}>
             {title}
           </Typography>}
 

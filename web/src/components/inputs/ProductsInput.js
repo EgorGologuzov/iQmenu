@@ -234,7 +234,8 @@ const ProductsInput = ({ products, categories, onChange }) => {
 
   const handleAddProduct = () => {
     const newProduct = deepCopy(PRODUCT_CREATE_TEMPLATE);
-    newProduct.id = Math.random(); // tmp id
+    const maxId = Math.max(...products.map(p => p.id));
+    newProduct.id = maxId === -Infinity ? 1 : maxId + 1;
     setCurrentProduct(newProduct);
     setEditDialogOpen(true);
   };

@@ -5,7 +5,7 @@ const FAVORITES_LIST_LOCAL_STORAGE_KEY = "favoriteSlice/favoritesList";
 // const FAVORITES_LIST_RECORD_EXAMPLE = [
 //   {
 //     menuId: 0,
-//     products: ["Product name 1", "Product name 2"],
+//     products: [1, 3],
 //   }
 // ]
 
@@ -30,13 +30,13 @@ const favoriteSlice = createSlice({
       const currentRecord = state.find(record => record.menuId == action.payload.menuId);
       
       if (currentRecord) {
-        currentRecord.products.push(action.payload.productName);
+        currentRecord.products.push(action.payload.productId);
       } 
       
       if (!currentRecord) {
         state.push({
           menuId: action.payload.menuId,
-          products: [action.payload.productName],
+          products: [action.payload.productId],
         })
       }
 
@@ -46,7 +46,7 @@ const favoriteSlice = createSlice({
       const currentRecord = state.find(record => record.menuId == action.payload.menuId);
       
       if (currentRecord) {
-        const productIndex = currentRecord.products.indexOf(action.payload.productName);
+        const productIndex = currentRecord.products.indexOf(action.payload.productId);
         if (productIndex != -1) {
           currentRecord.products.splice(productIndex, 1);
           if (!currentRecord.products.length) {

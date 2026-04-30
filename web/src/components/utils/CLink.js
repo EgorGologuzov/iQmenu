@@ -13,7 +13,7 @@ const CLink = ({ children, to, options, color="secondary", noStyles=false }) => 
   }
 
   return (
-    <Link color={color} onClick={() => navigate(to, options)} >
+    <Link color={color} style={{ cursor: 'pointer' }} onClick={() => navigate(to, options)} >
       {children}
     </Link>
   )

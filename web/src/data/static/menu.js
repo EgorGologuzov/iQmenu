@@ -23,8 +23,8 @@ export const MENU_SERVICE = {
     await sleep(1000);
     console.log("/data/static/menu/create", menuData);
 
-    if (menuData.categories && menuData.categories.length > 7) {
-      throw logAndReturnError("Тестовая ошибка: категорий не может быть больше 7");
+    if (menuData.categories && menuData.categories.length > 10) {
+      throw logAndReturnError("Тестовая ошибка: категорий не может быть больше 10");
     }
 
     const newMenu = deepCopy(menuData);
@@ -45,8 +45,8 @@ export const MENU_SERVICE = {
       throw logAndReturnError("Тестовая ошибка: меню с таким id не найдено");
     }
 
-    if (menuData.categories && menuData.categories.length > 7) {
-      throw logAndReturnError("Тестовая ошибка: категорий не может быть больше 7");
+    if (menuData.categories && menuData.categories.length > 10) {
+      throw logAndReturnError("Тестовая ошибка: категорий не может быть больше 10");
     }
 
     const index = MENUS.indexOf(current);
@@ -59,10 +59,6 @@ export const MENU_SERVICE = {
   async delete(id) {
     await sleep(1000);
     console.log("/data/static/menu/delte", { id: id });
-
-    if (id == 2) {
-      throw logAndReturnError("Тестовая ошибка: меню с id = 2 нельзя удалить");
-    }
 
     const current = MENUS.find(menu => menu.id == id);
 

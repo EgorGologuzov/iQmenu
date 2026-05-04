@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dialog, DialogActions, Typography, Button, Chip, Divider, Box, Stack, DialogContent } from '@mui/material';
 import ProductFavoriteButton from '../controls/ProductFavoriteButton';
+import { joinWithApiBaseUrl } from '../../utils/utils';
 
 function ProductInfoDialog({ product, onClose, ...otherProps }) {
   if (!product) return null;
@@ -17,7 +18,7 @@ function ProductInfoDialog({ product, onClose, ...otherProps }) {
             <Box
               component="img"
               sx={{ width: "100%", maxHeight: 500, aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 2, alignSelf: "center" }}
-              src={product.image}
+              src={joinWithApiBaseUrl(product.image)}
               alt={product.name}
             />
           )}

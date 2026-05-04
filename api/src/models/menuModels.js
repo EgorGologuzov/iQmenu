@@ -4,6 +4,7 @@ import { makeModel, mapSchema } from "../utils/schema.js";
 // Модель базы данных
 
 const productSchema = new mongoose.Schema({
+  code: { type: Number, required: true },
   name: { type: String, required: true },
   price: { type: Number, required: true },
   isActive: { type: Boolean, required: true },
@@ -36,6 +37,7 @@ export const Menu = mongoose.model("Menu", menuSchema);
 export const ProductReturn = makeModel({
 
   schema: {
+    id: { type: "number", valid: true, sourceName: "code" },
     name: { type: "string", valid: true },
     price: { type: "number", valid: true },
     isActive: { type: "boolean", valid: true },
@@ -55,6 +57,7 @@ export const ProductReturn = makeModel({
 export const ProductEdit = makeModel({
 
   schema: {
+    code: { type: "number", required: true, sourceName: "id" },
     name: { type: "string", required: true, minLength: 1, maxLength: 50, trim: true, sentenseCase: true },
     price: { type: "number", required: true, min: 0, max: 1_000_000, round: true },
     isActive: { type: "boolean", required: true },
@@ -136,7 +139,7 @@ export const MenuCreate = makeModel({
       maxLength: 100,
       item: { type: ProductEdit, notnull: true },
       uniqueItems: true,
-      itemsComparator: (p1, p2) => p1.name == p2.name,
+      itemsComparator: (p1, p2) => p1.code == p2.code,
     },
     companyName: { type: "string", required: true, trim: true, minLength: 1, maxLength: 100 },
     menuName: { type: "string", required: true, trim: true, minLength: 1, maxLength: 100 },

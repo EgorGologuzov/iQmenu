@@ -1,11 +1,11 @@
 ### Переменные
 
 @baseUrl = http://localhost:4200
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODEzMmRiMjc3OTJkN2RmMjBkMTVkODYiLCJpYXQiOjE3NDYwODczNDd9.KvwZcDKmzuBUmkoT2nXCyhR1Sd5ykCtWDDDXagn66C0
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWYzMzkzYjg5MDQ5MjI4MTA0Njk3ZDMiLCJpYXQiOjE3Nzc1NDc1Nzl9.s5XfcB15KwEsii7cDIdcNH42y9-irZHuR-y8a8XGYU8
 
 ### Get by id
 
-GET {{baseUrl}}/api/menu/3
+GET {{baseUrl}}/api/menu/1
 
 ### Create
 
@@ -14,9 +14,14 @@ Authorization: {{token}}
 content-type: application/json
 
 {
+  "companyName": "Кафе «Уют»",
+  "menuName": "Основное меню",
+  "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
+  "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg",
   "isActive": true,
   "products": [
     {
+      "id": 1,
       "name": "Цезарь с курицей",
       "price": 420,
       "isActive": false,
@@ -27,6 +32,7 @@ content-type: application/json
       "image": "https://menunedeli.ru/wp-content/uploads/2022/07/41322293-5B97-451F-886E-2522AB91F67B-886x700.jpeg"
     },
     {
+      "id": 2,
       "name": "Тирамису",
       "price": 350,
       "isActive": true,
@@ -35,11 +41,7 @@ content-type: application/json
       "description": "Итальянский десерт с маскарпоне и кофейной пропиткой",
       "image": "https://19tortov.ru/upload/resize_cache/iblock/39f/500_500_1/20192643.jpg"
     }
-  ],
-  "companyName": "Кафе «Уют»",
-  "menuName": "Основное меню",
-  "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
-  "image": "https://previews.123rf.com/images/vectorchef/vectorchef1507/vectorchef150709093/42871957-menu-icon.jpg"
+  ]
 }
 
 ### Update
@@ -53,6 +55,7 @@ content-type: application/json
   "createAt": "2024-04-29T12:38:32.609Z",
   "products": [
     {
+      "id": 1,
       "name": "Цезарь с курицей 2",
       "price": 420,
       "isActive": false,
@@ -63,6 +66,7 @@ content-type: application/json
       "image": "https://menunedeli.ru/wp-content/uploads/2022/07/41322293-5B97-451F-886E-2522AB91F67B-886x700.jpeg"
     },
     {
+      "id": 2,
       "name": "Тирамису",
       "price": 350,
       "isActive": true,
@@ -80,7 +84,7 @@ content-type: application/json
 
 ### Delete
 
-DELETE {{baseUrl}}/api/menu/1
+DELETE {{baseUrl}}/api/menu/4
 Authorization: {{token}}
 
 ### Get all menu for one user (without products and categories)

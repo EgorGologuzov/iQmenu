@@ -2,6 +2,7 @@ import { Avatar, Box, Card, CardMedia, Chip, Stack, Typography } from '@mui/mate
 import React, { memo } from 'react'
 import ProductFavoriteButton from '../controls/ProductFavoriteButton';
 import FastfoodIcon from '@mui/icons-material/Fastfood';
+import { joinWithApiBaseUrl } from '../../utils/utils';
 
 function ProductViewCard({ product, onClick }) {
 
@@ -24,7 +25,7 @@ function ProductViewCard({ product, onClick }) {
         <Box sx={{ width: "100%", aspectRatio: "1 / 1" }}>
           <Avatar
             variant="square"
-            src={product.image}
+            src={joinWithApiBaseUrl(product.image)}
             onClick={onClickHandler}
             sx={{ cursor: "pointer", width: "100%", height: "100%" }}
           >

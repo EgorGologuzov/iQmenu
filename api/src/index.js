@@ -6,6 +6,7 @@ import { menuRouter } from './routes/menuRouter.js'
 import { mediaRouter } from './routes/mediaRouter.js'
 import mongoose from 'mongoose'
 import { badRequest, internalServerError, notFound } from './utils/responses.js'
+import { orderRouter } from './routes/orderRouter.js';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ const main = async () => {
   app.use("/api/user", userRouter);
   app.use("/api/menu", menuRouter);
   app.use("/api/media", mediaRouter);
+  app.use("/api/order", orderRouter);
 
   app.all('/*notfound', (req, res) => notFound(res, "Такого эндпоинта нет..."));
 

@@ -7,7 +7,7 @@ import ProductInfoDialog from '../../components/dialogs/ProductInfoDialog'
 import ProductViewCard from '../../components/cards/ProductViewCard'
 import { useQuery } from '@tanstack/react-query'
 import withStackContainerShell from '../../hoc/withStackContainerShell'
-import ProductFilter from '../../components/controls/ProductFilter'
+import MenuViewActions from '../../components/controls/MenuViewActions'
 import { useSelector } from 'react-redux'
 import { MENU_FILTERS_DEFAULT } from '../../values/default'
 import { arraysIntersection, deepCopy } from '../../utils/utils'
@@ -20,7 +20,7 @@ const CardGrid = memo(({ displayGroups, onCardClick }) => {
           {displayGroups.map(group =>
             <React.Fragment key={group.groupName}>
               <Grid size={{ xs: 12 }}>
-                <Typography component="h6" variant="subtitle2" textAlign="center" sx={{ my: 1 }}>
+                <Typography component="h6" variant="subtitle2" textAlign="center">
                   {group.groupName}
                 </Typography>
               </Grid>
@@ -135,7 +135,7 @@ function MenuView() {
   });
 
   if (isLoading) {
-    return <CircularProgress sx={{ alignSelf: 'center' }} />
+    return <CircularProgress disableShrink sx={{ alignSelf: 'center' }} />
   }
 
   if (error) {
@@ -148,9 +148,10 @@ function MenuView() {
 
   return (
     <>
-      <ProductFilter
+      <MenuViewActions
         filters={filters}
         categories={menu.categories}
+        products={menu.products}
         onChange={handleFiltersChange}
       />
 
@@ -158,7 +159,7 @@ function MenuView() {
         <Alert severity="info">Ни один продукт не прошел фильтры... Попробуйет сбросить их!</Alert>
       }
 
-      {isPrerender && <CircularProgress sx={{ alignSelf: 'center' }} />}
+      {isPrerender && <CircularProgress disableShrink sx={{ alignSelf: 'center' }} />}
 
       {!isPrerender &&
         <CardGrid

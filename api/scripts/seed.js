@@ -8,6 +8,7 @@ import { User, UserTokenData } from '../src/models/userModels.js';
 import { generateToken } from '../src/utils/jwt.js';
 import { Menu } from '../src/models/menuModels.js';
 import { generateQrCode } from '../src/utils/qr.js';
+import { Order, OrderStatus } from '../src/models/orderModels.js';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ const imagesDir = path.join(__dirname, '/public/images');
 const qrsDir = path.join(__dirname, '/public/qrs');
 const seedImagesDir = path.join(__dirname, '/public/seed-images');
 
-const users = [
+const USERS = [
   {
     phone: "+70000000000",
     email: "example@example.com",
@@ -42,7 +43,7 @@ const users = [
   },
 ]
 
-const products = [
+const PRODUCTS = [
   {
     "id": 1,
     "name": "Цезарь с курицей",
@@ -401,12 +402,12 @@ const products = [
   }
 ]
 
-const menus = [
+const MENUS = [
   {
     "id": 1,
     "isActive": true,
     "createAt": new Date(),
-    "products": products,
+    "products": PRODUCTS,
     "companyName": "Кафе «Уют»",
     "menuName": "Основное меню",
     "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
@@ -416,7 +417,7 @@ const menus = [
     "id": 2,
     "isActive": true,
     "createAt": new Date(),
-    "products": products.filter((_, index) => index % 2 == 0),
+    "products": PRODUCTS.filter((_, index) => index % 2 == 0),
     "companyName": "Кафе «Уют»",
     "menuName": "Основное меню",
     "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
@@ -426,10 +427,62 @@ const menus = [
     "id": 3,
     "isActive": false,
     "createAt": new Date(),
-    "products": products.filter((_, index) => index % 2 != 0),
+    "products": PRODUCTS.filter((_, index) => index % 2 != 0),
     "companyName": "Кафе «Уют»",
     "menuName": "Новогоднее меню",
     "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"]
+  },
+]
+
+const ORDERS = [
+  {
+    id: 1,
+    accessKey: "0711a659-4533-447e-b523-a19bbffd5313",
+    menuId: 1,
+    tableNum: "10",
+    sendTime: new Date(),
+    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: index % 3 } }),
+    status: OrderStatus.CANCELED,
+  },
+  {
+    id: 2,
+    accessKey: "43dc8ef4-45ab-4e8d-97f2-ea92015e31de",
+    menuId: 1,
+    tableNum: "10",
+    sendTime: new Date(),
+    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: index % 4 } }),
+    status: OrderStatus.CANCELED,
+    prevId: 1,
+    prevCount: 1,
+  },
+  {
+    id: 3,
+    accessKey: "bd4f792f-87fb-4c47-8b39-57c8cb73503e",
+    menuId: 1,
+    tableNum: "10",
+    sendTime: new Date(),
+    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: index % 4 } }).splice(0, 1),
+    status: OrderStatus.NEW,
+    prevId: 2,
+    prevCount: 2,
+  },
+  {
+    id: 4,
+    accessKey: "698b13a4-2af2-491d-8d2e-89a62fd9e131",
+    menuId: 1,
+    tableNum: "12",
+    sendTime: new Date(),
+    products: PRODUCTS.filter((_, index) => index % 9 === 0).map((product, index) => { return { productId: product.id, amount: index % 3 } }),
+    status: OrderStatus.NEW,
+  },
+  {
+    id: 5,
+    accessKey: "a83a0a80-33d6-4523-a1e2-87fed9619144",
+    menuId: 1,
+    tableNum: "14",
+    sendTime: new Date(),
+    products: PRODUCTS.filter((_, index) => index % 20 === 0).map((product, index) => { return { productId: product.id, amount: index % 3 } }),
+    status: OrderStatus.NEW,
   },
 ]
 
@@ -449,8 +502,9 @@ async function clearDirectory(dir) {
 async function seed() {
   // prepare data
 
-  replaceCodeWithId(products);
-  replaceCodeWithId(menus);
+  replaceCodeWithId(PRODUCTS);
+  replaceCodeWithId(MENUS);
+  replaceCodeWithId(ORDERS);
 
   // connect mongo
 
@@ -465,7 +519,7 @@ async function seed() {
   // seed users
 
   await User.deleteMany({}).exec();
-  const createdUsers = await User.create(users);
+  const createdUsers = await User.create(USERS);
 
   await Promise.all(createdUsers.map(async (user) => {
     const userTokenData = UserTokenData.build(user).model;
@@ -475,11 +529,16 @@ async function seed() {
 
   // seed menus
 
-  menus.forEach(m => m.ownerId = createdUsers[1]._id);
-  await Promise.all(menus.map(async (m) => m.qr = await generateQrCode(m.code)));
+  MENUS.forEach(m => m.ownerId = createdUsers[1]._id);
+  await Promise.all(MENUS.map(async (m) => m.qr = await generateQrCode(m.code)));
 
   await Menu.deleteMany({}).exec();
-  await Menu.create(menus);
+  await Menu.create(MENUS);
+
+  // seed orders
+
+  await Order.deleteMany({}).exec();
+  await Order.create(ORDERS);
 }
 
 seed()

@@ -42,6 +42,18 @@ export function requestEntityTooLarge(res, message = 'Превышен макс�
     .json(ErrorReturn.build(message).model)
 }
 
+export function locked(res, message = 'Объект заблокирован') {
+  res
+    .status(423)
+    .json(ErrorReturn.build(message).model)
+}
+
+export function toManyRequests(res, message = 'Слишком много запросов') {
+  res
+    .status(429)
+    .json(ErrorReturn.build(message).model)
+}
+
 export function internalServerError(res, message = 'При выполнении запроса что-то пошло не так. Попробуйте позже или обратитесь к администратору.') {
   res
     .status(500)

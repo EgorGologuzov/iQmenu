@@ -103,20 +103,19 @@ function MenuEdit() {
   }
 
   if (isMenuLoading || !menu) {
-    return <CircularProgress sx={{ alignSelf: 'center' }} />
+    return <CircularProgress disableShrink sx={{ alignSelf: 'center' }} />
   }
 
   return (
     <>
-      <ButtonGroup sx={{ width: "100%", minHeight: '35px' }}>
+      <ButtonGroup sx={{ width: "100%" }}>
         <Tooltip title="Назад">
           <Button
             variant="outlined"
             disabled={isUpdatePending || isDeletePending}
-            startIcon={<ArrowBackIcon />}
             onClick={() => navigate(-1)}
             sx={{ flexGrow: 1 }}
-          />
+          ><ArrowBackIcon /></Button>
         </Tooltip>
         <Tooltip title="Удалить меню">
           <Button
@@ -125,9 +124,8 @@ function MenuEdit() {
             loading={isDeletePending}
             onClick={handleDeleteButtonClick}
             disabled={isUpdatePending || isDeletePending}
-            startIcon={<DeleteIcon />}
             sx={{ flexGrow: 1 }}
-          />
+          ><DeleteIcon /></Button>
         </Tooltip>
         <Tooltip title="Создать меню">
           <Button
@@ -135,9 +133,8 @@ function MenuEdit() {
             loading={isUpdatePending}
             onClick={handleUpdateButtonClick}
             disabled={isUpdatePending || isDeletePending || !isChanged}
-            startIcon={<CheckRoundedIcon />}
             sx={{ flexGrow: 1 }}
-          />
+          ><CheckRoundedIcon /></Button>
         </Tooltip>
       </ButtonGroup>
 

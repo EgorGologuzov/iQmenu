@@ -51,7 +51,7 @@ export const ProductReturn = makeModel({
     image: { type: "string", valid: true }
   },
 
-  build: source => mapSchema(source, ProductEdit.schema),
+  build: source => mapSchema(source, ProductReturn.schema),
 })
 
 export const ProductEdit = makeModel({
@@ -190,19 +190,20 @@ export const MenuUpdate = makeModel({
 
 // Генерация кода (id)
 
-let maxMenuCode;
+const MongoModel = Menu;
+let maxCodeGlobal;
 let findMaxQuery;
 
 async function findMaxCode() {
-  const queryResult = await Menu.aggregate([{ $group: { _id: null, maxCode: { $max: "$code" } } }]).exec();
+  const queryResult = await MongoModel.aggregate([{ $group: { _id: null, maxCode: { $max: "$code" } } }]).exec();
   const maxCode = queryResult?.length ? queryResult[0].maxCode : 0;
-  maxMenuCode = maxCode;
+  maxCodeGlobal = maxCode;
 }
 
-export async function nextMenuCode() {
+export async function nextCodeGlobal() {
 
-  if (maxMenuCode !== undefined) {
-    return ++maxMenuCode;
+  if (maxCodeGlobal !== undefined) {
+    return ++maxCodeGlobal;
   }
 
   if (!findMaxQuery) {
@@ -210,7 +211,7 @@ export async function nextMenuCode() {
   }
 
   await findMaxQuery;
-  return await nextMenuCode();
+  return await nextCodeGlobal();
 }
 
 // Извелечение всех путей к изображениям

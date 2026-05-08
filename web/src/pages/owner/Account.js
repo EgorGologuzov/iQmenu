@@ -68,25 +68,23 @@ function Account() {
 
   return (
     <>
-      <ButtonGroup sx={{ width: "100%", minHeight: '35px' }}>
+      <ButtonGroup sx={{ width: "100%" }}>
         <Tooltip title="Назад">
           <Button
             variant='outlined'
             disabled={isMutationPending}
-            startIcon={<ArrowBackIcon />}
             onClick={() => navigate(-1)}
             sx={{ flexGrow: 1 }}
-          />
+          ><ArrowBackIcon /></Button>
         </Tooltip>
         <Tooltip title="Сохранить изменения">
           <Button
             variant='contained'
             disabled={!hasChanges || isMutationPending}
-            startIcon={<CheckRoundedIcon />}
             loading={isMutationPending}
             onClick={saveChanges}
             sx={{ flexGrow: 1 }}
-          />
+          ><CheckRoundedIcon /></Button>
         </Tooltip>
       </ButtonGroup>
 

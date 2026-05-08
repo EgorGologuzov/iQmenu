@@ -1,7 +1,7 @@
 import Router from 'express'
 import { useAuth } from '../middlewares/useAuth.js';
 import { useModel } from '../middlewares/useModel.js';
-import { extractImagesFromMenuModel, Menu, MenuCreate, MenuListReturn, MenuReturn, MenuUpdate, nextMenuCode } from '../models/menuModels.js';
+import { extractImagesFromMenuModel, Menu, MenuCreate, MenuListReturn, MenuReturn, MenuUpdate, nextCodeGlobal } from '../models/menuModels.js';
 import { forbidden, notFound, ok } from '../utils/responses.js';
 import { useIntegerParam } from '../middlewares/useParam.js';
 import { generateQrCode, tryDeleteQrImage } from '../utils/qr.js';
@@ -48,7 +48,7 @@ r.post("/", useAuth(), useModel(MenuCreate), async (req, res) => {
   const { userId } = req.user;
   const createModel = req.model;
 
-  createModel.code = await nextMenuCode();
+  createModel.code = await nextCodeGlobal();
   createModel.ownerId = userId;
   createModel.qr = await generateQrCode(createModel.code);
 

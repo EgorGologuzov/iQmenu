@@ -4,3 +4,7 @@
   box-sizing: border-box;
   scroll-behavior: smooth;
 }
+
+@media (min-width: 600px) {
+  body { overflow-y: scroll; }
+}

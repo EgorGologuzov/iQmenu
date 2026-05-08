@@ -6,7 +6,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { add, remove } from '../../store/slices/favoriteSlice'
 
-function ProductFavoriteButton({ product }) {
+function ProductFavoriteButton({ product, ...otherProps }) {
 
   const dispatch = useDispatch();
   const { menuId } = useParams();
@@ -25,8 +25,8 @@ function ProductFavoriteButton({ product }) {
   }
 
   return (
-    <IconButton aria-label="Добавить в избранное" color="error" onClick={handleClick}>
-      {inFavorites ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+    <IconButton aria-label="Добавить в избранное" color="error" onClick={handleClick} {...otherProps}>
+      {inFavorites ? <FavoriteIcon sx={{ width: "22px", height: "22px" }} /> : <FavoriteBorderIcon sx={{ width: "22px", height: "22px" }} />}
     </IconButton>
   )
 }

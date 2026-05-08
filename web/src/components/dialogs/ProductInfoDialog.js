@@ -2,6 +2,7 @@ import React from 'react';
 import { Dialog, DialogActions, Typography, Button, Chip, Divider, Box, Stack, DialogContent } from '@mui/material';
 import ProductFavoriteButton from '../controls/ProductFavoriteButton';
 import { joinWithApiBaseUrl } from '../../utils/utils';
+import CartButton from '../controls/CartButton';
 
 function ProductInfoDialog({ product, onClose, ...otherProps }) {
   if (!product) return null;
@@ -29,11 +30,14 @@ function ProductInfoDialog({ product, onClose, ...otherProps }) {
           )}
 
           {/* Цена и кнопка добавить в избранное */}
-          <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+          <Stack direction="row" alignItems="center" justifyContent="space-between">
             <Typography variant="h6" component="div" color="secondary">
               {product.price}₽
             </Typography>
-            <ProductFavoriteButton product={product} />
+            <Stack direction="row">
+              <CartButton product={product} sx={{ pt: 0.25, pl: 0 }} />
+              <ProductFavoriteButton product={product} sx={{ pt: 1, pr: 0 }} />
+            </Stack>
           </Stack>
 
           {/* Название */}

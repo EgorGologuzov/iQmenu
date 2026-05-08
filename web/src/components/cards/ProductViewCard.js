@@ -3,6 +3,8 @@ import React, { memo } from 'react'
 import ProductFavoriteButton from '../controls/ProductFavoriteButton';
 import FastfoodIcon from '@mui/icons-material/Fastfood';
 import { joinWithApiBaseUrl } from '../../utils/utils';
+import ProductInCartControl from '../controls/ProductInCartControl';
+import CartButton from '../controls/CartButton';
 
 function ProductViewCard({ product, onClick }) {
 
@@ -46,39 +48,34 @@ function ProductViewCard({ product, onClick }) {
       </Box>
 
       {/* Содержимое */}
-      <Stack direction="column" sx={{ p: 1 }}>
+      <Stack direction="column" sx={{ p: 0.5 }}>
 
-        <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
-          <Typography variant="h6" component="div" color="secondary" onClick={onClickHandler} sx={{ cursor: "pointer" }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Typography variant="button" component="div" color="secondary" onClick={onClickHandler} sx={{ cursor: "pointer" }}>
             {product.price}₽
           </Typography>
-          <ProductFavoriteButton product={product} />
+          <Stack direction="row">
+            <CartButton product={product} sx={{ pt: 0.25 }}/>
+            <ProductFavoriteButton product={product} sx={{ pt: 1, pr: 0 }} />
+          </Stack>
         </Stack>
 
-        <Stack
-          direction="column"
-          sx={{
-            justifyContent: 'center',
-            minHeight: '45px',
-          }}>
+        <Stack direction="column">
           <Typography
-            variant="subtitle2"
-            component="div"
+            noWrap
+            variant="caption"
             onClick={onClickHandler}
             sx={{
               cursor: 'pointer',
-              overflow: 'hidden',
               textOverflow: 'ellipsis',
-              display: '-webkit-box',
-              WebkitLineClamp: '2',
-              WebkitBoxOrient: 'vertical',
+              fontWeight: 500
             }}>
             {product.name}
           </Typography>
         </Stack>
 
       </Stack>
-
+      
     </Card>
   )
 }

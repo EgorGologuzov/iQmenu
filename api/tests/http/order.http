@@ -1,0 +1,48 @@
+
+@baseUrl = http://localhost:4200
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWYzMzkzYjg5MDQ5MjI4MTA0Njk3ZDMiLCJpYXQiOjE3Nzc1NDc1Nzl9.s5XfcB15KwEsii7cDIdcNH42y9-irZHuR-y8a8XGYU8
+
+### Create (Client)
+
+POST {{baseUrl}}/api/order
+content-type: application/json
+
+{
+	"menuId": 1,
+	"tableNum": "10",
+	"products": [
+		{
+			"productId" : 5,
+			"amount": 2
+		},
+		{
+			"productId" : 2,
+			"amount": 2
+		}
+	]
+}
+
+### Update (Client)
+
+POST {{baseUrl}}/api/order
+content-type: application/json
+
+{
+	"menuId": 1,
+	"tableNum": "10",
+	"prevAccessKey": "c2d8f895-00fd-47b1-adf7-3f41451079bf",
+	"products": [
+		{
+			"productId" : 5,
+			"amount": 2
+		},
+		{
+			"productId" : 2,
+			"amount": 2
+		}
+	]
+}
+
+### Cancel (Client)
+
+PATCH {{baseUrl}}/api/order/c2d8f895-00fd-47b1-adf7-3f41451079bf/cancel

@@ -30,7 +30,7 @@ function MenuList() {
   useTitle({ general: "Ваши меню" }, []);
 
   if (isLoading) {
-    return <CircularProgress sx={{ alignSelf: 'center' }} />
+    return <CircularProgress disableShrink sx={{ alignSelf: 'center' }} />
   }
 
   const showQrDialog = (menuQr) => {

@@ -61,25 +61,23 @@ function MenuCreate() {
 
   return (
     <>
-      <ButtonGroup sx={{ width: "100%", minHeight: '35px' }}>
+      <ButtonGroup sx={{ width: "100%" }}>
         <Tooltip title="Назад">
           <Button
             variant="outlined"
             disabled={isMutationPending}
-            startIcon={<ArrowBackIcon />}
             onClick={() => navigate(-1)}
             sx={{ flexGrow: 1 }}
-          />
+          ><ArrowBackIcon /></Button>
         </Tooltip>
         <Tooltip title="Создать меню">
           <Button
             variant="contained"
-            startIcon={<CheckRoundedIcon />}
             onClick={onCreateClick}
             loading={isMutationPending}
             disabled={isMutationPending}
             sx={{ flexGrow: 1 }}
-          />
+          ><CheckRoundedIcon /></Button>
         </Tooltip>
       </ButtonGroup>
 

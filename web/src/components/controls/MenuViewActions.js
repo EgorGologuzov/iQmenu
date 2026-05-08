@@ -1,14 +1,17 @@
 import React, { useState } from 'react'
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Button, ButtonGroup } from '@mui/material';
 import ProductFiltersDialog from '../dialogs/ProductFiltersDialog';
 import { deepCopy } from '../../utils/utils';
 import { MENU_FILTERS_DEFAULT } from '../../values/default';
+import OrderDialog from '../dialogs/OrderDialog';
 
-function ProductFilter({ filters, categories, onChange }) {
+function MenuViewActions({ filters, categories, products, onChange }) {
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isFiltersDialogOpen, setIsFiltersDialogOpen] = useState(false);
+  const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [isFiltersApplied, setIsFiltersApplied] = useState(false);
 
   const dialogFilters = { 
@@ -34,34 +37,43 @@ function ProductFilter({ filters, categories, onChange }) {
     <>
       <ButtonGroup sx={{ width: "100%" }}>
         <Button
-          startIcon={<FilterListIcon />}
           variant={ isFiltersApplied ? "contained" : "outlined" }
           sx={{ flexGrow: 1 }}
-          onClick={() => setIsDialogOpen(true)}
-        >
-          Фильтры
+          onClick={() => setIsFiltersDialogOpen(true)}>
+          <FilterListIcon />
         </Button>
         <Button
-          startIcon={<FavoriteIcon />}
           variant={ filters.favoritesOnly ? "contained" : "outlined" }
           color="error"
           sx={{ flexGrow: 1 }}
-          onClick={() => changeFiltersAttrs({ favoritesOnly: !filters.favoritesOnly })}
-        >
-          Избранное
+          onClick={() => changeFiltersAttrs({ favoritesOnly: !filters.favoritesOnly })}>
+          <FavoriteIcon />
+        </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          sx={{ flexGrow: 1 }}
+          onClick={() => setIsOrderDialogOpen(true)}>
+          <ShoppingCartIcon />
         </Button>
       </ButtonGroup>
 
       <ProductFiltersDialog
         filters={dialogFilters}
         categories={categories}
-        open={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+        open={isFiltersDialogOpen}
+        onClose={() => setIsFiltersDialogOpen(false)}
         onApply={handleOnApply}
         onReset={handleOnReset}
+      />
+
+      <OrderDialog
+        products={products}
+        open={isOrderDialogOpen}
+        onClose={() => setIsOrderDialogOpen(false)}
       />
     </>
   )
 }
 
-export default ProductFilter
+export default MenuViewActions

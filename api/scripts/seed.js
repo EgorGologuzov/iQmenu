@@ -26,7 +26,6 @@ const USERS = [
     name: "Иван Иванович",
     passwordHash: hashPassword("12345678"),
     isActive: true,
-    createAt: new Date(),
     apiAccessToken: "not-set",
     role: "owner",
   },
@@ -36,7 +35,6 @@ const USERS = [
     name: "Егор Рустамович",
     passwordHash: hashPassword("12345678"),
     isActive: true,
-    createAt: new Date(),
     apiAccessToken: "not-set",
     role: "owner",
     avatar: "https://sotni.ru/wp-content/uploads/2023/08/genri-kavill-1.webp",
@@ -406,7 +404,6 @@ const MENUS = [
   {
     "id": 1,
     "isActive": true,
-    "createAt": new Date(),
     "products": PRODUCTS,
     "companyName": "Кафе «Уют»",
     "menuName": "Основное меню",
@@ -416,17 +413,15 @@ const MENUS = [
   {
     "id": 2,
     "isActive": true,
-    "createAt": new Date(),
     "products": PRODUCTS.filter((_, index) => index % 2 == 0),
     "companyName": "Кафе «Уют»",
-    "menuName": "Основное меню",
+    "menuName": "Летнее меню",
     "categories": ["Основные", "Десерты", "Напитки", "Закуски", "Гарниры", "Алкоголь"],
     "image": "https://images.assetsdelivery.com/compings_v2/vectorchef/vectorchef1507/vectorchef150709093.jpg"
   },
   {
     "id": 3,
     "isActive": false,
-    "createAt": new Date(),
     "products": PRODUCTS.filter((_, index) => index % 2 != 0),
     "companyName": "Кафе «Уют»",
     "menuName": "Новогоднее меню",
@@ -441,8 +436,9 @@ const ORDERS = [
     menuId: 1,
     tableNum: "10",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: index % 3 } }),
-    status: OrderStatus.CANCELED,
+    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: (index % 3) + 1 } }),
+    status: OrderStatus.NEW,
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
     id: 2,
@@ -450,10 +446,9 @@ const ORDERS = [
     menuId: 1,
     tableNum: "10",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: index % 4 } }),
-    status: OrderStatus.CANCELED,
-    prevId: 1,
-    prevCount: 1,
+    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: (index % 4) + 1 } }),
+    status: OrderStatus.NEW,
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
     id: 3,
@@ -461,10 +456,9 @@ const ORDERS = [
     menuId: 1,
     tableNum: "10",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: index % 4 } }).splice(0, 1),
+    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: (index % 4) + 1 } }).splice(0, 1),
     status: OrderStatus.NEW,
-    prevId: 2,
-    prevCount: 2,
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
     id: 4,
@@ -472,8 +466,9 @@ const ORDERS = [
     menuId: 1,
     tableNum: "12",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 9 === 0).map((product, index) => { return { productId: product.id, amount: index % 3 } }),
+    products: PRODUCTS.filter((_, index) => index % 9 === 0).map((product, index) => { return { productId: product.id, amount: (index % 3) + 1 } }),
     status: OrderStatus.NEW,
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
     id: 5,
@@ -481,8 +476,9 @@ const ORDERS = [
     menuId: 1,
     tableNum: "14",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 20 === 0).map((product, index) => { return { productId: product.id, amount: index % 3 } }),
+    products: PRODUCTS.filter((_, index) => index % 20 === 0).map((product, index) => { return { productId: product.id, amount: (index % 3) + 1 } }),
     status: OrderStatus.NEW,
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
 ]
 
@@ -518,6 +514,8 @@ async function seed() {
 
   // seed users
 
+  USERS.forEach(u => u.createAt = new Date());
+
   await User.deleteMany({}).exec();
   const createdUsers = await User.create(USERS);
 
@@ -529,13 +527,22 @@ async function seed() {
 
   // seed menus
 
-  MENUS.forEach(m => m.ownerId = createdUsers[1]._id);
+  MENUS.forEach((m, i) => { m.ownerId = createdUsers[1]._id; m.createAt = new Date(new Date().getTime() + i * 1000) });
   await Promise.all(MENUS.map(async (m) => m.qr = await generateQrCode(m.code)));
 
   await Menu.deleteMany({}).exec();
   await Menu.create(MENUS);
 
   // seed orders
+
+  ORDERS.forEach((o, i) => {
+    o.sendTime = new Date(new Date().getTime() + i * 1000);
+    const foundMenu = MENUS.find(m => m.code == o.menuId);
+    o.finalAmount = o.products.reduce((sum, productInCart) => 
+			sum + foundMenu.products.find(product => product.code == productInCart.productId).price * productInCart.amount,
+			0
+		);
+  });
 
   await Order.deleteMany({}).exec();
   await Order.create(ORDERS);

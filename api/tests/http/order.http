@@ -1,6 +1,31 @@
 
 @baseUrl = http://localhost:4200
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OWYzMzkzYjg5MDQ5MjI4MTA0Njk3ZDMiLCJpYXQiOjE3Nzc1NDc1Nzl9.s5XfcB15KwEsii7cDIdcNH42y9-irZHuR-y8a8XGYU8
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAzMDU3MzI4N2EyMmE4ODIxZDg1NWUiLCJpYXQiOjE3Nzg1ODI4OTl9.ncqVbzne1fMNpY0Qp1cvFlnS8lTgOiNwlAKLtnYvrII
+
+### Get list (Owner)
+
+GET {{baseUrl}}/api/order?page=1&menuId=1
+Authorization: {{token}}
+
+### Get list by tableNum (Owner)
+
+GET {{baseUrl}}/api/order?page=1&menuId=1&tableNum=10
+Authorization: {{token}}
+
+### Get list by sendTime (Owner)
+
+GET {{baseUrl}}/api/order?page=1&menuId=1&sendTimeStart=2026-05-12T10:48:00Z&sendTimeEnd=2026-05-12T10:49:00Z
+Authorization: {{token}}
+
+### Get list by status (Owner)
+
+GET {{baseUrl}}/api/order?page=1&menuId=1&status=new
+Authorization: {{token}}
+
+### Get list by finalAmount (Owner)
+
+GET {{baseUrl}}/api/order?page=1&menuId=1&finalAmountMin=2000&finalAmountMax=3000
+Authorization: {{token}}
 
 ### Create (Client)
 

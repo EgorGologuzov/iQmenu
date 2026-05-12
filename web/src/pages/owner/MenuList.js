@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import OndemandVideoIcon from '@mui/icons-material/OndemandVideo';
-import { Card, Grid, CardContent, Typography, IconButton, CardActions, Stack, Button, CircularProgress, Box, Avatar, Alert } from '@mui/material'
+import { Card, Grid, CardContent, Typography, IconButton, CardActions, Stack, Button, CircularProgress, Box, Avatar, Alert, ButtonGroup, Tooltip } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router'
@@ -13,6 +13,7 @@ import useTitle from '../../hooks/useTitle'
 import FastfoodIcon from '@mui/icons-material/Fastfood';
 import MenuQrCodeDialog from '../../components/dialogs/MenuQrCodeDialog';
 import { joinWithApiBaseUrl } from '../../utils/utils';
+import OwnerNavBar from '../../components/navs/OwnerNavBar';
 
 function MenuList() {
   const api = useIQmenuApi()
@@ -53,6 +54,8 @@ function MenuList() {
 
   return (
     <>
+      <OwnerNavBar />
+
       {(!menus || !menus.length) &&
         <Alert severity="info">Вы еще не создали ни одного меню. Создайте сейчас!</Alert>
       }

@@ -17,6 +17,7 @@ import { Provider } from "react-redux"
 import { APP_STORE } from "./store/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useUserRefresh } from "./hooks/useUserRefresh";
+import OrderList from "./pages/owner/OrderList";
 
 // Инициализация React Query
 const QUERY_CLIENT = new QueryClient();
@@ -57,6 +58,7 @@ function AppRouting() {
         <Route path="menu/new" element={<MenuCreate />} />
         <Route path="menu/:menuId/edit" element={<MenuEdit />} />
         <Route path="me" element={<Account />} />
+        <Route path="order" element={<OrderList />} />
       </Route>
 
       <Route path="/" element={<RoleDependentLayout />} >

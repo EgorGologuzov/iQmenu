@@ -15,7 +15,10 @@ const r = new Router();
 r.get("/my", useAuth(), async (req, res) => {
 
   const { userId } = req.user;
-  const foundMenus = await Menu.find({ ownerId: userId }).select(["-products", "-categories"]).exec();
+  const foundMenus = await Menu.find({ ownerId: userId })
+    .select(["-products", "-categories"])
+    .sort({ createAt: -1 })
+    .exec();
 
   const result = MenuListReturn.build({ menus: foundMenus }).model;
   return ok(res, result);

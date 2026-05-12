@@ -16,7 +16,7 @@ export const OrderStatus = Object.freeze({
 
 const productInCartSchema = new mongoose.Schema({
   productId: { type: Number, required: true },
-  amount: { type: String, required: true },
+  amount: { type: Number, required: true },
 }, {
   _id: false
 });
@@ -26,11 +26,11 @@ const orderSchema = new mongoose.Schema({
   accessKey: { type: String, required: true, index: true },
   menuId: { type: Number, required: true, index: true },
   tableNum: { type: String, required: true },
-  sendTime: { type: Date, required: true },
+  sendTime: { type: Date, required: true, index: true },
   products: { type: [productInCartSchema], required: true },
   status: { type: String, required: true },
-  prevId: { type: Number, required: false },
-  prevCount: { type: Number, required: false },
+	finalAmount: { type: Number, required: true },
+	userAgent: { type: String, required: false },
 });
 
 export const Order = mongoose.model("Order", orderSchema);
@@ -51,7 +51,7 @@ export const ProductInCartEdit = makeModel({
 
   schema: {
     productId: { type: "number", required: true, min: 0, max: 100_000, round: true },
-    amount: { type: "number", required: true, min: 0, max: 9_999, round: true },
+    amount: { type: "number", required: true, min: 1, max: 9_999, round: true },
   },
 
   build: source => mapSchema(source, ProductInCartEdit.schema),
@@ -70,18 +70,32 @@ export const OrderReturn = makeModel({
 			item: { type: ProductInCartEdit },
 		},
 		status: { type: "string", valid: true },
-		prevId: { type: "number", valid: true },
-		prevCount: { type: "number", valid: true },
+		finalAmount: { type: "number", valid: true },
+		userAgent: { type: "string", valid: true },
 	},
 
 	build: source => mapSchema(source, OrderReturn.schema),
+})
+
+export const OrderListReturn = makeModel({
+
+	schema: {
+		orders: {
+			type: "list",
+			item: { type: OrderReturn },
+			valid: true
+		},
+		pagesCount: { type: "number", valid: true }
+	},
+
+	build: source => mapSchema(source, OrderListReturn.schema),
 })
 
 export const OrderEditClient = makeModel({
 
 	schema: {
 		menuId: { type: "number", required: true, minValue: 0 },
-		tableNum: { type: "string", required: true, minLength: 1, maxLength: 15 },
+		tableNum: { type: "string", required: true, minLength: 1, maxLength: 15, trim: true },
 		products: {
 			type: "list",
 			item: { type: ProductInCartEdit },
@@ -92,6 +106,7 @@ export const OrderEditClient = makeModel({
       itemsComparator: (p1, p2) => p1.productId == p2.productId,
 		},
 		prevAccessKey: { type: "string", required: false, regExp: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/ },
+		userAgent: { type: "string", required: false, maxLength: 250 },
 	},
 
 	setDefaults(order) {

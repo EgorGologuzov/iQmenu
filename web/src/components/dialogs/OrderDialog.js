@@ -7,6 +7,7 @@ import { saveOrder, removeOrder } from '../../store/slices/orderSlice';
 import { useParams } from 'react-router';
 import { useMutation } from '@tanstack/react-query';
 import useIQmenuApi from '../../hooks/useIQmenuApi';
+import { getUserAgent } from '../../utils/utils';
 
 const ProductInCardItem = memo(({ product }) => {
 	return (
@@ -126,10 +127,8 @@ function OrderDialog({ products, onClose, ...otherProps }) {
 			menuId: menuId, 
 			tableNum: tableNum, 
 			products: cartDisplayProducts.map(p => { return { productId: p.id, amount: p.amount } }),
-		}
-
-		if (lastOrder) {
-			buildedOrder.prevAccessKey = lastOrder.accessKey;
+			prevAccessKey: lastOrder ? lastOrder.accessKey : undefined,
+			userAgent: getUserAgent(),
 		}
 
 		postOrder(buildedOrder);

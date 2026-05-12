@@ -70,17 +70,21 @@ function tryCast(v, p) {
     }
   }
 
-  // cast string => number | boolean
+  // cast string => number | boolean | datetime
   if (vType === "string") {
     if (p.type === "number") {
       const number = Number(v);
-      v = number !== NaN ? number : v;
-      return [v, p.type, undefined];
+      return number !== NaN ? [number, p.type, undefined] : [v, p.type, error(v, "Неверный формат строки")];
     }
     if (p.type === "boolean") {
       const lowerV = v.toLowerCase();
-      v = lowerV === "true" ? true : lowerV === "false" ? false : v;
-      return [v, p.type, undefined];
+      return lowerV === "true" ? [true, p.type, undefined] 
+            : lowerV === "false" ? [false, p.type, undefined] 
+            : [v, p.type, error(v, "Неверный формат строки")];
+    }
+    if (p.type === "datetime") {
+      const date = new Date(v);
+      return isNaN(date.getTime()) ? [v, p.type, error(v, "Неверный формат строки")] : [date, p.type, undefined];
     }
   }
 

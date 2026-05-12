@@ -35,6 +35,22 @@ export const schemaTests = [
     test(model.field).isNotEqual("123.45");
   },
 
+  function date_convert() {
+    const datetimeStr = "2026-05-12T06:34:29.452+00:00";
+    const schema = { field: { type: "datetime" } };
+    const source = { field: datetimeStr };
+    const { model, errors, isValid } = mapSchema(source, schema);
+    test(model.field.getTime()).isEqual(new Date(datetimeStr).getTime());
+  },
+
+  function date_convert_error() {
+    const datetimeStr = "invalid-datetime";
+    const schema = { field: { type: "datetime" } };
+    const source = { field: datetimeStr };
+    const { model, errors, isValid } = mapSchema(source, schema);
+    test(errors.field).isNotEqual(undefined);
+  },
+
   function required_error() {
     const schema = { field: { required: true }, field2: { required: true } };
     const source = { field: null, field2: undefined };

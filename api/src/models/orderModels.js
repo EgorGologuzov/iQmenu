@@ -12,10 +12,13 @@ export const OrderStatus = Object.freeze({
 	EXECUTING: "executing",
 })
 
+const ORDER_STATUS_VARIANTS = ['new', 'canceled', 'banned', 'executed', 'executing'];
+
 // Модель базы данных
 
 const productInCartSchema = new mongoose.Schema({
   productId: { type: Number, required: true },
+  productName: { type: String, required: true },
   amount: { type: Number, required: true },
 }, {
   _id: false
@@ -24,6 +27,7 @@ const productInCartSchema = new mongoose.Schema({
 const orderSchema = new mongoose.Schema({
   code: { type: Number, required: true, unique: true },
   accessKey: { type: String, required: true, index: true },
+  ownerId: { type: String, required: true, index: true },
   menuId: { type: Number, required: true, index: true },
   tableNum: { type: String, required: true },
   sendTime: { type: Date, required: true, index: true },
@@ -37,14 +41,15 @@ export const Order = mongoose.model("Order", orderSchema);
 
 // Модели для API
 
-export const ProdcutInCartReturn = makeModel({
+export const ProductInCartReturn = makeModel({
 
   schema: {
     productId: { type: "number", valid: true },
+    productName: { type: "string", valid: true },
     amount: { type: "number", valid: true },
   },
 
-  build: source => mapSchema(source, ProdcutInCartReturn.schema),
+  build: source => mapSchema(source, ProductInCartReturn.schema),
 })
 
 export const ProductInCartEdit = makeModel({
@@ -67,7 +72,7 @@ export const OrderReturn = makeModel({
 		sendTime: { type: "datetime", valid: true },
 		products: {
 			type: "list",
-			item: { type: ProductInCartEdit },
+			item: { type: ProductInCartReturn },
 		},
 		status: { type: "string", valid: true },
 		finalAmount: { type: "number", valid: true },
@@ -82,8 +87,7 @@ export const OrderListReturn = makeModel({
 	schema: {
 		orders: {
 			type: "list",
-			item: { type: OrderReturn },
-			valid: true
+			item: { type: OrderReturn }
 		},
 		pagesCount: { type: "number", valid: true }
 	},
@@ -116,6 +120,39 @@ export const OrderEditClient = makeModel({
 	},
 
 	build: source => mapSchema(source, OrderEditClient.schema, OrderEditClient.setDefaults),
+})
+
+export const UpdateOrdersStatusById = makeModel({
+
+	schema: {
+		newStatus: { type: "string", required: true, variants: ORDER_STATUS_VARIANTS },
+		ids: {
+			type: "list",
+			required: true,
+			item: { type: "number", required: true },
+			minLength: 1,
+			maxLength: 50,
+			uniqueItems: true,
+		},
+	},
+
+	build: source => mapSchema(source, UpdateOrdersStatusById.schema),
+})
+
+export const UpdateOrdersStatusByFilters = makeModel({
+
+	schema: {
+		newStatus: { type: "string", required: true, variants: ORDER_STATUS_VARIANTS },
+		menuId: { type: "number", required: true, minValue: 0 },
+		tableNum: { type: "string", required: false, minLength: 1, maxLength: 15, trim: true },
+		sendTimeStart: { type: "datetime", required: false },
+		sendTimeEnd: { type: "datetime", required: false },
+		status: { type: "string", required: false },
+		finalAmountMin: { type: "number", required: false },
+		finalAmountMax: { type: "number", required: false },
+	},
+
+	build: source => mapSchema(source, UpdateOrdersStatusByFilters.schema),
 })
 
 // Полезные функции

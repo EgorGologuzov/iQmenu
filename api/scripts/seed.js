@@ -429,54 +429,60 @@ const MENUS = [
   },
 ]
 
+const randomProductInCart = (eachIndex = 10, maxAmount = 3, offset = 1) => {
+  return PRODUCTS
+    .filter(product => product.isActive)
+    .filter((_, index) => index % eachIndex === 0)
+    .map((product, index) => { return { 
+      productId: product.id, 
+      productName: product.name, 
+      amount: (index % maxAmount) + offset } 
+    });
+}
+
 const ORDERS = [
   {
     id: 1,
     accessKey: "0711a659-4533-447e-b523-a19bbffd5313",
-    menuId: 1,
     tableNum: "10",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: (index % 3) + 1 } }),
+    products: randomProductInCart(),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
     id: 2,
     accessKey: "43dc8ef4-45ab-4e8d-97f2-ea92015e31de",
-    menuId: 1,
     tableNum: "10",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: (index % 4) + 1 } }),
+    products: randomProductInCart(10, 4, 1),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
     id: 3,
     accessKey: "bd4f792f-87fb-4c47-8b39-57c8cb73503e",
-    menuId: 1,
     tableNum: "10",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 10 === 0).map((product, index) => { return { productId: product.id, amount: (index % 4) + 1 } }).splice(0, 1),
+    products: randomProductInCart(10, 4, 1).splice(0, 1),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
     id: 4,
     accessKey: "698b13a4-2af2-491d-8d2e-89a62fd9e131",
-    menuId: 1,
     tableNum: "12",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 9 === 0).map((product, index) => { return { productId: product.id, amount: (index % 3) + 1 } }),
+    products: randomProductInCart(9, 3, 1),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
     id: 5,
     accessKey: "a83a0a80-33d6-4523-a1e2-87fed9619144",
-    menuId: 1,
     tableNum: "14",
     sendTime: new Date(),
-    products: PRODUCTS.filter((_, index) => index % 20 === 0).map((product, index) => { return { productId: product.id, amount: (index % 3) + 1 } }),
+    products: randomProductInCart(20, 3, 1),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
@@ -525,17 +531,27 @@ async function seed() {
     await user.save();
   }))
 
+  const MAIN_USER = createdUsers[1];
+
   // seed menus
 
-  MENUS.forEach((m, i) => { m.ownerId = createdUsers[1]._id; m.createAt = new Date(new Date().getTime() + i * 1000) });
+  MENUS.forEach((m, i) => { 
+    m.ownerId = MAIN_USER._id; 
+    m.createAt = new Date(new Date().getTime() + i * 1000);
+  });
+
   await Promise.all(MENUS.map(async (m) => m.qr = await generateQrCode(m.code)));
 
   await Menu.deleteMany({}).exec();
   await Menu.create(MENUS);
 
+  const MAIN_MENU = MENUS.find(m => m.code == 1);
+
   // seed orders
 
   ORDERS.forEach((o, i) => {
+    o.menuId = MAIN_MENU.code;
+    o.ownerId = MAIN_USER._id;
     o.sendTime = new Date(new Date().getTime() + i * 1000);
     const foundMenu = MENUS.find(m => m.code == o.menuId);
     o.finalAmount = o.products.reduce((sum, productInCart) => 

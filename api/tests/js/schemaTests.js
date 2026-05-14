@@ -115,6 +115,20 @@ export const schemaTests = [
     test(errors).isNotEqual(undefined);
   },
 
+  function value_in_variants() {
+    const schema = { field: { type: "string", variants: ["value1", "value2"] } };
+    const source = { field: "value1" };
+    const { model, errors, isValid } = mapSchema(source, schema);
+    test(errors.field).isEqual(undefined);
+  },
+
+    function value_in_variants_negative() {
+    const schema = { field: { type: "string", variants: ["value1", "value2"] } };
+    const source = { field: "invalid" };
+    const { model, errors, isValid } = mapSchema(source, schema);
+    test(errors.field).isNotEqual(undefined);
+  },
+
   // list tests
 
   function list_minLength_error() {

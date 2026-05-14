@@ -124,6 +124,10 @@ function processValue(v, p, vType) {
 
 function validateValue(v, p, vType) {
 
+  if (p.variants?.length && !p.variants.includes(v)) {
+    return error(v, "Значение не является допустимым вариантом");
+  }
+
   // string: minLength, maxLength, regExp
   if (vType === "string") {
     if (isNumber(p.minLength) && v.length < p.minLength) {

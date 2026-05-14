@@ -23,7 +23,7 @@ function MenuList() {
   const [currentQrCode, setCurrentQrCode] = useState(null);
 
   const { data: menus, isLoading } = useQuery({
-    queryKey: ["MenuList/getUsersMenus"],
+    queryKey: [`api.menu.getUsersMenus`, userId],
     queryFn: () => api.menu.getUsersMenus(userId),
     refetchOnWindowFocus: false,
   })
@@ -31,7 +31,10 @@ function MenuList() {
   useTitle({ general: "Ваши меню" }, []);
 
   if (isLoading) {
-    return <CircularProgress disableShrink sx={{ alignSelf: 'center' }} />
+    return <>
+      <OwnerNavBar />
+      <CircularProgress disableShrink sx={{ alignSelf: 'center' }} />
+    </>
   }
 
   const showQrDialog = (menuQr) => {

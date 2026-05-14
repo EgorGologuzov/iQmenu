@@ -2,7 +2,7 @@ import Router from 'express'
 import { useAuth } from '../middlewares/useAuth.js';
 import { useModel } from '../middlewares/useModel.js';
 import { badRequest, forbidden, locked, notFound, ok, toManyRequests } from '../utils/responses.js';
-import { nextCodeGlobal, Order, OrderEditClient, OrderListReturn, OrderReturn, OrderStatus } from '../models/orderModels.js';
+import { nextCodeGlobal, Order, OrderEditClient, OrderListReturn, OrderReturn, OrderStatus, UpdateOrdersStatusById, UpdateOrdersStatusByFilters } from '../models/orderModels.js';
 import { Menu } from '../models/menuModels.js';
 import { useIntegerParam, useUuidParam } from '../middlewares/useParam.js';
 import { useDatetimeQueryParam, useIntegerQueryParam, useStringQueryParam } from '../middlewares/useQueryParam.js';
@@ -21,25 +21,43 @@ r.post("/", useModel(OrderEditClient), async (req, res) => {
 		return notFound(res, "Меню, по которому вы хотите оформить заказ, не существует или снято с публикации");
 	}
 
-	const isAllProductsActual = createModel.products
-		.filter(productInCart => foundMenu.products.find(product => product.code == productInCart.productId)?.isActive).length == createModel.products.length;
+	let newProductsWithNames = [];
+	let newFinalAmount = 0;
+	let isAllProductsActual = true;
+
+	createModel.products.forEach(productInCart => {
+		const product = foundMenu.products.find(product => product.code == productInCart.productId);
+		if (product?.isActive) {
+			newProductsWithNames.push({ ...productInCart, productName: product.name });
+			newFinalAmount += product.price * productInCart.amount;
+		} else {
+			isAllProductsActual = false;
+		}
+	})
 
 	if (!isAllProductsActual) {
 		return badRequest(res, "В заказе есть продукты, которых временно нет в наличии");
 	}
 
-	const calcOrderAmount = () => {
-		return createModel.products.reduce((sum, productInCart) => 
-			sum + foundMenu.products.find(product => product.code == productInCart.productId).price * productInCart.amount,
-			0
-		)
+	const createNewOrder = async () => {
+		createModel.code = await nextCodeGlobal();
+		createModel.ownerId = foundMenu.ownerId;
+		createModel.products = newProductsWithNames;
+		createModel.finalAmount = newFinalAmount;
+    const newOrder = await Order.create(createModel);
+    return OrderReturn.build(newOrder).model;
+	}
+
+	const updateOrder = async () => {
+		foundOrder.tableNum = createModel.tableNum;
+		foundOrder.products = newProductsWithNames;
+		foundOrder.finalAmount = newFinalAmount;
+		await foundOrder.save();
+		return OrderReturn.build(foundOrder).model;
 	}
 
   if (!createModel.prevAccessKey) {
-		createModel.code = await nextCodeGlobal();
-		createModel.finalAmount = calcOrderAmount();
-    const newOrder = await Order.create(createModel);
-    const result = OrderReturn.build(newOrder).model;
+		const result = await createNewOrder();
     return ok(res, result);
   }
 
@@ -60,17 +78,9 @@ r.post("/", useModel(OrderEditClient), async (req, res) => {
 	let result = null;
 
 	if (foundOrder.status == OrderStatus.NEW) {
-		foundOrder.tableNum = createModel.tableNum;
-		foundOrder.products = createModel.products;
-		foundOrder.finalAmount = calcOrderAmount();
-		await foundOrder.save();
-		result = OrderReturn.build(foundOrder).model;
-	}
-	else if (foundOrder.status == OrderStatus.EXECUTED || foundOrder.status == OrderStatus.CANCELED){
-		createModel.code = await nextCodeGlobal();
-		createModel.finalAmount = calcOrderAmount();
-    const newOrder = await Order.create(createModel);
-    result = OrderReturn.build(newOrder).model;
+		result = await updateOrder();
+	} else {
+		result = await createNewModel();
 	}
 
 	return ok(res, result);
@@ -129,13 +139,17 @@ r.get("/",
     sendTimeEnd, 
     status, 
     finalAmountMin, 
-    finalAmountMax 
+    finalAmountMax,
   } = req;
 
 	const foundMenu = await Menu.findOne({ code: menuId }).exec();
 	const { userId } = req.user;
 
-	if (foundMenu?.ownerId !== userId) {
+	if (!foundMenu) {
+		return notFound(res, "Меню с таким идентификатором не найдено");
+	}
+
+	if (foundMenu.ownerId !== userId) {
 		return forbidden(res, "Отказано в доступе. Это меню принадлежит другому пользователю.");
 	}
 
@@ -170,6 +184,69 @@ r.get("/",
 	const result = OrderListReturn.build({ orders, pagesCount: Math.ceil(totalCount / LIMIT) }).model;
 
   return ok(res, result);
+})
+
+// update orders statuses by filters
+
+r.patch("/update/status/by/filters", useAuth(), useModel(UpdateOrdersStatusByFilters), async (req, res) => {
+
+  const { 
+    menuId, 
+    tableNum, 
+    sendTimeStart, 
+    sendTimeEnd, 
+    status, 
+    finalAmountMin, 
+    finalAmountMax 
+  } = req.model;
+
+	const newStatus = req.model.newStatus;
+
+	const foundMenu = await Menu.findOne({ code: menuId }).exec();
+	const { userId } = req.user;
+
+	if (!foundMenu) {
+		return notFound(res, "Меню с таким идентификатором не найдено");
+	}
+
+	if (foundMenu.ownerId !== userId) {
+		return forbidden(res, "Отказано в доступе. Это меню принадлежит другому пользователю.");
+	}
+
+  const query = { menuId };
+
+  if (tableNum) query.tableNum = tableNum;
+  if (status) query.status = status;
+
+  if (sendTimeStart || sendTimeEnd) {
+    query.sendTime = {};
+    if (sendTimeStart) query.sendTime.$gte = sendTimeStart;
+    if (sendTimeEnd) query.sendTime.$lte = sendTimeEnd;
+  }
+
+  if (finalAmountMin !== undefined || finalAmountMax !== undefined) {
+    query.finalAmount = {};
+    if (finalAmountMin !== undefined) query.finalAmount.$gte = finalAmountMin;
+    if (finalAmountMax !== undefined) query.finalAmount.$lte = finalAmountMax;
+  }
+
+	const result = await Order.updateMany(query, { $set: { status: newStatus } });
+
+	return ok(res, { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
+})
+
+// update orders statuses by ids
+
+r.patch("/update/status/by/ids", useAuth(), useModel(UpdateOrdersStatusById), async (req, res) => {
+
+	const { userId } = req.user;
+	const ids = req.model.ids;
+	const newStatus = req.model.newStatus;
+
+	const query = { ownerId: userId, code: { $in: ids } }
+	const result = await Order.updateMany(query, { $set: { status: newStatus } });
+
+	return ok(res, { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
 })
 
 export const orderRouter = r;

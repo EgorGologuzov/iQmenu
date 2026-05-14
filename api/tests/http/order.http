@@ -1,7 +1,6 @@
 
 @baseUrl = http://localhost:4200
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTAzMDU3MzI4N2EyMmE4ODIxZDg1NWUiLCJpYXQiOjE3Nzg1ODI4OTl9.ncqVbzne1fMNpY0Qp1cvFlnS8lTgOiNwlAKLtnYvrII
-
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTA1YTJkYWI3NjEwYjBkNGQ0NjQzM2EiLCJpYXQiOjE3Nzg3NTQyNjZ9._HnqtAgu-8d9vmnSqZCnh73ftcJ-Dd3809pF9Xktoq0
 ### Get list (Owner)
 
 GET {{baseUrl}}/api/order?page=1&menuId=1
@@ -71,3 +70,25 @@ content-type: application/json
 ### Cancel (Client)
 
 PATCH {{baseUrl}}/api/order/c2d8f895-00fd-47b1-adf7-3f41451079bf/cancel
+
+### Update status by access keys (Owner)
+
+PATCH {{baseUrl}}/api/order/update/status/by/ids
+Authorization: {{token}}
+content-type: application/json
+
+{
+	"newStatus": "new",
+	"ids": [1, 2, 3]
+}
+
+### Update status by filters (Owner)
+
+PATCH {{baseUrl}}/api/order/update/status/by/filters
+Authorization: {{token}}
+content-type: application/json
+
+{
+	"newStatus": "banned",
+	"menuId": 1
+}

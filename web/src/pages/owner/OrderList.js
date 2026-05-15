@@ -9,16 +9,19 @@ import { useQuery } from '@tanstack/react-query';
 import { STATUS_TRANSLATION } from '../../values/strings';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import OrderEditStatusDialog from '../../components/dialogs/OrderEditStatusDialog';
 import { formatRelativeTime, formatTime } from '../../utils/utils';
+import OrderFiltersDialog from '../../components/dialogs/OrderFiltersDialog';
 
 const MAX_PRODUCTS_ITEMS_IN_ORDER_CARD = 5;
 
 function OrderList() {
 
-  const [fetchQuery, setFetchQuery] = useState({ page: 1 });
+  const [query, setQuery] = useState({ page: 1 });
   const [checkedOrders, setCheckedOrders] = useState([]);
 
+  const [isFiltersDialogOpened, setIsFiltersDialogOpened] = useState(false);
   const [isOrderDialogOpened, setIsOrderDialogOpened] = useState(false);
   const [currentOrder, setCurrentOrder] = useState();
 
@@ -32,10 +35,10 @@ function OrderList() {
   })
 
   const { data: ordersData, isLoading: isOrdersLoading, error: ordersError, refetch: refetchOrders } = useQuery({
-    queryKey: [`api.order.getOrders`, fetchQuery],
-    queryFn: () => api.order.getOrders(fetchQuery),
+    queryKey: [`api.order.getOrders`, query],
+    queryFn: () => api.order.getOrders(query),
     refetchOnWindowFocus: false,
-    enabled: !!fetchQuery.page && !!fetchQuery.menuId,
+    enabled: !!query.page && !!query.menuId,
   })
 
   const isLoading = isMenusLoading || isOrdersLoading;
@@ -67,24 +70,32 @@ function OrderList() {
 
       {lastError && <Alert severity="error">{lastError.message}</Alert>}
 
-      <FormControl fullWidth>
-        <InputLabel size="small">Меню</InputLabel>
-        <Select
-          label="Меню"
-          size="small"
-          value={fetchQuery.menuId ?? ''}
-          onChange={(e) => setFetchQuery({ ...fetchQuery, menuId: e.target.value })}
-        >
-          {allMenus && allMenus.map(menu => <MenuItem key={menu.id} value={menu.id}>{`${menu.menuName} / ${menu.companyName}`}</MenuItem>)}
-        </Select>
-      </FormControl>
+      <Stack direction="row" spacing={1}>
+
+        <FormControl fullWidth>
+          <InputLabel size="small">Меню</InputLabel>
+          <Select
+            label="Меню"
+            size="small"
+            value={query.menuId ?? ''}
+            onChange={(e) => setQuery({ ...query, menuId: e.target.value })}
+          >
+            {allMenus && allMenus.map(menu => <MenuItem key={menu.id} value={menu.id}>{`${menu.menuName} / ${menu.companyName}`}</MenuItem>)}
+          </Select>
+        </FormControl>
+
+        <Button variant="contained" onClick={() => setIsFiltersDialogOpened(true)}>
+          <FilterAltIcon />
+        </Button>
+
+      </Stack>
 
       {isLoading && <CircularProgress disableShrink sx={{ alignSelf: 'center' }} />}
 
       {!isLoading && typeof pagesCount === "number" && pagesCount > 1 && <Pagination 
         count={pagesCount}
-        page={fetchQuery.page}
-        onChange={(event, newPage) => setFetchQuery({ ...fetchQuery, page: newPage })}
+        page={query.page}
+        onChange={(event, newPage) => setQuery({ ...query, page: newPage })}
         color="primary"
         sx={{ 
           alignSelf: 'center',
@@ -99,7 +110,7 @@ function OrderList() {
 
           {(!orders || orders.length === 0) && <Alert 
             severity="info">
-              {fetchQuery.menuId ? "Список заказов пуст, попробуйте выбрать другое меню" : "Выберите меню, чтобы загрузить список заказов"}
+              {query.menuId ? "Список заказов пуст, попробуйте выбрать другое меню" : "Выберите меню, чтобы загрузить список заказов"}
             </Alert>
           }
 
@@ -130,6 +141,7 @@ function OrderList() {
                     label={STATUS_TRANSLATION[order.status]}
                     color={({ new: "success", executing: "warning" })[order.status] ?? "primary.light"}
                     size="small"
+                    sx={{ fontWeight: 500 }}
                   />
                   <IconButton onClick={(event) => onCheckOrderClick(event, order.id)} sx={{ p: 1, mt: 0.5 }}>
                     {checkedOrders.includes(order.id) ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
@@ -146,13 +158,20 @@ function OrderList() {
         </Stack>
       }
 
-      {currentOrder && <OrderEditStatusDialog 
+      {currentOrder && isOrderDialogOpened && <OrderEditStatusDialog 
         open={isOrderDialogOpened}
         order={currentOrder}
         checkedOrdersIds={checkedOrders}
-        filters={fetchQuery}
+        filters={query}
         onClose={() => setIsOrderDialogOpened(false)}
         onOrdersUpdated={refetchOrders} />
+      }
+
+      {isFiltersDialogOpened && <OrderFiltersDialog 
+        open={isFiltersDialogOpened}
+        defaultFilters={query}
+        onClose={() => setIsFiltersDialogOpened(false)}
+        onFiltersUpdated={(filters) => setQuery({ ...query, ...filters })} />
       }
     </>
   )

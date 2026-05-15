@@ -35,7 +35,7 @@ const ProductInCardItem = memo(({ product }) => {
 	)
 })
 
-function OrderDialog({ products, onClose, ...otherProps }) {
+function OrderCreateDialog({ products, onClose, ...otherProps }) {
 
   const dispatch = useDispatch();
 	const api = useIQmenuApi();
@@ -220,4 +220,4 @@ function OrderDialog({ products, onClose, ...otherProps }) {
   )
 }
 
-export default OrderDialog
+export default OrderCreateDialog

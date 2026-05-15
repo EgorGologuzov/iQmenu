@@ -6,7 +6,7 @@ import { Button, ButtonGroup } from '@mui/material';
 import ProductFiltersDialog from '../dialogs/ProductFiltersDialog';
 import { deepCopy } from '../../utils/utils';
 import { MENU_FILTERS_DEFAULT } from '../../values/default';
-import OrderDialog from '../dialogs/OrderDialog';
+import OrderCreateDialog from '../dialogs/OrderCreateDialog';
 
 function MenuViewActions({ filters, categories, products, onChange }) {
 
@@ -67,7 +67,7 @@ function MenuViewActions({ filters, categories, products, onChange }) {
         onReset={handleOnReset}
       />
 
-      <OrderDialog
+      <OrderCreateDialog
         products={products}
         open={isOrderDialogOpen}
         onClose={() => setIsOrderDialogOpen(false)}

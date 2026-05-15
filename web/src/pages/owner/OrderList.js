@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { STATUS_TRANSLATION } from '../../values/strings';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import OwnerOrderDialog from '../../components/dialogs/OwnerOrderDialog';
+import OrderEditStatusDialog from '../../components/dialogs/OrderEditStatusDialog';
 import { formatRelativeTime, formatTime } from '../../utils/utils';
 
 const MAX_PRODUCTS_ITEMS_IN_ORDER_CARD = 5;
@@ -146,7 +146,7 @@ function OrderList() {
         </Stack>
       }
 
-      {currentOrder && <OwnerOrderDialog 
+      {currentOrder && <OrderEditStatusDialog 
         open={isOrderDialogOpened}
         order={currentOrder}
         checkedOrdersIds={checkedOrders}

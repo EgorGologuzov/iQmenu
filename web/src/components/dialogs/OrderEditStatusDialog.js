@@ -8,7 +8,7 @@ import { formatRelativeTime, formatTime, parseDeviceInfo } from '../../utils/uti
 
 const DEFAULT_QUERY = { ordersSelector: ORDER_SELECTOR_TRANSLATION.onlyThis };
 
-function OwnerOrderDialog({ order, checkedOrdersIds, filters, onClose, onOrdersUpdated, ...otherProps }) {
+function OrderEditStatusDialog({ order, checkedOrdersIds, filters, onClose, onOrdersUpdated, ...otherProps }) {
 
 	const api = useIQmenuApi();
 
@@ -164,4 +164,4 @@ function OwnerOrderDialog({ order, checkedOrdersIds, filters, onClose, onOrdersU
 	)
 }
 
-export default OwnerOrderDialog
+export default OrderEditStatusDialog

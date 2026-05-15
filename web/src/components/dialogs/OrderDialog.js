@@ -104,24 +104,27 @@ function OrderDialog({ products, onClose, ...otherProps }) {
 
 	const isPending = isPostPending || isCancelPending;
 
-	const isTableNumValid = () => {
-		return tableNum && tableNum.length <= 15;
+	const errors = {
+		tableNum: tableNum && tableNum.length <= 15 ? undefined : "Это обязательное поле, длина от 1 до 15 символов",
+		isCartEmpty: !cartDisplayProducts || !cartDisplayProducts.length,
+		hasNotActiveProductsInCart: !!cartDisplayProducts.reduce((count, product) => !product.isActive ? count + 1 : count, 0),
 	}
 
   const sendOrder = () => {
-    if (!isTableNumValid()) {
-      alert("Укажите корректный номер столика");
+    if (errors.tableNum) {
+			setLastError(new Error("Укажите корректный номер столика"));
       return;
     }
-    if (!cartDisplayProducts || !cartDisplayProducts.length) {
-      alert("Нет продуктов в корзине, добавьте хотябы один продукт, чтобы сделать заказ");
+    if (errors.isCartEmpty) {
+			setLastError(new Error("Нет продуктов в корзине, добавьте хотябы один продукт, чтобы сделать заказ"));
       return;
     }
-		const hasNonActiveProducts = !!cartDisplayProducts.reduce((count, product) => !product.isActive ? count + 1 : count, 0);
-		if (hasNonActiveProducts) {
-			alert("В корзине есть продукты, которые временно не доступны для заказа, уберите их, чтобы сделать заказ");
+		if (errors.hasNotActiveProductsInCart) {
+			setLastError(new Error("В корзине есть продукты, которые временно не доступны для заказа, уберите их, чтобы сделать заказ"));
 			return;
 		}
+
+		setLastError(null);
 
 		const buildedOrder = {
 			menuId: menuId, 
@@ -176,8 +179,8 @@ function OrderDialog({ products, onClose, ...otherProps }) {
             required
             value={tableNum ?? ""}
             onChange={event => setTableNum(event.target.value)}
-            error={!isTableNumValid()}
-            helperText={!isTableNumValid() ? "Это обязательное поле, длина от 1 до 15 символов" : ""}
+            error={errors.tableNum}
+            helperText={errors.tableNum}
             size="small"
           />
 

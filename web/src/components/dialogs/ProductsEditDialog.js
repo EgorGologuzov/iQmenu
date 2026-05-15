@@ -112,8 +112,8 @@ const ProductEditDialog = ({ open, onClose, product, products, categories, onSav
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogContent dividers>
-        <Stack spacing={2} sx={{ pt: 1 }}>
+      <DialogContent dividers sx={{ p: 0 }}>
+        <Stack spacing={2} sx={{ p: 2, pb: 0 }}>
 
           <ImageInput
             image={typeof editedProduct.image == "string" ? joinWithApiBaseUrl(editedProduct.image) : editedProduct.image}

@@ -92,7 +92,7 @@ function ProductInfoDialog({ product, onClose, ...otherProps }) {
 
       {/* Кнопка закрытия */}
       <DialogActions>
-        <Button onClick={onClose} variant="outlined" sx={{ width: "100%" }}>
+        <Button onClick={onClose} variant="text">
           Закрыть
         </Button>
       </DialogActions>

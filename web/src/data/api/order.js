@@ -31,7 +31,7 @@ export const ORDER_SERVICE = {
 
   async updateOrdersStatusByIds(query) {
     try {
-      const response = await ORDER_SERVICE.http.patch('/update/status/by/ids', query);
+      const response = await ORDER_SERVICE.http.patch('/order/update/status/by/ids', query);
       return response.data;
     } catch (error) {
       throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
@@ -40,7 +40,7 @@ export const ORDER_SERVICE = {
 
   async updateOrdersStatusByFilters(query) {
     try {
-      const response = await ORDER_SERVICE.http.patch('/update/status/by/filters', query);
+      const response = await ORDER_SERVICE.http.patch('/order/update/status/by/filters', query);
       return response.data;
     } catch (error) {
       throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);

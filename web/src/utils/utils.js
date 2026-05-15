@@ -76,5 +76,62 @@ export function parseDeviceInfo(userAgentString) {
     type = isMobile ? "modile" : "desktop";
   }
 
-  return { os, browser, type }
+  return { os, browser, type, stringInfo: `клиент: ${[os, browser].filter(Boolean).join(", ")}` };
 }
+
+export function formatRelativeTime(targetDate) {
+  const now = new Date();
+  const past = new Date(targetDate);
+  const diffMs = now - past;
+  
+  // Перевод разницы в разные единицы времени
+  const diffMins = Math.floor(diffMs / 1000 / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  // Вспомогательная функция для правильных окончаний русских слов
+  const getNoun = (number, one, two, five) => {
+    let n = Math.abs(number);
+    n %= 100;
+    if (n >= 5 && n <= 20) return five;
+    n %= 10;
+    if (n === 1) return one;
+    if (n >= 2 && n <= 4) return two;
+    return five;
+  };
+
+  // Условие 1: Меньше 1 минуты
+  if (diffMins < 1) {
+    return 'только что';
+  }
+  
+  // Условие 2: Меньше 1 часа
+  if (diffHours < 1) {
+    return `${diffMins} ${getNoun(diffMins, 'минуту', 'минуты', 'минут')} назад`;
+  }
+  
+  // Условие 3: Меньше 1 дня (24 часов)
+  if (diffDays < 1) {
+    return `${diffHours} ${getNoun(diffHours, 'час', 'часа', 'часов')} назад`;
+  }
+  
+  // Условие 4: Меньше 7 дней
+  if (diffDays < 7) {
+    return `${diffDays} ${getNoun(diffDays, 'день', 'дня', 'дней')} назад`;
+  }
+  
+  // Условие 5: Больше 7 дней (Формат: день месяцСловом год)
+  const formatter = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  
+  return formatter.format(past).replace(' г.', '');
+}
+
+export function formatTime(date) {
+  date = new Date(date);
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+

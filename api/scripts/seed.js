@@ -9,6 +9,7 @@ import { generateToken } from '../src/utils/jwt.js';
 import { Menu } from '../src/models/menuModels.js';
 import { generateQrCode } from '../src/utils/qr.js';
 import { Order, OrderStatus } from '../src/models/orderModels.js';
+import { randomUUID } from 'crypto';
 
 dotenv.config();
 
@@ -429,7 +430,7 @@ const MENUS = [
   },
 ]
 
-const randomProductInCart = (eachIndex = 10, maxAmount = 3, offset = 1) => {
+const selectSomeProductInCart = (eachIndex = 10, maxAmount = 3, offset = 1) => {
   return PRODUCTS
     .filter(product => product.isActive)
     .filter((_, index) => index % eachIndex === 0)
@@ -442,47 +443,38 @@ const randomProductInCart = (eachIndex = 10, maxAmount = 3, offset = 1) => {
 
 const ORDERS = [
   {
-    id: 1,
-    accessKey: "0711a659-4533-447e-b523-a19bbffd5313",
     tableNum: "10",
-    sendTime: new Date(),
-    products: randomProductInCart(),
+    products: selectSomeProductInCart(),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
-    id: 2,
-    accessKey: "43dc8ef4-45ab-4e8d-97f2-ea92015e31de",
     tableNum: "10",
-    sendTime: new Date(),
-    products: randomProductInCart(10, 4, 1),
+    products: selectSomeProductInCart(10, 4, 1),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
-    id: 3,
-    accessKey: "bd4f792f-87fb-4c47-8b39-57c8cb73503e",
     tableNum: "10",
-    sendTime: new Date(),
-    products: randomProductInCart(10, 4, 1).splice(0, 1),
+    products: selectSomeProductInCart(10, 4, 1).splice(0, 1),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
-    id: 4,
-    accessKey: "698b13a4-2af2-491d-8d2e-89a62fd9e131",
     tableNum: "12",
-    sendTime: new Date(),
-    products: randomProductInCart(9, 3, 1),
+    products: selectSomeProductInCart(9, 3, 1),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
   {
-    id: 5,
-    accessKey: "a83a0a80-33d6-4523-a1e2-87fed9619144",
     tableNum: "14",
-    sendTime: new Date(),
-    products: randomProductInCart(20, 3, 1),
+    products: selectSomeProductInCart(20, 3, 1),
+    status: OrderStatus.NEW,
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+  },
+  {
+    tableNum: "20",
+    products: selectSomeProductInCart(5, 3, 1),
     status: OrderStatus.NEW,
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
   },
@@ -506,7 +498,6 @@ async function seed() {
 
   replaceCodeWithId(PRODUCTS);
   replaceCodeWithId(MENUS);
-  replaceCodeWithId(ORDERS);
 
   // connect mongo
 
@@ -549,19 +540,47 @@ async function seed() {
 
   // seed orders
 
-  ORDERS.forEach((o, i) => {
-    o.menuId = MAIN_MENU.code;
-    o.ownerId = MAIN_USER._id;
-    o.sendTime = new Date(new Date().getTime() + i * 1000);
-    const foundMenu = MENUS.find(m => m.code == o.menuId);
-    o.finalAmount = o.products.reduce((sum, productInCart) => 
-			sum + foundMenu.products.find(product => product.code == productInCart.productId).price * productInCart.amount,
+  const CLOSED_ORDERS_COUNT = 100;
+  const closedOrders = [];
+
+  for (let i = CLOSED_ORDERS_COUNT; i >= 1; i--) {
+    let products = MAIN_MENU.products.filter(p => Math.random() <= 0.1);
+    if (!products.length) products.push(MAIN_MENU.products[0]);
+    products = products.map(p => ({ productId: p.code, productName: p.name, amount: Math.round(Math.random() * 5) + 1}));
+
+    const finalAmount = products.reduce((sum, productInCart) => 
+			sum + MAIN_MENU.products.find(product => product.code == productInCart.productId).price * productInCart.amount,
+			0
+		);
+
+    closedOrders.push({
+      code: i,
+      accessKey: randomUUID(),
+      menuId: MAIN_MENU.code,
+      ownerId: MAIN_USER._id,
+      sendTime: new Date(new Date().getTime() - (CLOSED_ORDERS_COUNT - i) * 1_000_000),
+      tableNum: Math.round(Math.random() * 30 + 1),
+      products: products,
+      finalAmount: finalAmount,
+      status: ([OrderStatus.BANNED, OrderStatus.EXECUTED, OrderStatus.CANCELED])[Math.round(Math.random() * 2)],
+      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+    });
+  }
+
+  ORDERS.forEach((order, index) => {
+    order.code = CLOSED_ORDERS_COUNT + index + 1;
+    order.accessKey = randomUUID();
+    order.menuId = MAIN_MENU.code;
+    order.ownerId = MAIN_USER._id;
+    order.sendTime = new Date(new Date().getTime() + index * 1000);
+    order.finalAmount = order.products.reduce((sum, productInCart) => 
+			sum + MAIN_MENU.products.find(product => product.code == productInCart.productId).price * productInCart.amount,
 			0
 		);
   });
 
   await Order.deleteMany({}).exec();
-  await Order.create(ORDERS);
+  await Order.create([...closedOrders, ...ORDERS]);
 }
 
 seed()

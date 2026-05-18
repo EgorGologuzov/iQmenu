@@ -5,6 +5,7 @@ import { ORDER_SELECTOR_TRANSLATION, STATUS_TRANSLATION } from '../../values/str
 import { useMutation } from '@tanstack/react-query';
 import { isPending } from '@reduxjs/toolkit';
 import { formatRelativeTime, formatTime, parseDeviceInfo } from '../../utils/utils';
+import { enqueueSnackbar } from 'notistack';
 
 const DEFAULT_QUERY = { ordersSelector: ORDER_SELECTOR_TRANSLATION.onlyThis };
 
@@ -38,7 +39,7 @@ function OrderEditStatusDialog({ order, checkedOrdersIds, filters, onClose, onOr
 	const onSuccessUpdateStatuses = (result) => {
 		onOrdersUpdated && onOrdersUpdated();
 		closeDialog();
-		alert(`Обновлено заказов: ${result.modifiedCount}`);
+		enqueueSnackbar(`Обновлено заказов: ${result.modifiedCount}`, { variant: 'success' });
 	}
 
 	const { mutate: updateStatuses, isPending } = useMutation({

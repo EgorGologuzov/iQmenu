@@ -144,6 +144,7 @@ export const UpdateOrdersStatusByFilters = makeModel({
 	schema: {
 		newStatus: { type: "string", required: true, variants: ORDER_STATUS_VARIANTS },
 		menuId: { type: "number", required: true, minValue: 0 },
+		orderId: { type: "number" },
 		tableNum: { type: "string", required: false, minLength: 1, maxLength: 15, trim: true },
 		sendTimeStart: { type: "datetime", required: false },
 		sendTimeEnd: { type: "datetime", required: false },

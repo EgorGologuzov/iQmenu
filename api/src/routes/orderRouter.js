@@ -122,6 +122,7 @@ r.get("/",
 	useAuth(),
 	useIntegerQueryParam({ name: "page", required: true, min: 1 }),
 	useIntegerQueryParam({ name: "menuId", required:  true }),
+	useIntegerQueryParam({ name: "orderId" }),
 	useStringQueryParam({ name: "tableNum" }),
 	useDatetimeQueryParam({ name: "sendTimeStart" }),
 	useDatetimeQueryParam({ name: "sendTimeEnd" }),
@@ -134,6 +135,7 @@ r.get("/",
   const { 
 		page,
     menuId, 
+		orderId,
     tableNum, 
     sendTimeStart, 
     sendTimeEnd, 
@@ -153,11 +155,12 @@ r.get("/",
 		return forbidden(res, "Отказано в доступе. Это меню принадлежит другому пользователю.");
 	}
 
-	const LIMIT = 2;
+	const LIMIT = 10;
 	const skip = (page - 1) * LIMIT;
 
   const query = { menuId };
 
+  if (orderId) query.code = orderId;
   if (tableNum) query.tableNum = tableNum;
   if (status) query.status = status;
 
@@ -192,6 +195,7 @@ r.patch("/update/status/by/filters", useAuth(), useModel(UpdateOrdersStatusByFil
 
   const { 
     menuId, 
+		orderId,
     tableNum, 
     sendTimeStart, 
     sendTimeEnd, 
@@ -215,6 +219,7 @@ r.patch("/update/status/by/filters", useAuth(), useModel(UpdateOrdersStatusByFil
 
   const query = { menuId };
 
+	if (orderId) query.code = orderId;
   if (tableNum) query.tableNum = tableNum;
   if (status) query.status = status;
 

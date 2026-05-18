@@ -5,6 +5,7 @@ import { STATUS_TRANSLATION } from '../../values/strings';
 function OrderFiltersDialog({ defaultFilters, onClose, onFiltersUpdated, ...otherProps }) {
 
 	const [filters, setFilters] = useState({
+		orderId: defaultFilters.orderId,
 		tableNum: defaultFilters.tableNum,
 		sendTimeStart: defaultFilters.sendTimeStart,
 		sendTimeEnd: defaultFilters.sendTimeEnd,
@@ -47,6 +48,19 @@ function OrderFiltersDialog({ defaultFilters, onClose, onFiltersUpdated, ...othe
 					<Typography variant="h6">Фильтры</Typography>
 
 					<TextField
+						label="Номер заказа"
+						type="number"
+						size="small"
+						value={filters.orderId ?? ''}
+						onChange={event => setFilters({ ...filters, orderId: event.target.value })}
+						slotProps={{
+							inputLabel: {
+								shrink: true,
+							},
+						}}
+					/>
+
+					<TextField
 						label="Номер столика"
 						value={filters.tableNum ?? ''}
 						onChange={event => setFilters({ ...filters, tableNum: event.target.value })}
@@ -61,8 +75,6 @@ function OrderFiltersDialog({ defaultFilters, onClose, onFiltersUpdated, ...othe
 						type="datetime-local"
 						value={filters.sendTimeStart}
 						onChange={event => setFilters({ ...filters, sendTimeStart: event.target.value })}
-						error={errors.sendTimeStart ?? ''}
-						helperText={errors.sendTimeStart}
 						size="small"
 						InputLabelProps={{
 							shrink: true,
@@ -90,8 +102,6 @@ function OrderFiltersDialog({ defaultFilters, onClose, onFiltersUpdated, ...othe
 							size="small"
 							value={filters.status ?? ''}
 							onChange={event => setFilters({ ...filters, status: event.target.value })}
-							error={errors.status}
-							helperText={errors.status}
 						>
 							{Object.keys(STATUS_TRANSLATION).map(key => <MenuItem key={key} value={key}>{STATUS_TRANSLATION[key]}</MenuItem>)}
 						</Select>
@@ -101,12 +111,8 @@ function OrderFiltersDialog({ defaultFilters, onClose, onFiltersUpdated, ...othe
 						label="Мин. сумма"
 						type="number"
 						size="small"
-						min={0}
-						step={1}
 						value={filters.finalAmountMin ?? ''}
 						onChange={event => setFilters({ ...filters, finalAmountMin: event.target.value })}
-						error={errors.finalAmountMin}
-						helperText={errors.finalAmountMin}
 						slotProps={{
 							inputLabel: {
 								shrink: true,
@@ -118,8 +124,6 @@ function OrderFiltersDialog({ defaultFilters, onClose, onFiltersUpdated, ...othe
 						label="Макс. сумма"
 						type="number"
 						size="small"
-						min={0}
-						step={1}
 						value={filters.finalAmountMax ?? ''}
 						onChange={event => setFilters({ ...filters, finalAmountMax: event.target.value })}
 						error={errors.finalAmountMax}

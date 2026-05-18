@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 import OwnerNavBar from '../../components/navs/OwnerNavBar';
 import withStackContainerShell from '../../hoc/withStackContainerShell';
 import useTitle from '../../hooks/useTitle';
@@ -16,6 +16,50 @@ import OrderFiltersDialog from '../../components/dialogs/OrderFiltersDialog';
 
 const MAX_PRODUCTS_ITEMS_IN_ORDER_CARD = 5;
 
+const OrderItem = memo(({ order, checked, onClick, onCheck }) => {
+  return (
+    <React.Fragment>
+      <Stack direction="row" spacing={1} sx={{ cursor: "pointer" }} onClick={() => onClick(order)}>
+
+        <Typography variant="body2" sx={{ flexGrow: 1 }}>
+
+          <Typography variant="caption">
+            {`${formatRelativeTime(order.sendTime)} (${formatTime(order.sendTime)})`}<br/>
+          </Typography>
+          
+          <b>{`Заказ  №${order.id}, столик ${order.tableNum}:`}</b><br/>
+
+          {order.products.filter((_, i) => i < MAX_PRODUCTS_ITEMS_IN_ORDER_CARD).map(product => 
+            <React.Fragment key={product.productId}>&#10004; {product.productName} ({product.amount} {product.amount % 10 >= 2 && product.amount % 10 <= 4 ? "раза" : "раз"})<br/></React.Fragment>
+          )}
+
+          {order.products.length > MAX_PRODUCTS_ITEMS_IN_ORDER_CARD 
+            ? `и еще ${order.products.length - MAX_PRODUCTS_ITEMS_IN_ORDER_CARD}...` 
+            : undefined
+          }
+        </Typography>
+
+        <Stack direction="column" alignItems="end" justifyContent="space-between">
+          <Chip
+            label={STATUS_TRANSLATION[order.status]}
+            color={({ new: "success", executing: "warning" })[order.status] ?? "primary.light"}
+            size="small"
+            sx={{ fontWeight: 500 }}
+          />
+          <IconButton onClick={(event) => onCheck(event, order.id)} sx={{ p: 1, mt: 0.5 }}>
+            {checked ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
+          </IconButton>
+          <Typography variant="button" color="secondary">
+            {order.finalAmount}₽
+          </Typography>
+        </Stack>
+        
+      </Stack>
+      <Divider />
+    </React.Fragment>
+  )
+})
+
 function OrderList() {
 
   const [query, setQuery] = useState({ page: 1 });
@@ -24,9 +68,12 @@ function OrderList() {
   const [isFiltersDialogOpened, setIsFiltersDialogOpened] = useState(false);
   const [isOrderDialogOpened, setIsOrderDialogOpened] = useState(false);
   const [currentOrder, setCurrentOrder] = useState();
+  const [isFiltersApplied, setIsFiltersApllied] = useState(false);
 
   const api = useIQmenuApi();
   const userId = useSelector(state => state.user.id);
+
+  const isQueryValid = !!query.page && !!query.menuId;
 
   const { data: allMenus, isLoading: isMenusLoading, error: menusError } = useQuery({
     queryKey: [`api.menu.getUsersMenus`, userId],
@@ -38,7 +85,7 @@ function OrderList() {
     queryKey: [`api.order.getOrders`, query],
     queryFn: () => api.order.getOrders(query),
     refetchOnWindowFocus: false,
-    enabled: !!query.page && !!query.menuId,
+    enabled: isQueryValid,
   })
 
   const isLoading = isMenusLoading || isOrdersLoading;
@@ -46,23 +93,38 @@ function OrderList() {
   const orders = ordersData?.orders;
   const pagesCount = ordersData?.pagesCount;
 
-  const onCheckOrderClick = (event, orderId) => {
+  const onCheckOrderClick = useCallback((event, orderId) => {
     event.stopPropagation();
-    if (checkedOrders.includes(orderId)) {
-      setCheckedOrders(checkedOrders.filter(id => id !== orderId));
-    } else {
-      setCheckedOrders([...checkedOrders, orderId]);
-    }
-  };
+    setCheckedOrders(checkedOrders => {
+      if (checkedOrders.includes(orderId)) {
+        return checkedOrders.filter(id => id !== orderId);
+      } else {
+        return [...checkedOrders, orderId];
+      }
+    })
+  }, [])
 
-  const openOrder = (order) => {
+  const openOrder = useCallback((order) => {
     setCurrentOrder(order);
     setIsOrderDialogOpened(true);
+  }, [])
+
+  const setFilters = (newFilters) => {
+    const hasActiveFilters = !!Object.keys(newFilters).find(key => !!newFilters[key]);
+    setQuery({ ...query, ...newFilters });
+    setIsFiltersApllied(hasActiveFilters);
   }
 
-	useTitle({ general: "Заказы по вашим меню" }, []);
+	useTitle({ general: "Заказы по вашим меню" }, [])
 
-  useEffect(() => setCheckedOrders([]), [ordersData])
+  useEffect(() => { 
+    setCheckedOrders(checkedOrders => checkedOrders.filter(orderId => !!orders?.find(order => orderId == order.id)));
+  }, [orders])
+
+  useEffect(() => {
+    const timer = setInterval(() => { if (isQueryValid) refetchOrders() }, 10_000);
+    return () => clearInterval(timer);
+  })
 
   return (
     <>
@@ -84,7 +146,7 @@ function OrderList() {
           </Select>
         </FormControl>
 
-        <Button variant="contained" onClick={() => setIsFiltersDialogOpened(true)}>
+        <Button variant={isFiltersApplied ? "contained" : "outlined"} onClick={() => setIsFiltersDialogOpened(true)}>
           <FilterAltIcon />
         </Button>
 
@@ -110,50 +172,18 @@ function OrderList() {
 
           {(!orders || orders.length === 0) && <Alert 
             severity="info">
-              {query.menuId ? "Список заказов пуст, попробуйте выбрать другое меню" : "Выберите меню, чтобы загрузить список заказов"}
+              {query.menuId ? "Список заказов пуст, попробуйте сбросить фильтры или выбрать другое меню" : "Выберите меню, чтобы загрузить список заказов"}
             </Alert>
           }
 
           {(orders && orders.length !== 0) && orders.map(order => 
-            <React.Fragment key={order.id}>
-              <Stack direction="row" spacing={1} sx={{ cursor: "pointer" }} onClick={() => openOrder(order)}>
-
-                <Typography variant="body2" sx={{ flexGrow: 1 }}>
-
-                  <Typography variant="caption">
-                    {`${formatRelativeTime(order.sendTime)} (${formatTime(order.sendTime)})`}<br/>
-                  </Typography>
-                  
-                  <b>{`Заказ  №${order.id}, столик ${order.tableNum}:`}</b><br/>
-
-                  {order.products.filter((_, i) => i < MAX_PRODUCTS_ITEMS_IN_ORDER_CARD).map(product => 
-                    <React.Fragment key={product.productId}>&#10004; {product.productName} ({product.amount} {product.amount % 10 >= 2 && product.amount % 10 <= 4 ? "раза" : "раз"})<br/></React.Fragment>
-                  )}
-
-                  {order.products.length > MAX_PRODUCTS_ITEMS_IN_ORDER_CARD 
-                    ? `и еще ${order.products.length - MAX_PRODUCTS_ITEMS_IN_ORDER_CARD}...` 
-                    : undefined
-                  }
-                </Typography>
-
-                <Stack direction="column" alignItems="end" justifyContent="space-between">
-                  <Chip
-                    label={STATUS_TRANSLATION[order.status]}
-                    color={({ new: "success", executing: "warning" })[order.status] ?? "primary.light"}
-                    size="small"
-                    sx={{ fontWeight: 500 }}
-                  />
-                  <IconButton onClick={(event) => onCheckOrderClick(event, order.id)} sx={{ p: 1, mt: 0.5 }}>
-                    {checkedOrders.includes(order.id) ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
-                  </IconButton>
-                  <Typography variant="button" color="secondary">
-                    {order.finalAmount}₽
-                  </Typography>
-                </Stack>
-                
-              </Stack>
-              <Divider />
-            </React.Fragment>
+            <OrderItem
+              key={order.id}
+              order={order}
+              checked={checkedOrders.includes(order.id)}
+              onClick={openOrder}
+              onCheck={onCheckOrderClick}
+            />
           )}
         </Stack>
       }
@@ -171,7 +201,7 @@ function OrderList() {
         open={isFiltersDialogOpened}
         defaultFilters={query}
         onClose={() => setIsFiltersDialogOpened(false)}
-        onFiltersUpdated={(filters) => setQuery({ ...query, ...filters })} />
+        onFiltersUpdated={setFilters} />
       }
     </>
   )

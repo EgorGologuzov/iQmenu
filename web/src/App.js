@@ -17,6 +17,7 @@ import { Provider } from "react-redux"
 import { APP_STORE } from "./store/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useUserRefresh } from "./hooks/useUserRefresh";
+import { SnackbarProvider } from 'notistack';
 import OrderList from "./pages/owner/OrderList";
 
 // Инициализация React Query
@@ -42,7 +43,9 @@ function AppWrappers({ children }) {
     <QueryClientProvider client={QUERY_CLIENT}>
       <Provider store={APP_STORE} >
         <ThemeProvider theme={APP_THEME}>
-          { children }
+          <SnackbarProvider>
+            { children }
+          </SnackbarProvider>
         </ThemeProvider>
       </Provider>
     </QueryClientProvider>

@@ -6,6 +6,7 @@ import { MENU_SERVICE as REAL_MENU_SERVICE } from "../data/api/menu"
 import { USER_SERVICE as REAL_USER_SERVICE } from "../data/api/user"
 import { MEDIA_SERVICE as REAL_MEDIA_SERVICE } from "../data/api/media"
 import { ORDER_SERVICE as REAL_ORDER_SERVICE } from "../data/api/order"
+import { STATISTIC_SERVICE as REAL_STATISTIC_SERVICE } from "../data/api/statistic"
 
 export function getServices(http) {
 	const services = {}
@@ -19,6 +20,7 @@ export function getServices(http) {
 		services.user = REAL_USER_SERVICE;
 		services.media = REAL_MEDIA_SERVICE;
 		services.order = REAL_ORDER_SERVICE;
+		services.statistic = REAL_STATISTIC_SERVICE;
 	}
 
 	Object.keys(services).forEach(service => {

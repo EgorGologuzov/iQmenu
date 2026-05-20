@@ -10,6 +10,7 @@ import { Menu } from '../src/models/menuModels.js';
 import { generateQrCode } from '../src/utils/qr.js';
 import { Order, OrderStatus } from '../src/models/orderModels.js';
 import { randomUUID } from 'crypto';
+import { Event } from '../src/models/statisticModels.js';
 
 dotenv.config();
 
@@ -19,6 +20,12 @@ const __dirname = path.resolve();
 const imagesDir = path.join(__dirname, '/public/images');
 const qrsDir = path.join(__dirname, '/public/qrs');
 const seedImagesDir = path.join(__dirname, '/public/seed-images');
+
+const USERS_AGENTS = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.5 Mobile/15E148 Safari/604.1",
+  "Mozilla/5.0 (Linux; Android 8.0.0; SM-G955U Build/R16NW) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Mobile Safari/537.36",
+]
 
 const USERS = [
   {
@@ -487,6 +494,23 @@ function replaceCodeWithId(list) {
   });
 }
 
+function randomInt(start, end) {
+  const diff = end - start;
+  return Math.round(start + Math.random() * diff);
+}
+
+function randomItem(list) {
+  if (!list?.length) return;
+  const index = Math.round(Math.random() * (list.length - 1));
+  return list[index];
+}
+
+function randomItems({ list, filterChance, notEmpty = false }) {
+  if (!list?.length) return [];
+  const items = list.filter(item => Math.random() <= filterChance);
+  return !items.length && notEmpty ? [randomItem(list)] : items;
+}
+
 async function clearDirectory(dir) {
   const files = await fs.readdir(dir);
   await Promise.all(files.map(file => fs.unlink(path.join(dir, file))));
@@ -544,8 +568,7 @@ async function seed() {
   const closedOrders = [];
 
   for (let i = CLOSED_ORDERS_COUNT; i >= 1; i--) {
-    let products = MAIN_MENU.products.filter(p => Math.random() <= 0.1);
-    if (!products.length) products.push(MAIN_MENU.products[0]);
+    let products = randomItems({ list: MAIN_MENU.products, filterChance: 0.1, notEmpty: true });
     products = products.map(p => ({ productId: p.code, productName: p.name, amount: Math.round(Math.random() * 5) + 1}));
 
     const finalAmount = products.reduce((sum, productInCart) => 
@@ -559,11 +582,11 @@ async function seed() {
       menuId: MAIN_MENU.code,
       ownerId: MAIN_USER._id,
       sendTime: new Date(new Date().getTime() - (CLOSED_ORDERS_COUNT - i) * 1_000_000),
-      tableNum: Math.round(Math.random() * 30 + 1),
+      tableNum: randomInt(1, 30),
       products: products,
       finalAmount: finalAmount,
-      status: ([OrderStatus.BANNED, OrderStatus.EXECUTED, OrderStatus.CANCELED])[Math.round(Math.random() * 2)],
-      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+      status: randomItem([OrderStatus.BANNED, OrderStatus.EXECUTED, OrderStatus.CANCELED]),
+      userAgent: randomItem(USERS_AGENTS),
     });
   }
 
@@ -581,6 +604,35 @@ async function seed() {
 
   await Order.deleteMany({}).exec();
   await Order.create([...closedOrders, ...ORDERS]);
+
+  // seed statistic
+
+  const EVENTS_COUNT = 1500;
+  const BORDER_DAYS = 40;
+  const MIN_TIME = 10 * 3600000;  // 10:00 in milliseconds
+  const MAX_TIME = 22 * 3600000;  // 22:00 in milliseconds
+
+  const events = []
+  for (let i = 0; i < EVENTS_COUNT; i++) {
+    const eventType = randomItem(["view-menu", "view-product", "like-product", "order-product"])
+
+    const sendTime = new Date();
+    sendTime.setDate(sendTime.getDate() - randomInt(1, BORDER_DAYS));
+    sendTime.setHours(0, 0, 0, 0);
+    const randomOffset = randomInt(MIN_TIME, MAX_TIME);
+    sendTime.setTime(sendTime.getTime() + randomOffset);
+
+    events.push({
+      event: eventType,
+      menuId: MAIN_MENU.code,
+      productName: eventType !== "view-menu" ? randomItem(MAIN_MENU.products).name : undefined,
+      sendTime: sendTime,
+      userAgent: randomItem(USERS_AGENTS),
+    })
+  }
+
+  await Event.deleteMany({}).exec();
+  await Event.create(events);
 }
 
 seed()

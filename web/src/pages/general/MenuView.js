@@ -123,6 +123,7 @@ function MenuView() {
   const showProductDialog = useCallback((product) => {
     setSelectedProduct(product);
     setIsDialogOpen(true);
+    api.statistic.sendProductView(menuId, product.name);
   }, [])
 
   const handleFiltersChange = useCallback((filters) => {
@@ -133,6 +134,8 @@ function MenuView() {
   useEffect(() => {
     if (isPrerender) setTimeout(() => setIsPrerender(false), 500);
   });
+
+  useEffect(() => { api.statistic.sendMenuView(menuId) }, [])
 
   if (isLoading) {
     return <CircularProgress disableShrink sx={{ alignSelf: 'center' }} />

@@ -5,9 +5,11 @@ import { useParams } from 'react-router';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { add, remove } from '../../store/slices/favoriteSlice'
+import useIQmenuApi from '../../hooks/useIQmenuApi';
 
 function ProductFavoriteButton({ product, ...otherProps }) {
 
+  const api = useIQmenuApi();
   const dispatch = useDispatch();
   const { menuId } = useParams();
 
@@ -21,6 +23,7 @@ function ProductFavoriteButton({ product, ...otherProps }) {
       dispatch(remove({ menuId: menuId, productId: product.id }));
     } else {
       dispatch(add({ menuId: menuId, productId: product.id }));
+      api.statistic.sendProductLike(menuId, product.name);
     }
   }
 

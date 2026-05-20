@@ -1,6 +1,7 @@
 
 @baseUrl = http://localhost:4200
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTA1YTJkYWI3NjEwYjBkNGQ0NjQzM2EiLCJpYXQiOjE3Nzg3NTQyNjZ9._HnqtAgu-8d9vmnSqZCnh73ftcJ-Dd3809pF9Xktoq0
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTBkNDRlN2Y4ZWUwYmY4ZTE5MTU4MDgiLCJpYXQiOjE3NzkyNTQ1MDN9.QcUnWMPGrOlS-02fZbsc62AxBsELonydExBX0WML2TM
+
 ### Get list (Owner)
 
 GET {{baseUrl}}/api/order?page=1&menuId=1

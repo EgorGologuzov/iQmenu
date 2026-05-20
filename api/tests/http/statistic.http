@@ -1,0 +1,29 @@
+@baseUrl = http://localhost:4200
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTBkNDRlN2Y4ZWUwYmY4ZTE5MTU4MDgiLCJpYXQiOjE3NzkyNTQ1MDN9.QcUnWMPGrOlS-02fZbsc62AxBsELonydExBX0WML2TM
+
+### Get statistic (Owner)
+
+GET {{baseUrl}}/api/statistic?menuId=1&lastDays=40
+Authorization: {{token}}
+
+### Post statistic (view-menu)
+
+POST {{baseUrl}}/api/statistic
+content-type: application/json
+
+{
+	"menuId": 5,
+    "event": "view-menu",
+    "productName": "forgot nulling"
+}
+
+### Post statistic (view-product)
+
+POST {{baseUrl}}/api/statistic
+content-type: application/json
+
+{
+	"menuId": 1,
+    "event": "view-product",
+    "productName": "Название продукта"
+}

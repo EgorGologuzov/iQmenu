@@ -44,6 +44,7 @@ r.post("/", useModel(OrderEditClient), async (req, res) => {
 		createModel.ownerId = foundMenu.ownerId;
 		createModel.products = newProductsWithNames;
 		createModel.finalAmount = newFinalAmount;
+		createModel.userAgent = req.get('user-agent');
     const newOrder = await Order.create(createModel);
     return OrderReturn.build(newOrder).model;
 	}

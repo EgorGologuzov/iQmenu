@@ -110,7 +110,6 @@ export const OrderEditClient = makeModel({
       itemsComparator: (p1, p2) => p1.productId == p2.productId,
 		},
 		prevAccessKey: { type: "string", required: false, regExp: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/ },
-		userAgent: { type: "string", required: false, maxLength: 250 },
 	},
 
 	setDefaults(order) {

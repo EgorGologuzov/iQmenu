@@ -14,7 +14,7 @@ const r = new Router();
 
 r.post("/", useModel(OrderEditClient), async (req, res) => {
 
-  const createModel = req.model;
+	const createModel = req.model;
 
 	const foundMenu = await Menu.findOne({ code: createModel.menuId }).exec();
 	if (!foundMenu?.isActive) {
@@ -45,8 +45,8 @@ r.post("/", useModel(OrderEditClient), async (req, res) => {
 		createModel.products = newProductsWithNames;
 		createModel.finalAmount = newFinalAmount;
 		createModel.userAgent = req.get('user-agent');
-    const newOrder = await Order.create(createModel);
-    return OrderReturn.build(newOrder).model;
+		const newOrder = await Order.create(createModel);
+		return OrderReturn.build(newOrder).model;
 	}
 
 	const updateOrder = async () => {
@@ -57,10 +57,10 @@ r.post("/", useModel(OrderEditClient), async (req, res) => {
 		return OrderReturn.build(foundOrder).model;
 	}
 
-  if (!createModel.prevAccessKey) {
+	if (!createModel.prevAccessKey) {
 		const result = await createNewOrder();
-    return ok(res, result);
-  }
+		return ok(res, result);
+	}
 
 	const foundOrder = await Order.findOne({ accessKey: createModel.prevAccessKey })
 
@@ -122,7 +122,7 @@ r.patch("/:orderAccessKey/cancel", useUuidParam("orderAccessKey"), async (req, r
 r.get("/",
 	useAuth(),
 	useIntegerQueryParam({ name: "page", required: true, min: 1 }),
-	useIntegerQueryParam({ name: "menuId", required:  true }),
+	useIntegerQueryParam({ name: "menuId", required: true }),
 	useIntegerQueryParam({ name: "orderId" }),
 	useStringQueryParam({ name: "tableNum" }),
 	useDatetimeQueryParam({ name: "sendTimeStart" }),
@@ -133,77 +133,77 @@ r.get("/",
 
 	async (req, res) => {
 
-  const { 
-		page,
-    menuId, 
-		orderId,
-    tableNum, 
-    sendTimeStart, 
-    sendTimeEnd, 
-    status, 
-    finalAmountMin, 
-    finalAmountMax,
-  } = req;
+		const {
+			page,
+			menuId,
+			orderId,
+			tableNum,
+			sendTimeStart,
+			sendTimeEnd,
+			status,
+			finalAmountMin,
+			finalAmountMax,
+		} = req;
 
-	const foundMenu = await Menu.findOne({ code: menuId }).exec();
-	const { userId } = req.user;
+		const foundMenu = await Menu.findOne({ code: menuId }).exec();
+		const { userId } = req.user;
 
-	if (!foundMenu) {
-		return notFound(res, "Меню с таким идентификатором не найдено");
-	}
+		if (!foundMenu) {
+			return notFound(res, "Меню с таким идентификатором не найдено");
+		}
 
-	if (foundMenu.ownerId !== userId) {
-		return forbidden(res, "Отказано в доступе. Это меню принадлежит другому пользователю.");
-	}
+		if (foundMenu.ownerId !== userId) {
+			return forbidden(res, "Отказано в доступе. Это меню принадлежит другому пользователю.");
+		}
 
-	const LIMIT = 10;
-	const skip = (page - 1) * LIMIT;
+		const LIMIT = 10;
+		const skip = (page - 1) * LIMIT;
 
-  const query = { menuId };
+		const query = { menuId };
 
-  if (orderId) query.code = orderId;
-  if (tableNum) query.tableNum = tableNum;
-  if (status) query.status = status;
+		if (orderId) query.code = orderId;
+		if (tableNum) query.tableNum = tableNum;
+		if (status) query.status = status;
 
-  if (sendTimeStart || sendTimeEnd) {
-    query.sendTime = {};
-    if (sendTimeStart) query.sendTime.$gte = sendTimeStart;
-    if (sendTimeEnd) query.sendTime.$lte = sendTimeEnd;
-  }
+		if (sendTimeStart || sendTimeEnd) {
+			query.sendTime = {};
+			if (sendTimeStart) query.sendTime.$gte = sendTimeStart;
+			if (sendTimeEnd) query.sendTime.$lte = sendTimeEnd;
+		}
 
-  if (finalAmountMin !== undefined || finalAmountMax !== undefined) {
-    query.finalAmount = {};
-    if (finalAmountMin !== undefined) query.finalAmount.$gte = finalAmountMin;
-    if (finalAmountMax !== undefined) query.finalAmount.$lte = finalAmountMax;
-  }
+		if (finalAmountMin !== undefined || finalAmountMax !== undefined) {
+			query.finalAmount = {};
+			if (finalAmountMin !== undefined) query.finalAmount.$gte = finalAmountMin;
+			if (finalAmountMax !== undefined) query.finalAmount.$lte = finalAmountMax;
+		}
 
-  const [orders, totalCount] = await Promise.all([
-		Order.find(query)
-			.sort({ sendTime: -1 })
-			.skip(skip)
-			.limit(LIMIT),
-		Order.countDocuments(query)
-	]);
+		const [orders, totalCount] = await Promise.all([
+			Order.find(query)
+				.sort({ sendTime: -1 })
+				.skip(skip)
+				.limit(LIMIT),
+			Order.countDocuments(query)
+		]);
 
-	const result = OrderListReturn.build({ orders, pagesCount: Math.ceil(totalCount / LIMIT) }).model;
+		const result = OrderListReturn.build({ orders, pagesCount: Math.ceil(totalCount / LIMIT) }).model;
 
-  return ok(res, result);
-})
+		return ok(res, result);
+	})
 
 // update orders statuses by filters
 
 r.patch("/update/status/by/filters", useAuth(), useModel(UpdateOrdersStatusByFilters), async (req, res) => {
 
-  const { 
-    menuId, 
+	const {
+		menuId,
 		orderId,
-    tableNum, 
-    sendTimeStart, 
-    sendTimeEnd, 
-    status, 
-    finalAmountMin, 
-    finalAmountMax 
-  } = req.model;
+		tableNum,
+		sendTimeStart,
+		sendTimeEnd,
+		status,
+		finalAmountMin,
+		finalAmountMax
+	} = req.model;
 
 	const newStatus = req.model.newStatus;
 
@@ -218,23 +218,23 @@ r.patch("/update/status/by/filters", useAuth(), useModel(UpdateOrdersStatusByFil
 		return forbidden(res, "Отказано в доступе. Это меню принадлежит другому пользователю.");
 	}
 
-  const query = { menuId };
+	const query = { menuId };
 
 	if (orderId) query.code = orderId;
-  if (tableNum) query.tableNum = tableNum;
-  if (status) query.status = status;
+	if (tableNum) query.tableNum = tableNum;
+	if (status) query.status = status;
 
-  if (sendTimeStart || sendTimeEnd) {
-    query.sendTime = {};
-    if (sendTimeStart) query.sendTime.$gte = sendTimeStart;
-    if (sendTimeEnd) query.sendTime.$lte = sendTimeEnd;
-  }
+	if (sendTimeStart || sendTimeEnd) {
+		query.sendTime = {};
+		if (sendTimeStart) query.sendTime.$gte = sendTimeStart;
+		if (sendTimeEnd) query.sendTime.$lte = sendTimeEnd;
+	}
 
-  if (finalAmountMin !== undefined || finalAmountMax !== undefined) {
-    query.finalAmount = {};
-    if (finalAmountMin !== undefined) query.finalAmount.$gte = finalAmountMin;
-    if (finalAmountMax !== undefined) query.finalAmount.$lte = finalAmountMax;
-  }
+	if (finalAmountMin !== undefined || finalAmountMax !== undefined) {
+		query.finalAmount = {};
+		if (finalAmountMin !== undefined) query.finalAmount.$gte = finalAmountMin;
+		if (finalAmountMax !== undefined) query.finalAmount.$lte = finalAmountMax;
+	}
 
 	const result = await Order.updateMany(query, { $set: { status: newStatus } });
 

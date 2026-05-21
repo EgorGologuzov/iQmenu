@@ -17,6 +17,8 @@ import SaveStatus from '../../components/utils/SaveStatus';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AutoGraphIcon from '@mui/icons-material/AutoGraph';
+import DownloadStatisticDialog from '../../components/dialogs/DownloadStatisticDialog';
 
 function MenuEdit() {
   const [savedMenu, setSavedMenu] = useState();
@@ -24,6 +26,8 @@ function MenuEdit() {
   const [image, setImage] = useState();
   const [categories, setCategories] = useState();
   const [products, setProducts] = useState();
+
+  const [isStatisticDialogOpen, setIsStatisticDialogOpen] = useState(false);
   const [lastError, setLastError] = useState();
 
   const api = useIQmenuApi();
@@ -127,6 +131,14 @@ function MenuEdit() {
             sx={{ flexGrow: 1 }}
           ><DeleteIcon /></Button>
         </Tooltip>
+        <Tooltip title="Статистика">
+          <Button
+            variant="outlined"
+            disabled={isUpdatePending || isDeletePending}
+            onClick={() => setIsStatisticDialogOpen(true)}
+            sx={{ flexGrow: 1 }}
+          ><AutoGraphIcon /></Button>
+        </Tooltip>
         <Tooltip title="Создать меню">
           <Button
             variant="contained"
@@ -139,6 +151,7 @@ function MenuEdit() {
       </ButtonGroup>
 
       <SaveStatus isSaved={!isChanged} />
+      {lastError && <Alert severity="error">{lastError.message}</Alert>}
 
       <Divider />
 
@@ -199,7 +212,6 @@ function MenuEdit() {
       <Divider />
 
       <SaveStatus isSaved={!isChanged} />
-
       {lastError && <Alert severity="error">{lastError.message}</Alert>}
 
       <Button
@@ -217,6 +229,12 @@ function MenuEdit() {
         src={menu.qr}
         label="QR-код для доступа к меню"
       />
+
+      {isStatisticDialogOpen && <DownloadStatisticDialog
+        open={isStatisticDialogOpen}
+        menu={buildedMenu}
+        onClose={() => setIsStatisticDialogOpen(false)}
+      />}
     </>
   )
 }

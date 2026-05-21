@@ -581,7 +581,7 @@ async function seed() {
       accessKey: randomUUID(),
       menuId: MAIN_MENU.code,
       ownerId: MAIN_USER._id,
-      sendTime: new Date(new Date().getTime() - (CLOSED_ORDERS_COUNT - i) * 1_000_000),
+      sendTime: new Date(new Date().getTime() - (CLOSED_ORDERS_COUNT - i) * 3_600_000),
       tableNum: randomInt(1, 30),
       products: products,
       finalAmount: finalAmount,
@@ -614,7 +614,7 @@ async function seed() {
 
   const events = []
   for (let i = 0; i < EVENTS_COUNT; i++) {
-    const eventType = randomItem(["view-menu", "view-product", "like-product", "order-product"])
+    const eventType = randomItem(["view-menu", "view-product", "like-product"])
 
     const sendTime = new Date();
     sendTime.setDate(sendTime.getDate() - randomInt(1, BORDER_DAYS));

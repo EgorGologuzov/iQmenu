@@ -10,16 +10,12 @@ function MenuQrCodeDialog({qr, onClose, ...otherProps}){
         <Dialog {...otherProps} onClose={onClose} maxWidth="xs" fullWidth>
     
           <DialogContent sx={{ p: 0 }}>
-    
-            <QrView
-                src={qr}
-            />
-    
+            <QrView src={qr} />
           </DialogContent>
     
           {/* Кнопка закрытия */}
           <DialogActions>
-            <Button onClick={onClose} variant="outlined" sx={{ width: "100%" }}>
+            <Button onClick={onClose} variant="text">
               Закрыть
             </Button>
           </DialogActions>

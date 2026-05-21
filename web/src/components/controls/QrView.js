@@ -17,11 +17,11 @@ const ActionButton = ({ icon, onClick, noCopy }) => {
       try {
         onClick && await onClick();
         setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 5000);
+        setTimeout(() => setIsCopied(false), 3000);
       } catch (er) {
         console.error("Не удалось выполнить действие", er);
         setIsError(true);
-        setTimeout(() => setIsError(false), 5000);
+        setTimeout(() => setIsError(false), 3000);
       } finally {
         setIsBusy(false);
       }

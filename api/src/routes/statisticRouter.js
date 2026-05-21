@@ -5,13 +5,14 @@ import { Menu } from '../models/menuModels.js';
 import { badRequest, forbidden, notFound, ok } from '../utils/responses.js';
 import { useIntegerQueryParam } from '../middlewares/useQueryParam.js';
 import { useAuth } from '../middlewares/useAuth.js';
+import { Order, OrderListReturn } from '../models/orderModels.js';
 
 
 const r = new Router();
 
 r.post("/", useModel(EventCreate), async (req, res) => {
 
-  const createModel = req.model;
+	const createModel = req.model;
 
 	if (createModel.event === EventType.VIEW_MENU) {
 		delete createModel.productName;
@@ -37,27 +38,56 @@ r.get("/",
 	useIntegerQueryParam({ name: "lastDays", required: true, min: 1 }),
 	async (req, res) => {
 
-	const { userId } = req.user;
-	const { menuId, lastDays } = req;
+		const { userId } = req.user;
+		const { menuId, lastDays } = req;
 
-	const foundMenu = await Menu.findOne({ code: menuId }).exec();
+		const foundMenu = await Menu.findOne({ code: menuId }).exec();
 
-	if (!foundMenu) {
-		return notFound(res, "Меню с таким идентифактором не найдено");
-	}
+		if (!foundMenu) {
+			return notFound(res, "Меню с таким идентифактором не найдено");
+		}
 
-	if (foundMenu.ownerId !== userId) {
-		return forbidden(res, "Это меню принадлежит другому пользователю");
-	}
+		if (foundMenu.ownerId !== userId) {
+			return forbidden(res, "Это меню принадлежит другому пользователю");
+		}
 
-	const border = new Date();
-	border.setDate(border.getDate() - lastDays);
+		const border = new Date();
+		border.setDate(border.getDate() - lastDays);
 
-	const query = { menuId: menuId, sendTime: { $gte: border } };
-	const events = await Event.find(query).sort({ sendTime: -1 });
-	const result = EventListReturn.build({ events: events }).model;
+		const query = { menuId: menuId, sendTime: { $gte: border } };
+		const events = await Event.find(query).sort({ sendTime: -1 });
+		const result = EventListReturn.build({ events: events }).model;
 
-	return ok(res, result);
-})
+		return ok(res, result);
+	})
+
+r.get("/order",
+	useAuth(),
+	useIntegerQueryParam({ name: "menuId", required: true, min: 0 }),
+	useIntegerQueryParam({ name: "lastDays", required: true, min: 1 }),
+	async (req, res) => {
+
+		const { userId } = req.user;
+		const { menuId, lastDays } = req;
+
+		const foundMenu = await Menu.findOne({ code: menuId }).exec();
+
+		if (!foundMenu) {
+			return notFound(res, "Меню с таким идентифактором не найдено");
+		}
+
+		if (foundMenu.ownerId !== userId) {
+			return forbidden(res, "Это меню принадлежит другому пользователю");
+		}
+
+		const border = new Date();
+		border.setDate(border.getDate() - lastDays);
+
+		const query = { menuId: menuId, sendTime: { $gte: border } };
+		const orders = await Order.find(query).sort({ sendTime: -1 });
+		const result = OrderListReturn.build({ orders: orders }).model;
+
+		return ok(res, result);
+	})
 
 export const statisticRouter = r;

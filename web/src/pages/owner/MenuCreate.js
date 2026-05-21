@@ -81,6 +81,8 @@ function MenuCreate() {
         </Tooltip>
       </ButtonGroup>
 
+      {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
+
       <Divider />
 
       <SwitchInput

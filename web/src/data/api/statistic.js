@@ -35,26 +35,44 @@ export const STATISTIC_SERVICE = {
 
 	async sendMenuView(menuId) {
 		try {
-      await this.sendStatistic({ event: "view-menu", menuId });
-    } catch (error) {
-      logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
-    }
+			await this.sendStatistic({ event: "view-menu", menuId });
+		} catch (error) {
+			logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+		}
 	},
 
 	async sendProductView(menuId, productName) {
 		try {
-      await this.sendStatistic({ event: "view-product", menuId, productName });
-    } catch (error) {
-      logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
-    }
+			await this.sendStatistic({ event: "view-product", menuId, productName });
+		} catch (error) {
+			logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+		}
 	},
 
 	async sendProductLike(menuId, productName) {
 		try {
 			await this.sendStatistic({ event: "like-product", menuId, productName });
 		} catch (error) {
-      logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
-    }
+			logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+		}
+	},
+
+	async getViewsStatistic(params) {
+		try {
+			const response = await STATISTIC_SERVICE.http.get('/statistic', { params });
+			return response.data;
+		} catch (error) {
+			throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+		}
+	},
+
+	async getOrdersDownload(params) {
+		try {
+			const response = await STATISTIC_SERVICE.http.get('/statistic/order', { params });
+			return response.data;
+		} catch (error) {
+			throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+		}
 	},
 
 }

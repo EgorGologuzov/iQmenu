@@ -1,3 +1,4 @@
+import { UAParser } from 'ua-parser-js';
 
 export function sleep(miliseconds) {
   return new Promise((resolve, _) => setTimeout(() => resolve(), miliseconds));
@@ -46,37 +47,22 @@ export function getUserAgent() {
   }
 }
 
-export function parseDeviceInfo(userAgentString) {
-  if (!userAgentString) return null;
+export function parseDeviceInfo(userAgentStr) {
+  if (!userAgentStr) return null;
 
-  let os = null;
-  let browser = null;
-  let type = null;
-  let ua = userAgentString;
+  const parser = new UAParser(userAgentStr);
+  const info = parser.getResult();
 
-  if (ua) {
-    // Определение ОС
-    if (ua.indexOf("Win") !== -1) os = "Windows";
-    if (ua.indexOf("Mac") !== -1) os = "macOS";
-    if (ua.indexOf("Linux") !== -1) os = "Linux";
-    if (ua.indexOf("Android") !== -1) os = "Android";
-    if (ua.indexOf("like Mac") !== -1) os = "iOS";
-
-    // Определение браузера
-    if (ua.indexOf("Firefox") !== -1) browser = "Mozilla Firefox";
-    else if (ua.indexOf("SamsungBrowser") !== -1) browser = "Samsung Browser";
-    else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1) browser = "Opera";
-    else if (ua.indexOf("Trident") !== -1) browser = "Internet Explorer";
-    else if (ua.indexOf("Edge") !== -1 || ua.indexOf("Edg") !== -1) browser = "Microsoft Edge";
-    else if (ua.indexOf("Chrome") !== -1) browser = "Google Chrome";
-    else if (ua.indexOf("Safari") !== -1) browser = "Safari";
-
-    // Определение типа устройства (простой метод по ключевым словам и тач-способностям)
-    const isMobile = /Mobile|Android|iPhone|iPad|IEMobile|BlackBerry|Kindle/i.test(ua);
-    type = isMobile ? "modile" : "desktop";
+  const result = {
+    type: info.device.type, // mobile | tablet | desktop
+    browser: info.browser?.name,
+    os: [info.os?.name, info.os?.version].filter(Boolean).join(" "),
+    device: info.device?.model,
   }
 
-  return { os, browser, type, stringInfo: `клиент: ${[os, browser].filter(Boolean).join(", ")}` };
+  result.stringInfo = `клиент: ${[result.os, result.browser, result.device].filter(Boolean).join(", ")}`;
+
+  return result;
 }
 
 export function formatRelativeTime(targetDate) {

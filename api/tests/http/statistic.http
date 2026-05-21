@@ -1,9 +1,13 @@
 @baseUrl = http://localhost:4200
-@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTBkNDRlN2Y4ZWUwYmY4ZTE5MTU4MDgiLCJpYXQiOjE3NzkyNTQ1MDN9.QcUnWMPGrOlS-02fZbsc62AxBsELonydExBX0WML2TM
-
+@token = Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTBkN2Q4MWE5MTIzM2VkOTYxMDExNzMiLCJpYXQiOjE3NzkyNjg5OTN9.BzXZFXhEUhjhfNZSR4QnGeuHtNHKfRy8we3vqeh8b4I
 ### Get statistic (Owner)
 
 GET {{baseUrl}}/api/statistic?menuId=1&lastDays=40
+Authorization: {{token}}
+
+### Download orders (Owner)
+
+GET {{baseUrl}}/api/statistic/order?menuId=1&lastDays=1
 Authorization: {{token}}
 
 ### Post statistic (view-menu)

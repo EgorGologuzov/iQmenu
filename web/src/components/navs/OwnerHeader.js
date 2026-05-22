@@ -17,7 +17,7 @@ function OwnerHeader() {
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ pl: 1 }}>
 
           <Stack direction="row" spacing={1} alignItems="center">
-            <CLink to="/" noStyles>
+            <CLink to="/presentation" noStyles>
               <IconButton size="large" edge="start" sx={{ p: 1 }}>
                 <Logo />
               </IconButton>

@@ -5,6 +5,8 @@ import Logo from '../../components/icons/LogoCustomizable';
 import withStackContainerShell from '../../hoc/withStackContainerShell';
 import { Link, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
+import { useSelector } from 'react-redux';
+import { ROLES } from '../../values/roles';
 
 const MotionBox = motion.create(Box);
 const MotionSvgIcon = motion.create(SvgIcon);
@@ -32,6 +34,9 @@ const textItemVariants = {
 
 function Presentation() {
 
+  const user = useSelector(state => state.user);
+  const isOwner = user?.role === ROLES.OWNER.NAME;
+
   const navigate = useNavigate();
   const [isReady, setIsReady] = useState(false);
 
@@ -43,7 +48,7 @@ function Presentation() {
     return <img 
       src={src}
       alt={alt ?? src}
-      style={{ flexGrow: 1, maxWidth: "50%", backgroundSize: "cover", backgroundPosition: "center" }}
+      style={{ flexGrow: 1, maxWidth: "49%" }}
     />
   }
 
@@ -158,10 +163,9 @@ function Presentation() {
       <Stack direction="column" spacing={2} alignItems="center" sx={{ p: 2, textAlign: "center" }}>
 
         <Typography variant="h6">Хотите создать меню для своего заведения?</Typography>
-        <NavigationButton to="/auth">
-          Войдите в аккаунт
-        </NavigationButton>
-
+        {!isOwner && <NavigationButton to="/auth">Войдите в аккаунт</NavigationButton>}
+        {isOwner && <NavigationButton to="/o/menu">Откройте список ваших меню</NavigationButton>}
+        
         <Typography variant="h6">Подробности и примеры</Typography>
         <Typography variant="body1">
           Наш сервис позволяет создавать гибкие электронные меню, доступные для просмотра по QR-коду.

@@ -13,12 +13,13 @@ import Account from "./pages/owner/Account";
 import E404 from "./components/errors/E404";
 import { ThemeProvider } from "@emotion/react";
 import { APP_THEME } from "./values/theme";
-import { Provider } from "react-redux"
+import { Provider, useSelector } from "react-redux"
 import { APP_STORE } from "./store/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useUserRefresh } from "./hooks/useUserRefresh";
 import { SnackbarProvider } from 'notistack';
 import OrderList from "./pages/owner/OrderList";
+import { ROLES } from "./values/roles";
 
 // Инициализация React Query
 const QUERY_CLIENT = new QueryClient();
@@ -43,7 +44,7 @@ function AppWrappers({ children }) {
     <QueryClientProvider client={QUERY_CLIENT}>
       <Provider store={APP_STORE} >
         <ThemeProvider theme={APP_THEME}>
-          <SnackbarProvider>
+          <SnackbarProvider style={{ fontFamily: APP_THEME.typography.fontFamily, fontSize: APP_THEME.typography.body1.fontSize, }}>
             { children }
           </SnackbarProvider>
         </ThemeProvider>
@@ -53,6 +54,10 @@ function AppWrappers({ children }) {
 }
 
 function AppRouting() {
+
+  const user = useSelector(state => state.user);
+  const isOwner = user?.role === ROLES.OWNER.NAME;
+
   return <RouterProvider router={createBrowserRouter(createRoutesFromElements(
     <>
       <Route path="/o" element={<OwnerLayout />} >
@@ -65,7 +70,8 @@ function AppRouting() {
       </Route>
 
       <Route path="/" element={<RoleDependentLayout />} >
-        <Route index element={<Presentation />} />
+        <Route index element={<Navigate to={isOwner ? "o/menu" : "presentation"} replace />} />
+        <Route path="presentation" element={<Presentation />} />
         <Route path=":menuId" element={<MenuView />} />
       </Route>
 

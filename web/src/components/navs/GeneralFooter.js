@@ -21,7 +21,7 @@ function GeneralFooter() {
         >
 
           <Typography variant="body1" color="inherit" align="center">
-            <CLink to="/">iQmenu</CLink> — цифровые меню для кафе и ресторанов
+            <CLink to="/presentation">iQmenu</CLink> — цифровые меню для кафе и ресторанов
           </Typography>
 
           <Typography variant="body1" color="inherit" align="center">

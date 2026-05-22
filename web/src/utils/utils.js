@@ -28,12 +28,6 @@ export function asInSentense(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function logAndReturnError(message) {
-  const error = new Error(message);
-  console.error(error);
-  return error;
-}
-
 export function joinWithApiBaseUrl(url) {
   if (!url) return;
   return new URL(url, process.env.REACT_APP_API_BASE_URL).toString();

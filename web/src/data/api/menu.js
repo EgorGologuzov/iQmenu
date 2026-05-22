@@ -1,4 +1,4 @@
-import { logAndReturnError } from '../../utils/utils';
+import { handleHttpError } from '../../utils/http';
 
 export const MENU_SERVICE = {
 
@@ -7,15 +7,10 @@ export const MENU_SERVICE = {
       const response = await MENU_SERVICE.http.get(`/menu/${id}`);
       return response.data;
     } catch (error) {
-
-      if (error.response) {
-        switch (error.response.status) {
-          case 404:
-            throw logAndReturnError('Меню не найдено')
-        }
-      }
-
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error, {
+        403: "Меню снято с публикации",
+        404: "Меню не найдено",
+      })
     }
   },
 
@@ -45,15 +40,9 @@ export const MENU_SERVICE = {
       const response = await MENU_SERVICE.http.post(`/menu`, menuData);
       return response.data;
     } catch (error) {
-
-      if (error.response) {
-        switch (error.response.status) {
-          case 422:
-            throw logAndReturnError('Ошибка в полях запроса')
-        }
-      }
-
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error, {
+        422: "Ошибка в полях запроса",
+      })
     }
   },
 
@@ -83,19 +72,11 @@ export const MENU_SERVICE = {
       const response = await MENU_SERVICE.http.put(`/menu/${id}`, menuData);
       return response.data;
     } catch (error) {
-
-      if (error.response) {
-        switch (error.response.status) {
-          case 422:
-            throw logAndReturnError('Ошибка в полях запроса')
-          case 404:
-            throw logAndReturnError('Меню не найдено')
-          case 403:
-            throw logAndReturnError('Это меню принадлежит другому пользователю')
-        }
-      }
-
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error, {
+        403: "Это меню принадлежит другому пользователю",
+        404: "Меню не найдено",
+        422: "Ошибка в полях запроса",
+      })
     }
   },
 
@@ -104,19 +85,10 @@ export const MENU_SERVICE = {
       const response = await MENU_SERVICE.http.delete(`/menu/${id}`);
       return response.data;
     } catch (error) {
-
-      if (error.response) {
-        switch (error.response.status) {
-          case 422:
-            throw logAndReturnError('Ошибка в полях запроса')
-          case 404:
-            throw logAndReturnError('Меню не найдено')
-          case 403:
-            throw logAndReturnError('Это меню принадлежит другому пользователю')
-        }
-      }
-
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error, {
+        403: "Это меню принадлежит другому пользователю",
+        404: "Меню не найдено",
+      })
     }
   },
 
@@ -125,7 +97,7 @@ export const MENU_SERVICE = {
       const response = await MENU_SERVICE.http.get("/menu/my");
       return response.data.menus;
     } catch (error) {
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error);
     }
   },
 }

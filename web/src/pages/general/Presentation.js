@@ -164,7 +164,7 @@ function Presentation() {
 
         <Typography variant="h6">Хотите создать меню для своего заведения?</Typography>
         {!isOwner && <NavigationButton to="/auth">Войдите в аккаунт</NavigationButton>}
-        {isOwner && <NavigationButton to="/o/menu">Откройте список ваших меню</NavigationButton>}
+        {isOwner && <NavigationButton to="/o/menu">Перейдите в «Мой iQmenu»</NavigationButton>}
         
         <Typography variant="h6">Подробности и примеры</Typography>
         <Typography variant="body1">

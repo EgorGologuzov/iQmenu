@@ -1,4 +1,4 @@
-import { logAndReturnError } from "../../utils/utils";
+import { handleHttpError } from "../../utils/http";
 
 export const MEDIA_SERVICE = {
   async uploadImage(file) {
@@ -14,17 +14,10 @@ export const MEDIA_SERVICE = {
 
       return response.data;
     } catch (error) {
-
-      if (error.response) {
-        switch (error.response.status) {
-          case 400:
-            throw logAndReturnError('Недопустимый формат файла или файл не передан')
-          case 413:
-            throw logAndReturnError('Файл слишком большой')
-        }
-      }
-
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error, {
+        400: "Недопустимый формат файла или файл не передан",
+        413: "Файл слишком большой",
+      })
     }
   },
 }

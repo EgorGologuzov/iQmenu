@@ -1,4 +1,4 @@
-import { logAndReturnError } from '../../utils/utils';
+import { handleHttpError } from '../../utils/http';
 
 export const ORDER_SERVICE = {
   
@@ -7,7 +7,7 @@ export const ORDER_SERVICE = {
       const response = await ORDER_SERVICE.http.post('/order', orderData);
       return response.data;
     } catch (error) {
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error);
     }
 	},
 
@@ -16,7 +16,7 @@ export const ORDER_SERVICE = {
       const response = await ORDER_SERVICE.http.patch(`/order/${orderAccessKey}/cancel`);
       return response.data;
     } catch (error) {
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error);
     }
 	},
 
@@ -25,7 +25,7 @@ export const ORDER_SERVICE = {
       const response = await ORDER_SERVICE.http.get('/order', { params });
       return response.data;
     } catch (error) {
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error);
     }
   },
 
@@ -34,7 +34,7 @@ export const ORDER_SERVICE = {
       const response = await ORDER_SERVICE.http.patch('/order/update/status/by/ids', query);
       return response.data;
     } catch (error) {
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error);
     }
   },
 
@@ -43,7 +43,7 @@ export const ORDER_SERVICE = {
       const response = await ORDER_SERVICE.http.patch('/order/update/status/by/filters', query);
       return response.data;
     } catch (error) {
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error);
     }
   },
 

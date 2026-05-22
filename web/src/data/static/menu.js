@@ -1,7 +1,7 @@
 import MENU_1 from "./json/menu-1.json"
 import MENU_2 from "./json/menu-2.json"
 import MENU_3 from "./json/menu-3.json"
-import { deepCopy, logAndReturnError, sleep } from "../../utils/utils";
+import { deepCopy, sleep } from "../../utils/utils";
 
 const MENUS = [MENU_1, MENU_2, MENU_3];
 let idCount = 10;
@@ -13,7 +13,7 @@ export const MENU_SERVICE = {
     console.log("/data/static/menu/getById", { id: id });
 
     if (id < 1) {
-      throw logAndReturnError("Тестовая ошибка: id < 1");
+      throw new Error("Тестовая ошибка: id < 1");
     }
 
     return MENUS.find(menu => menu.id == id) ?? null;
@@ -24,7 +24,7 @@ export const MENU_SERVICE = {
     console.log("/data/static/menu/create", menuData);
 
     if (menuData.categories && menuData.categories.length > 10) {
-      throw logAndReturnError("Тестовая ошибка: категорий не может быть больше 10");
+      throw new Error("Тестовая ошибка: категорий не может быть больше 10");
     }
 
     const newMenu = deepCopy(menuData);
@@ -42,11 +42,11 @@ export const MENU_SERVICE = {
     const current = MENUS.find(menu => menu.id == id);
 
     if (current < 0) {
-      throw logAndReturnError("Тестовая ошибка: меню с таким id не найдено");
+      throw new Error("Тестовая ошибка: меню с таким id не найдено");
     }
 
     if (menuData.categories && menuData.categories.length > 10) {
-      throw logAndReturnError("Тестовая ошибка: категорий не может быть больше 10");
+      throw new Error("Тестовая ошибка: категорий не может быть больше 10");
     }
 
     const index = MENUS.indexOf(current);
@@ -63,7 +63,7 @@ export const MENU_SERVICE = {
     const current = MENUS.find(menu => menu.id == id);
 
     if (current < 0) {
-      throw logAndReturnError("Тестовая ошибка: меню с таким id не найдено");
+      throw new Error("Тестовая ошибка: меню с таким id не найдено");
     }
 
     const index = MENUS.indexOf(current);

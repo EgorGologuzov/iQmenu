@@ -81,7 +81,7 @@ r.post("/", useModel(OrderEditClient), async (req, res) => {
 	if (foundOrder.status == OrderStatus.NEW) {
 		result = await updateOrder();
 	} else {
-		result = await createNewModel();
+		result = await createNewOrder();
 	}
 
 	return ok(res, result);

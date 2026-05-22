@@ -1,4 +1,4 @@
-import { logAndReturnError } from '../../utils/utils';
+import { handleHttpError } from '../../utils/http';
 
 export const USER_SERVICE = {
 
@@ -7,19 +7,11 @@ export const USER_SERVICE = {
       const response = await USER_SERVICE.http.post('/user/auth', authData);
       return response.data;
     } catch (error) {
-
-      if (error.response) {
-        switch (error.response.status) {
-          case 422:
-            throw logAndReturnError('Ошибка в полях запроса')
-          case 401:
-            throw logAndReturnError('Неверный логин или пароль');
-          case 403:
-            throw logAndReturnError('Аккаунт не активен');
-        }
-      }
-
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error, {
+        401: "Неверный логин или пароль",
+        403: "Аккаунт не активен",
+        422: "Номер телефона или пароль имеют неверный формат",
+      })
     }
   },
 
@@ -28,17 +20,10 @@ export const USER_SERVICE = {
       const response = await USER_SERVICE.http.post('/user/reg', regData);
       return response.data;
     } catch (error) {
-
-      if (error.response) {
-        switch (error.response.status) {
-          case 422:
-            throw logAndReturnError('Ошибка в полях запроса')
-          case 400:
-            throw logAndReturnError('Пользователь с таким номером уже существует');
-        }
-      }
-
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error, {
+        400: "Пользователь с таким номером уже существует",
+        422: "Некоторые поля имеют неверный формат",
+      })
     }
   },
 
@@ -62,19 +47,11 @@ export const USER_SERVICE = {
       const response = await USER_SERVICE.http.put('/user/update', userData);
       return response.data;
     } catch (error) {
-
-      if (error.response) {
-        switch (error.response.status) {
-          case 422:
-            throw logAndReturnError('Ошибка в полях запроса')
-          case 404:
-            throw logAndReturnError('Пользователь, которому принадлежит токен, не найден в базе данных');
-          case 400:
-            throw logAndReturnError('Пользователь с таким номером уже существует');
-        }
-      }
-
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error, {
+        400: "Пользователь с таким номером уже существует",
+        404: "Пользователь, которому принадлежит токен, не найден в базе данных",
+        422: "Некоторые поля имеют неверный формат",
+      })
     }
   },
 
@@ -83,7 +60,9 @@ export const USER_SERVICE = {
       const response = await USER_SERVICE.http.get('/user/me');
       return response.data;
     } catch (error) {
-      throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+      throw handleHttpError(error, {
+        404: "Пользователь, которому принадлежит токен, не найден в базе данных",
+      })
     }
   },
 }

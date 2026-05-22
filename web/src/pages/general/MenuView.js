@@ -51,6 +51,7 @@ function MenuView() {
   const { data: menu, isLoading, error } = useQuery({
     queryKey: ["MenuView/api.menu.getById"],
     queryFn: () => api.menu.getById(menuId),
+    retry: false,
   })
 
   const filterProducts = (products) => {

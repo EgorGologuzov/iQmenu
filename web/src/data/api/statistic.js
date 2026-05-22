@@ -1,4 +1,4 @@
-import { logAndReturnError } from '../../utils/utils';
+import { handleHttpError } from '../../utils/http';
 
 const LOCAL_STATISTIC_LIFETIME_MILLIS = 3 * 3600 * 1000;
 const LOCAL_STATISTIC_KEY = "data/statistic/localStatistic";
@@ -37,7 +37,7 @@ export const STATISTIC_SERVICE = {
 		try {
 			await this.sendStatistic({ event: "view-menu", menuId });
 		} catch (error) {
-			logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+			handleHttpError(error);
 		}
 	},
 
@@ -45,7 +45,7 @@ export const STATISTIC_SERVICE = {
 		try {
 			await this.sendStatistic({ event: "view-product", menuId, productName });
 		} catch (error) {
-			logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+			handleHttpError(error);
 		}
 	},
 
@@ -53,7 +53,7 @@ export const STATISTIC_SERVICE = {
 		try {
 			await this.sendStatistic({ event: "like-product", menuId, productName });
 		} catch (error) {
-			logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+			handleHttpError(error);
 		}
 	},
 
@@ -62,7 +62,7 @@ export const STATISTIC_SERVICE = {
 			const response = await STATISTIC_SERVICE.http.get('/statistic', { params });
 			return response.data;
 		} catch (error) {
-			throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+			handleHttpError(error);
 		}
 	},
 
@@ -71,7 +71,7 @@ export const STATISTIC_SERVICE = {
 			const response = await STATISTIC_SERVICE.http.get('/statistic/order', { params });
 			return response.data;
 		} catch (error) {
-			throw logAndReturnError(`При отправке произошла ошибка: ${error.response.data?.error}`);
+			handleHttpError(error);
 		}
 	},
 

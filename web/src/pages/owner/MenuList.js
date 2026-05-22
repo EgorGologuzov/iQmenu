@@ -47,7 +47,7 @@ const MenuCard = memo(({ menu, onQrButtonClick, onStatisticButtonClick }) => {
           </Avatar>
         </Box>
 
-        <CardContent sx={{ p: 1, cursor: "pointer" }} onClick={() => navigateMenuEdit(menu.id)}>
+        <CardContent sx={{ p: 1, pb: 0, cursor: "pointer" }} onClick={() => navigateMenuEdit(menu.id)}>
           <Typography variant="subtitle2" component="div" noWrap>
             {menu.menuName}
           </Typography>
@@ -145,7 +145,7 @@ function MenuList() {
             </Box>
             <Stack
               direction="column"
-              sx={{ p: 1, cursor: "pointer", height: "108px", justifyContent: 'center' }}
+              sx={{ p: 1, cursor: "pointer", height: "100px", justifyContent: 'center' }}
               onClick={navigateMenuCreate}>
               <Typography variant="subtitle2" component="div" noWrap>
                 Создать <br /> новое меню

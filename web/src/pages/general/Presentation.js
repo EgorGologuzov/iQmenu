@@ -1,118 +1,215 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import useTitle from '../../hooks/useTitle';
-import { Box, Card, Chip, CardMedia, Divider, Button, Stack, SvgIcon, Typography, CardContent, Container, Grid, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
+import { Alert, Box, Button, Stack, SvgIcon, Typography } from '@mui/material';
 import Logo from '../../components/icons/LogoCustomizable';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import withStackContainerShell from '../../hoc/withStackContainerShell';
 import { Link, useNavigate } from 'react-router';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CLink from '../../components/utils/CLink';
+import { motion } from 'framer-motion';
 
-function TechStackCard({ tech, desc, image }) {
-  return (
-    <>
-      <Card sx={{ maxWidth: 150, maxHeight: 'min-content', textAlign: 'center', minInlineSize: '-webkit-fill-available' }}>
-        <CardMedia
-          component="img"
-          alt="MONGO DB"
-          height='100px'
-          sx={{ objectFit: 'contain' }}
-          image={image}
-        />
-        <CardContent sx={{ padding: "0", paddingX: '5px', alignContent: 'center' }}>
-          <Typography variant="h6" component="div">
-            {tech}
-          </Typography>
-          <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
-            {desc}
-          </Typography>
-        </CardContent>
-      </Card>
-    </>
-  )
-}
+const MotionBox = motion.create(Box);
+const MotionSvgIcon = motion.create(SvgIcon);
+const MotionTypography = motion.create(Typography);
 
-const Item = ({ primary }) => {
-  return (
-    <ListItem>
-      <ListItemIcon color='secondary'>
-        <CheckCircleIcon color='secondary' />
-      </ListItemIcon>
-      <ListItemText primary={primary} />
-    </ListItem>
-  )
-}
+const textContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.25,
+      delayChildren: 0.4,
+    }
+  }
+};
+
+const textItemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: "easeOut" }
+  }
+};
 
 function Presentation() {
 
   const navigate = useNavigate();
+  const [isReady, setIsReady] = useState(false);
 
-  useTitle({ tabTitle: "iQmenu: QR-код меню для кафе и ресторанов", headerTitle: "Главная" }, [])
+  const scrollToPageTop = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }
+
+  const Screenshot = ({ src, alt }) => {
+    return <img 
+      src={src}
+      alt={alt ?? src}
+      style={{ flexGrow: 1, maxWidth: "50%", backgroundSize: "cover", backgroundPosition: "center" }}
+    />
+  }
+
+  const ScreenshotStack = ({ children }) => {
+    return <Stack
+      direction="row"
+      spacing={1}
+      sx={{ width: "100%", overflow: "hidden", justifyContent: "center" }}>
+      {children}
+    </Stack>
+  }
+
+  const NavigationButton = ({ children, to, blank = false }) => {
+    return <Link to={to} target={blank ? "_blank" : undefined} style={{ width: "100%", maxWidth: "400px" }}>
+      <Button variant="contained" sx={{ width: "100%" }}>
+        {children}
+      </Button>
+    </Link>
+  }
+
+  useTitle({ tabTitle: "iQmenu: QR-код меню для кафе и ресторанов", headerTitle: "Главная" }, []);
+
+  useEffect(() => {
+    if (document.readyState === 'complete') {
+      setTimeout(() => setIsReady(true), 1_000)
+    } else {
+      const handleLoad = () => setTimeout(() => setIsReady(true), 1_000);
+      window.addEventListener('load', handleLoad);
+      return () => window.removeEventListener('load', handleLoad);
+    }
+  }, []);
 
   return (
-    <Stack alignItems={'center'} textAlign={'center'} spacing={2}>
+    <>
+      <Box sx={{ width: "100%", aspectRatio: "1 / 1", overflow: "hidden", position: "relative" }}>
 
-      <Stack spacing={2} sx={{ height: "calc(100vh - 144px)", textAlign: "center", alignItems: "center", justifyContent: "center" }}>
-        <SvgIcon
-          inheritViewBox
-          sx={{ width: 150, height: 150, backgroundColor: "primary.main", borderRadius: "50%", borderWidth: "3px", borderColor: "primary.main", borderStyle: "solid" }}
+        <MotionBox
+          animate={{ rotate: 360 }}
+          transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundImage: `url(${process.env.PUBLIC_URL + '/bg_presentation.png'})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            zIndex: 1,
+          }}
+        />
+
+        <Stack
+          direction="column"
+          sx={{
+            position: "relative",
+            zIndex: 2,
+            height: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          <Logo />
-        </SvgIcon>
+          <MotionSvgIcon
+            inheritViewBox
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={isReady ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            sx={{
+              width: { xs: 60, sm: 80, md: 100 },
+              height: { xs: 60, sm: 80, md: 100 },
+              backgroundColor: "primary.main",
+              borderRadius: "50%",
+              borderWidth: "3px",
+              borderColor: "primary.main",
+              borderStyle: "solid",
+            }}
+          >
+            <Logo />
+          </MotionSvgIcon>
 
-        <Typography variant='h1'>iQmenu</Typography>
-        <Typography variant='body1'>Сервис по созданию электронных QR-код меню для кафе и ресторанов.</Typography>
+          <motion.div
+            variants={textContainerVariants}
+            initial="hidden"
+            animate={isReady ? "visible" : "hidden"}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}
+          >
+            <MotionTypography
+              variants={textItemVariants}
+              variant='h2'
+              sx={{
+                fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3.5rem' },
+                lineHeight: 1.2
+              }}
+            >
+              <b>iQmenu</b>
+            </MotionTypography>
 
-        <Typography variant='subtitle2'>Хотите создавать свои меню?</Typography>
-
-        <Stack direction="column" spacing={1} width="100%" maxWidth="xs">
-          <Button variant='contained' sx={{ width: "250" }} onClick={() => navigate("auth")}>Войдите</Button>
-          <Typography variant='body1'>или</Typography>
-          <Button variant='outlined' sx={{ width: "250" }} onClick={() => navigate("reg")}>Зарегистрируйтесь</Button>
+            <MotionTypography
+              variants={textItemVariants}
+              variant='h5'
+              sx={{
+                fontSize: { xs: '0.8rem', sm: '1.2rem', md: '1.25rem' },
+                letterSpacing: { xs: '1px', sm: '2px' }
+              }}
+            >
+              ЭЛЕКТРОННЫЕ МЕНЮ
+            </MotionTypography>
+          </motion.div>
         </Stack>
+      </Box>
+
+      <Stack direction="column" spacing={2} alignItems="center" sx={{ p: 2, textAlign: "center" }}>
+
+        <Typography variant="h6">Хотите создать меню для своего заведения?</Typography>
+        <NavigationButton to="/auth">
+          Войдите в аккаунт
+        </NavigationButton>
+
+        <Typography variant="h6">Подробности и примеры</Typography>
+        <Typography variant="body1">
+          Наш сервис позволяет создавать гибкие электронные меню, доступные для просмотра по QR-коду.
+          Сервис позволяет гостям заведений оформлять заказы по меню, а администраторам обрабатывать заказы и отслеживать статистику заказов и просмотров.
+          Сервис рассчитан на владельцев и админисраторов кафе, ресторанов, столовых и других заведений общественного питания.
+        </Typography>
+        <NavigationButton to="/1" blank>
+          Пример меню здесь!
+        </NavigationButton>
+
+
+        <Typography variant="h6">Как создать меню?</Typography>
+
+        <Typography variant="body1"><b>Шаг 1.</b> Войдите или зарегистрируйтесь <span style={{ cursor: "pointer" }} onClick={scrollToPageTop}>⬆️⬆️⬆️</span></Typography>
+
+        <Typography variant="body1"><b>Шаг 2.</b> Создайте новое меню и заполните его продуктами</Typography>
+        
+        <ScreenshotStack>
+          <Screenshot src={process.env.PUBLIC_URL + '/presentation/1.png'} />
+          <Screenshot src={process.env.PUBLIC_URL + '/presentation/2.png'} />
+        </ScreenshotStack>
+
+        <Typography variant="body1"><b>Шаг 3.</b> Получите QR-код и разместите его в заведении</Typography>
+
+        <ScreenshotStack>
+          <Screenshot src={process.env.PUBLIC_URL + '/presentation/3.png'} />
+        </ScreenshotStack>
+
+        <Typography variant="h6">Дополнительные возможности</Typography>
+
+        <Typography variant="body1">Отслеживайте заказы и скачивайте статистику</Typography>
+
+        <ScreenshotStack>
+          <Screenshot src={process.env.PUBLIC_URL + '/presentation/4.png'} />
+          <Screenshot src={process.env.PUBLIC_URL + '/presentation/5.png'} />
+        </ScreenshotStack>
+
+        <Alert severity="success" sx={{ py: 4 }}>
+          <b>
+            Создайте гибкое электронное меню для своего заведения прямо сейчас (или позже)
+            <span style={{ cursor: "pointer" }} onClick={scrollToPageTop}>⬆️⬆️⬆️</span>
+          </b>
+        </Alert>
+
       </Stack>
+    </>
 
-      <Stack textAlign={'justify'} spacing={2} width="100%" maxWidth="sm">
-        <Typography variant='h5' textAlign="center">Функции</Typography>
-
-        <Typography variant='body1'>Сервис позволяет вледельцам кафе и ресторанов легко создавать электронное меню и размещать его на нашем сайте. Доступ к меню получить по сгенерированному QR-коду, который можно распечатать и разместить в заведении.</Typography>
-        <Typography variant='body1'>Сервис расчитан на 2 категории пользователей: посетители и владельцы.</Typography>
-
-        <Typography variant='h5' textAlign="center">Посетители</Typography>
-
-        <Typography variant='body1'>Посетители кафе и ресторанов. Они могут:</Typography>
-
-        <List>
-          <Item primary="Просматривать опубликованные меню" />
-          <Item primary="Добавлять позиции меню в список избранного" />
-        </List>
-
-        <Typography variant='h5' textAlign="center">Владельцы</Typography>
-
-        <Typography variant='body1'>Владельцы кафе и ресторанов. Они могут:</Typography>
-
-        <List>
-          <Item primary={<><CLink to='/reg'>Регистрироваться</CLink> и <CLink to='/auth'>авторизоваться</CLink> в приложении</>} />
-          <Item primary="Создавать / Обновлять / Удалять электронные меню" />
-          <Item primary="Генерировать QR-код для доступа к своим меню" />
-        </List>
-
-        <Typography variant='h5' textAlign="center">Стек технологий</Typography>
-
-        <Typography variant='body1'>MERN: MongoDB + Express JS + React JS (+ Material UI) + Node JS.</Typography>
-
-        <Grid container spacing={2} columns={2} height={'maxContent'} marginBottom={5}>
-          <TechStackCard image={process.env.PUBLIC_URL + "/mongodb_thumbnail.png"} tech={'Mongo DB'} desc={'База данных'} />
-          <TechStackCard image={process.env.PUBLIC_URL + "/React_Logo_SVG.svg.png"} tech={'React'} desc={'веб-интерфейс на основе Material UI.'} />
-          <TechStackCard image={process.env.PUBLIC_URL + "/express-js.png"} tech={'Express JS'} desc={'REST API'} />
-          <TechStackCard image={process.env.PUBLIC_URL + "/images (1).png"} tech={'Node JS'} desc={'Сервер'} />
-        </Grid>
-      </Stack>
-
-
-
-    </Stack>
-  )
+  );
 }
 
-export default withStackContainerShell(Presentation)
+export default withStackContainerShell(Presentation, { p: 0 })

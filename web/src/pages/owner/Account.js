@@ -88,6 +88,8 @@ function Account() {
         </Tooltip>
       </ButtonGroup>
 
+      {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
+
       <SaveStatus isSaved={!hasChanges} />
 
       <Divider />
@@ -174,8 +176,6 @@ function Account() {
       <Divider />
 
       <SaveStatus isSaved={!hasChanges} />
-
-      {mutationError && <Alert severity="error">{mutationError.message}</Alert>}
 
       <Button
         disabled={isMutationPending}

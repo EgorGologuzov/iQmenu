@@ -1,5 +1,5 @@
 import { multerConfig } from "../utils/images.js";
-import { badRequest, requestEntityTooLarge } from "../utils/responses.js";
+import { badRequest, internalServerError, requestEntityTooLarge } from "../utils/responses.js";
 import path from 'path';
 
 export function useSingleImageUpload(fieldName, required = false) {
@@ -22,6 +22,9 @@ export function useSingleImageUpload(fieldName, required = false) {
         if (err.code === 'MIMETYPE_NOT_ALLOWED') {
           return badRequest(res, "Файл не является изображением");
         }
+
+        console.error("Image upload error:", err);
+        return internalServerError(res);
       }
 
       req.file.url = path.join(process.env.IMAGES_BASE_URL, req.file.filename);

@@ -25,3 +25,7 @@ yarn-error.log*
 # env
 .env
 .env.*
+
+# api
+/api/public/images
+/api/public/qrs

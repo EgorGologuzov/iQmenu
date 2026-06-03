@@ -1,5 +1,5 @@
 import { FormControl, TextField, Stack, Button, FormHelperText, Alert, Divider, ButtonGroup, Tooltip } from '@mui/material'
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import LogoutIcon from '@mui/icons-material/Logout';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import React, { useState } from 'react'
@@ -179,7 +179,7 @@ function Account() {
 
       <Button
         disabled={isMutationPending}
-        startIcon={<ExitToAppIcon />}
+        startIcon={<LogoutIcon />}
         color='error'
         variant='contained'
         onClick={() => (onLeave())}>

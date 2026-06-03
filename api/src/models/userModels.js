@@ -26,7 +26,7 @@ export const Auth = makeModel({
 
   schema: {
     phone: { type: "string", required: true, clear: /[^\d+]/g, regExp: /^\+\d{10,15}$/ },
-    password: { type: "string", required: true, minLength: 8, maxLength: 100 },
+    password: { type: "string", required: true, minLength: 1, maxLength: 100 },
   },
 
   build: source => mapSchema(source, Auth.schema),

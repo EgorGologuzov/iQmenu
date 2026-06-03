@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router';
 import { setUserData } from '../../store/slices/userSlice';
 import PhoneInputMask from '../../components/inputs/PhoneInputMask';
 import useTitle from '../../hooks/useTitle';
+import LoginIcon from '@mui/icons-material/Login';
 
 
 function Auth() {
@@ -100,7 +101,13 @@ function Auth() {
           </FormControl>
 
           <FormControl>
-            <Button variant='contained' type='submit' color='primary' loading={isMutationPending}>
+            <Button
+              variant='contained'
+              type='submit'
+              color='primary'
+              loading={isMutationPending}
+              startIcon={<LoginIcon />}
+            >
               Войти
             </Button>
           </FormControl>

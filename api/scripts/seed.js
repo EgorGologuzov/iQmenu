@@ -491,6 +491,27 @@ async function copyAllFiles(sourceDir, targetDir) {
   console.log(`Seed images copied!`);
 }
 
+async function seedImage(imageName) {
+  const images = await fs.readdir(seedImagesDir);
+  const pattern = new RegExp(`^${imageName}\\.(.+)$`);
+  const fileName = images.find(file => pattern.test(file));
+
+  if (!fileName) {
+    return;
+  }
+
+  const fileExtension = path.extname(fileName);
+  const newFileName = `${randomUUID()}${fileExtension}`;
+  const sourcePath = path.join(seedImagesDir, fileName);
+  const targetPath = path.join(imagesDir, newFileName);
+  await fs.copyFile(sourcePath, targetPath);
+  const webPath = `/api/public/images/${newFileName}`;
+
+  console.log(`Success image seeding: ${imageName} as ${webPath}`);
+
+  return webPath;
+}
+
 async function seed() {
   // prepare data
 
@@ -510,61 +531,53 @@ async function seed() {
   await clearDirectory(imagesDir);
   await clearDirectory(qrsDir);
 
-  await copyAllFiles(seedImagesDir, imagesDir);
-
-  const IMAGES = await fs.readdir(imagesDir);
-  function findImage(imageName) {
-    const pattern = new RegExp(`^${imageName}\\.(.+)$`);
-    const fileName = IMAGES.find(file => pattern.test(file));
-    return `/api/public/images/${fileName}`;
-  }
-
   // seed users
 
   const MAIN_USER_INDEX = 1;
 
-  USERS.forEach(u => {
+  const users = USERS.map(user => {
+    const u = { ...user };
     u.createAt = new Date();
-    u.apiAccessToken = "not-set";
+    u.apiAccessToken = generateToken(UserTokenData.build(user).model);
+    return u;
   });
 
+  const avatar = await seedImage("avatar");
+  users[MAIN_USER_INDEX].avatar = avatar;
+
   await User.deleteMany({}).exec();
-
-  const avatar = findImage("avatar");
-  USERS[MAIN_USER_INDEX].avatar = avatar;
-
-  const createdUsers = await User.create(USERS);
-  await Promise.all(createdUsers.map(async (user) => {
-    const userTokenData = UserTokenData.build(user).model;
-    user.apiAccessToken = generateToken(userTokenData);
-    await user.save();
-  }))
+  const createdUsers = await User.create(users);
 
   const MAIN_USER = createdUsers[MAIN_USER_INDEX];
 
   // seed menus
 
+  const MAIN_MENU_ID = 1;
   const MENU_WITH_IMAGE_MAX_INDEX = 1;
 
-  const menuImage = findImage("menu_image");
+  const menus = await Promise.all(MENUS.map(async (menu, index) => {
+    const m = { ...menu };
 
-  MENUS.forEach((m, i) => { 
     m.ownerId = MAIN_USER._id; 
-    m.createAt = new Date(new Date().getTime() + i * 1000);
-    if (i <= MENU_WITH_IMAGE_MAX_INDEX) m.image = menuImage;
-  });
+    m.createAt = new Date(new Date().getTime() + index * 1000);
 
-  PRODUCTS.forEach(product => {
-    const image = findImage(`product_${product.code}`);
-    product.image = image;
-  });
+    m.image = await seedImage(`menu_image_${menu.code}`);
 
-  await Promise.all(MENUS.map(async (m) => m.qr = await generateQrCode(m.code)));
+    m.products = await Promise.all(m.products.map(async (product) => {
+      const p = { ...product };
+      p.image = await seedImage(`product_${product.code}`);
+      return p;
+    }));
+
+    m.qr = await generateQrCode(m.code);
+
+    return m;
+  }));
 
   await Menu.deleteMany({}).exec();
-  await Menu.create(MENUS);
+  const createdMenus = await Menu.create(menus);
 
-  const MAIN_MENU = MENUS.find(m => m.code == 1);
+  const MAIN_MENU = createdMenus.find(m => m.code === MAIN_MENU_ID);
 
   // seed orders
 

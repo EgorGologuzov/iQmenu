@@ -38,7 +38,7 @@ export const UserTokenData = makeModel({
     userId: { type: "string", required: true },
   },
 
-  build: source => ({ model: { userId: source.id } })
+  build: source => ({ model: { userId: source.id ?? source._id } })
 })
 
 export const UserReturn = makeModel({

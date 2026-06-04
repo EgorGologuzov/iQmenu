@@ -17,24 +17,26 @@ const ORDER_STATUS_VARIANTS = ['new', 'canceled', 'banned', 'executed', 'executi
 // Модель базы данных
 
 const productInCartSchema = new mongoose.Schema({
-  productId: { type: Number, required: true },
-  productName: { type: String, required: true },
-  amount: { type: Number, required: true },
+	productId: { type: Number, required: true },
+	productName: { type: String, required: true },
+	amount: { type: Number, required: true },
 }, {
-  _id: false
+	_id: false
 });
 
 const orderSchema = new mongoose.Schema({
-  code: { type: Number, required: true, unique: true },
-  accessKey: { type: String, required: true, index: true },
-  ownerId: { type: String, required: true, index: true },
-  menuId: { type: Number, required: true, index: true },
-  tableNum: { type: String, required: true },
-  sendTime: { type: Date, required: true, index: true },
-  products: { type: [productInCartSchema], required: true },
-  status: { type: String, required: true },
+	code: { type: Number, required: true, unique: true },
+	accessKey: { type: String, required: true, index: true },
+	ownerId: { type: String, required: true, index: true },
+	menuId: { type: Number, required: true, index: true },
+	tableNum: { type: String, required: true },
+	sendTime: { type: Date, required: true, index: true },
+	products: { type: [productInCartSchema], required: true },
+	status: { type: String, required: true },
 	finalAmount: { type: Number, required: true },
 	userAgent: { type: String, required: false },
+	ownerComment: { type: String, required: false },
+	guestComment: { type: String, required: false },
 });
 
 export const Order = mongoose.model("Order", orderSchema);
@@ -43,23 +45,23 @@ export const Order = mongoose.model("Order", orderSchema);
 
 export const ProductInCartReturn = makeModel({
 
-  schema: {
-    productId: { type: "number", valid: true },
-    productName: { type: "string", valid: true },
-    amount: { type: "number", valid: true },
-  },
+	schema: {
+		productId: { type: "number", valid: true },
+		productName: { type: "string", valid: true },
+		amount: { type: "number", valid: true },
+	},
 
-  build: source => mapSchema(source, ProductInCartReturn.schema),
+	build: source => mapSchema(source, ProductInCartReturn.schema),
 })
 
 export const ProductInCartEdit = makeModel({
 
-  schema: {
-    productId: { type: "number", required: true, min: 0, max: 100_000, round: true },
-    amount: { type: "number", required: true, min: 1, max: 9_999, round: true },
-  },
+	schema: {
+		productId: { type: "number", required: true, min: 0, max: 100_000, round: true },
+		amount: { type: "number", required: true, min: 1, max: 9_999, round: true },
+	},
 
-  build: source => mapSchema(source, ProductInCartEdit.schema),
+	build: source => mapSchema(source, ProductInCartEdit.schema),
 })
 
 export const OrderReturn = makeModel({
@@ -77,6 +79,8 @@ export const OrderReturn = makeModel({
 		status: { type: "string", valid: true },
 		finalAmount: { type: "number", valid: true },
 		userAgent: { type: "string", valid: true },
+		ownerComment: { type: "string", valid: true },
+		guestComment: { type: "string", valid: true },
 	},
 
 	build: source => mapSchema(source, OrderReturn.schema),
@@ -105,10 +109,11 @@ export const OrderEditClient = makeModel({
 			item: { type: ProductInCartEdit },
 			required: true,
 			minLength: 1,
-      maxLength: 100,
+			maxLength: 100,
 			uniqueItems: true,
-      itemsComparator: (p1, p2) => p1.productId == p2.productId,
+			itemsComparator: (p1, p2) => p1.productId == p2.productId,
 		},
+		guestComment: { type: "string", required: false, maxLength: 200, trim: true },
 		prevAccessKey: { type: "string", required: false, regExp: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/ },
 	},
 
@@ -125,6 +130,7 @@ export const UpdateOrdersStatusById = makeModel({
 
 	schema: {
 		newStatus: { type: "string", required: true, variants: ORDER_STATUS_VARIANTS },
+		ownerComment: { type: "string", required: false, maxLength: 200, trim: true },
 		ids: {
 			type: "list",
 			required: true,
@@ -142,6 +148,7 @@ export const UpdateOrdersStatusByFilters = makeModel({
 
 	schema: {
 		newStatus: { type: "string", required: true, variants: ORDER_STATUS_VARIANTS },
+		ownerComment: { type: "string", required: false, maxLength: 200, trim: true },
 		menuId: { type: "number", required: true, minValue: 0 },
 		orderId: { type: "number" },
 		tableNum: { type: "string", required: false, minLength: 1, maxLength: 15, trim: true },

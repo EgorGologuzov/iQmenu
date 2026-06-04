@@ -119,6 +119,10 @@ function OrderList() {
 
   useEffect(() => { 
     setCheckedOrders(checkedOrders => checkedOrders.filter(orderId => !!orders?.find(order => orderId == order.id)));
+    setCurrentOrder(currentOrder => {
+      const updatedOrder = currentOrder && orders && orders.find(order => order.id == currentOrder.id);
+      return updatedOrder ?? currentOrder;
+    });
   }, [orders])
 
   useEffect(() => {

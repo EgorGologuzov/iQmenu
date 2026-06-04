@@ -7,6 +7,7 @@ import { saveOrder, removeOrder } from '../../store/slices/orderSlice';
 import { useParams } from 'react-router';
 import { useMutation } from '@tanstack/react-query';
 import useIQmenuApi from '../../hooks/useIQmenuApi';
+import { enqueueSnackbar } from 'notistack';
 
 const ProductInCardItem = memo(({ product }) => {
 	return (
@@ -36,15 +37,16 @@ const ProductInCardItem = memo(({ product }) => {
 
 function OrderCreateDialog({ products, onClose, ...otherProps }) {
 
-  const dispatch = useDispatch();
+	const dispatch = useDispatch();
 	const api = useIQmenuApi();
-  const { menuId } = useParams();
+	const { menuId } = useParams();
 
-  const [tableNum, setTableNum] = useState();
+	const productsInCart = useSelector(state => state.cart);
+	const lastOrder = useSelector(state => state.orders.find(order => order.menuId == menuId));
+
+	const [tableNum, setTableNum] = useState(lastOrder?.tableNum);
+	const [guestComment, setGuestComment] = useState(lastOrder?.guestComment);
 	const [lastError, setLastError] = useState();
-
-  const productsInCart = useSelector(state => state.cart);
-  const lastOrder = useSelector(state => state.orders.find(order => order.menuId == menuId));
 
 	const prevCartDisplayProducts = useRef([]);
 	const cartDisplayProducts = useMemo(() => {
@@ -54,7 +56,7 @@ function OrderCreateDialog({ products, onClose, ...otherProps }) {
 				const pastProductItem = prevCartDisplayProducts.current.find(p => p.id == productInCart.productId);
 				if (pastProductItem && pastProductItem.amount == productInCart.amount) return pastProductItem;
 				let product = products.find(product => productInCart.productId == product.id);
-				return product ? { ...product, amount: productInCart.amount} : null;
+				return product ? { ...product, amount: productInCart.amount } : null;
 			})
 			.filter(product => !!product);
 		prevCartDisplayProducts.current = newList;
@@ -63,11 +65,11 @@ function OrderCreateDialog({ products, onClose, ...otherProps }) {
 
 	const lastOrderDisplayProducts = lastOrder?.products
 		? lastOrder.products
-				.map(productInCart => {
-					let product = products.find(product => productInCart.productId == product.id);
-					return product ? { ...product, amount: productInCart.amount} : null;
-				})
-				.filter(product => !!product)
+			.map(productInCart => {
+				let product = products.find(product => productInCart.productId == product.id);
+				return product ? { ...product, amount: productInCart.amount } : null;
+			})
+			.filter(product => !!product)
 		: [];
 
 	const productsListToString = (products) => products
@@ -77,7 +79,9 @@ function OrderCreateDialog({ products, onClose, ...otherProps }) {
 
 	const cartString = productsListToString(cartDisplayProducts);
 	const lastOrderProductsString = productsListToString(lastOrderDisplayProducts);
-	const hasChanges = tableNum != lastOrder?.tableNum || cartString != lastOrderProductsString;
+	const hasChanges = tableNum != lastOrder?.tableNum
+		|| guestComment != lastOrder?.guestComment
+		|| cartString != lastOrderProductsString;
 
 	const setOrder = (order) => {
 		if (order) {
@@ -95,9 +99,9 @@ function OrderCreateDialog({ products, onClose, ...otherProps }) {
 	});
 
 	const { mutate: patchCancelOrder, isPending: isCancelPending } = useMutation({
-		mutationFn: (orderAccessKey) => api.order.cancel(orderAccessKey),
+		mutationFn: (args) => api.order.cancel(args.orderAccessKey, args.params),
 		mutationKey: ["api.order.cancel"],
-		onSuccess: () => { setOrder(null); setLastError(null); },
+		onSuccess: () => { setOrder(null); setLastError(null); enqueueSnackbar(`Заказ отменен`, { variant: 'success' }); },
 		onError: (error) => setLastError(error),
 	});
 
@@ -105,19 +109,24 @@ function OrderCreateDialog({ products, onClose, ...otherProps }) {
 
 	const errors = {
 		tableNum: tableNum && tableNum.length <= 15 ? undefined : "Это обязательное поле, длина от 1 до 15 символов",
+		guestComment: !guestComment || guestComment.length <= 200 ? undefined : "Максимальная длина комментария 200 символов",
 		isCartEmpty: !cartDisplayProducts || !cartDisplayProducts.length,
 		hasNotActiveProductsInCart: !!cartDisplayProducts.reduce((count, product) => !product.isActive ? count + 1 : count, 0),
 	}
 
-  const sendOrder = () => {
-    if (errors.tableNum) {
+	const sendOrder = () => {
+		if (errors.tableNum) {
 			setLastError(new Error("Укажите корректный номер столика"));
-      return;
-    }
-    if (errors.isCartEmpty) {
+			return;
+		}
+		if (errors.guestComment) {
+			setLastError(new Error("Форма заполнена с ошибками"));
+			return;
+		}
+		if (errors.isCartEmpty) {
 			setLastError(new Error("Нет продуктов в корзине, добавьте хотябы один продукт, чтобы сделать заказ"));
-      return;
-    }
+			return;
+		}
 		if (errors.hasNotActiveProductsInCart) {
 			setLastError(new Error("В корзине есть продукты, которые временно не доступны для заказа, уберите их, чтобы сделать заказ"));
 			return;
@@ -126,66 +135,89 @@ function OrderCreateDialog({ products, onClose, ...otherProps }) {
 		setLastError(null);
 
 		const buildedOrder = {
-			menuId: menuId, 
-			tableNum: tableNum, 
+			menuId: menuId,
+			tableNum: tableNum,
+			guestComment: guestComment,
 			products: cartDisplayProducts.map(p => { return { productId: p.id, amount: p.amount } }),
 			prevAccessKey: lastOrder ? lastOrder.accessKey : undefined,
 		}
 
 		postOrder(buildedOrder);
-  }
+	}
 
 	const cancelCurrentOrder = () => {
 		if (isPending || !lastOrder) return;
-		if (window.confirm("Хотите отменить заказ?")) {
-			patchCancelOrder(lastOrder.accessKey);
+		const reason = prompt("Хотите отменить заказ? Укажите причину отмены.")
+		if (reason !== null) {
+			patchCancelOrder({ orderAccessKey: lastOrder.accessKey, params: { guestComment: reason } });
 		}
 	}
 
-  const closeDialog = () => {
-    onClose && onClose();
-  }
+	const closeDialog = () => {
+		onClose && onClose();
+	}
 
 	const formatTime = (date) => {
 		date = new Date(date);
 		return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 	}
 
-  return (
-    <Dialog {...otherProps} onClose={onClose} maxWidth="xs" fullWidth>
+	return (
+		<Dialog {...otherProps} onClose={onClose} maxWidth="xs" fullWidth>
 
-      <DialogContent sx={{ p: 0 }}>
+			<DialogContent sx={{ p: 0 }}>
 
-        <Stack direction="column" spacing={2} sx={{ p: 2, pb: 0 }}>
+				<Stack direction="column" spacing={2} sx={{ p: 2, pb: 0 }}>
 
 					{lastError && !isPending && <Alert severity="error">{lastError.message}</Alert>}
 
 					{lastOrder &&
 						<Alert severity="success" onClick={cancelCurrentOrder} sx={{ cursor: "pointer" }}>
-							<b>Ваш заказ (№{lastOrder.id}) был сделан в {formatTime(lastOrder.sendTime)} к столику {lastOrder.tableNum}:</b> <br/>
-							{lastOrder.products && lastOrderDisplayProducts.map(product => 
-								<React.Fragment key={product.id}>&#10004; {product.name} ({product.amount} {product.amount % 10 >= 2 && product.amount % 10 <= 4 ? "раза" : "раз"})<br/></React.Fragment>
-							)}
+							<Stack direction="column" spacing={1}>
+								<div>
+									<b>Ваш заказ (№{lastOrder.id}) был сделан в {formatTime(lastOrder.sendTime)} к столику&nbsp;{lastOrder.tableNum}:</b>
+								</div>
+								<div>
+									{lastOrder.products && lastOrderDisplayProducts.map(product =>
+										<React.Fragment key={product.id}>&#10004; {product.name} ({product.amount} {product.amount % 10 >= 2 && product.amount % 10 <= 4 ? "раза" : "раз"})<br /></React.Fragment>
+									)}
+								</div>
+								{lastOrder.guestComment && <div><i>* {lastOrder.guestComment}</i></div>}
+							</Stack>
 						</Alert>
 					}
 
 					{lastOrder && <Divider />}
 
-          <TextField
-            id="tableNum"
-            label="Номер столика"
-            required
-            value={tableNum ?? ""}
-            onChange={event => setTableNum(event.target.value)}
-            error={errors.tableNum}
-            helperText={errors.tableNum}
-            size="small"
-          />
+					<Stack direction="column" spacing={1}>
+						<TextField
+							id="tableNum"
+							label="Номер столика"
+							required
+							value={tableNum ?? ""}
+							onChange={event => setTableNum(event.target.value)}
+							error={errors.tableNum}
+							helperText={errors.tableNum}
+							size="small"
+						/>
 
-          <Stack direction="column" spacing={0.5}>
+						<TextField
+							id="guestComment"
+							label="Комментарий"
+							value={guestComment ?? ""}
+							onChange={event => setGuestComment(event.target.value)}
+							error={errors.guestComment}
+							helperText={errors.guestComment}
+							size="small"
+							multiline
+							rows={3}
+						/>
+					</Stack>
+
+					<Stack direction="column" spacing={0.5}>
 						{!cartDisplayProducts?.length && <Alert severity="info">Корзина пуста</Alert>}
-            {cartDisplayProducts?.length != 0 && cartDisplayProducts.map(product => <ProductInCardItem key={product.id} product={product} />)}
-          </Stack>
+						{cartDisplayProducts?.length != 0 && cartDisplayProducts.map(product => <ProductInCardItem key={product.id} product={product} />)}
+					</Stack>
 
 					<Divider />
 
@@ -198,24 +230,24 @@ function OrderCreateDialog({ products, onClose, ...otherProps }) {
 						</Stack>
 					}
 
-        </Stack>
+				</Stack>
 
-      </DialogContent>
+			</DialogContent>
 
-      <DialogActions>
-        <Button variant="text" onClick={closeDialog}>Закрыть</Button>
-        <Button
+			<DialogActions>
+				<Button variant="text" onClick={closeDialog}>Закрыть</Button>
+				<Button
 					variant="contained"
 					loading={isPending}
 					startIcon={<UploadIcon />}
 					disabled={isPending || !hasChanges}
 					onClick={sendOrder}>
 					{lastOrder ? "Обновить" : "Заказать"}
-        </Button>
-      </DialogActions>
+				</Button>
+			</DialogActions>
 
-    </Dialog>
-  )
+		</Dialog>
+	)
 }
 
 export default OrderCreateDialog

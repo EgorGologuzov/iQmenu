@@ -1,4 +1,4 @@
-import { Alert, Button, Chip, Dialog, DialogActions, DialogContent, FormControl, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material'
+import { Alert, Button, Chip, Dialog, DialogActions, DialogContent, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import useIQmenuApi from '../../hooks/useIQmenuApi';
 import { ORDER_SELECTOR_TRANSLATION, STATUS_TRANSLATION } from '../../values/strings';
@@ -18,13 +18,13 @@ function OrderEditStatusDialog({ order, checkedOrdersIds, filters, onClose, onOr
 
 	const sendStatusUpdateRequest = () => {
 		if (query.ordersSelector === ORDER_SELECTOR_TRANSLATION.onlyThis) {
-			return api.order.updateOrdersStatusByIds({ ids: [order.id], newStatus: query.newStatus });
+			return api.order.updateOrdersStatusByIds({ ids: [order.id], newStatus: query.newStatus, ownerComment: query.ownerComment });
 		}
 		else if (query.ordersSelector === ORDER_SELECTOR_TRANSLATION.allChecked) {
-			return api.order.updateOrdersStatusByIds({ ids: checkedOrdersIds, newStatus: query.newStatus });
+			return api.order.updateOrdersStatusByIds({ ids: checkedOrdersIds, newStatus: query.newStatus, ownerComment: query.ownerComment });
 		}
 		else if (query.ordersSelector === ORDER_SELECTOR_TRANSLATION.allFiltered) {
-			return api.order.updateOrdersStatusByFilters({ ...filters, newStatus: query.newStatus  });
+			return api.order.updateOrdersStatusByFilters({ ...filters, newStatus: query.newStatus, ownerComment: query.ownerComment  });
 		}
 	}
 
@@ -52,6 +52,7 @@ function OrderEditStatusDialog({ order, checkedOrdersIds, filters, onClose, onOr
 	const errors = {
 		newStatus: !query.newStatus,
 		ordersSelector: !query.ordersSelector,
+		ownerComment: !query.ownerComment || query.ownerComment.length <= 200 ? undefined : "Максимальная длина комментария 200 символов",
 		choosenAllCheckedSelectorButCheckedOrdersIdsIsEmpty: query.ordersSelector === ORDER_SELECTOR_TRANSLATION.allChecked && (!checkedOrdersIds || !checkedOrdersIds.length),
 	}
 
@@ -63,7 +64,11 @@ function OrderEditStatusDialog({ order, checkedOrdersIds, filters, onClose, onOr
 			return;
 		}
 		if (errors.ordersSelector) {
-			setLastError(new Error("Укажите, каким заказам "));
+			setLastError(new Error("Укажите, к каким заказам применить новый статус"));
+			return;
+		}
+		if (errors.ownerComment) {
+			setLastError(new Error("Форма заполнена с ошибками"));
 			return;
 		}
 		if (errors.choosenAllCheckedSelectorButCheckedOrdersIdsIsEmpty) {
@@ -99,12 +104,22 @@ function OrderEditStatusDialog({ order, checkedOrdersIds, filters, onClose, onOr
 						Столик: <b>{order.tableNum}</b>
 					</Typography>
 
-					<Typography variant="body1">
-						<b>Список продуктов:</b><br/>
-						{order.products.map(product => 
-							<React.Fragment key={product.productId}>&#10004; {product.productName} ({product.amount} {product.amount % 10 >= 2 && product.amount % 10 <= 4 ? "раза" : "раз"})<br/></React.Fragment>
-						)}
-					</Typography>
+					<Stack direction="column" spacing={1}>
+
+						<Typography variant="body1">
+							<b>Список продуктов:</b>
+						</Typography>
+
+						<Typography variant="body1">
+							{order.products.map(product => 
+								<React.Fragment key={product.productId}>&#10004; {product.productName} ({product.amount} {product.amount % 10 >= 2 && product.amount % 10 <= 4 ? "раза" : "раз"})<br/></React.Fragment>
+							)}
+						</Typography>
+
+						{order.guestComment && <Typography variant="body2" color="error"><i>* {order.guestComment}</i></Typography>}
+						{order.ownerComment && <Typography variant="body2"><i>** {order.ownerComment}</i></Typography>}
+
+					</Stack>
 
 					<Stack direction="column" spacing={2}>
 
@@ -140,6 +155,18 @@ function OrderEditStatusDialog({ order, checkedOrdersIds, filters, onClose, onOr
 								{Object.keys(ORDER_SELECTOR_TRANSLATION).map(key => <MenuItem key={key} value={ORDER_SELECTOR_TRANSLATION[key]}>{ORDER_SELECTOR_TRANSLATION[key]}</MenuItem>)}
 							</Select>
 						</FormControl>
+
+						<TextField
+							id="ownerComment"
+							label="Комментарий"
+							value={query.ownerComment ?? ""}
+							onChange={(e) => setQuery({ ...query, ownerComment: e.target.value })}
+							error={errors.ownerComment}
+							helperText={errors.ownerComment}
+							size="small"
+							multiline
+							rows={3}
+						/>
 
 						<Button
 							variant="contained"

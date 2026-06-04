@@ -53,6 +53,7 @@ r.post("/", useModel(OrderEditClient), async (req, res) => {
 		foundOrder.tableNum = createModel.tableNum;
 		foundOrder.products = newProductsWithNames;
 		foundOrder.finalAmount = newFinalAmount;
+		foundOrder.guestComment = createModel.guestComment;
 		await foundOrder.save();
 		return OrderReturn.build(foundOrder).model;
 	}
@@ -89,9 +90,14 @@ r.post("/", useModel(OrderEditClient), async (req, res) => {
 
 // cancel order (client)
 
-r.patch("/:orderAccessKey/cancel", useUuidParam("orderAccessKey"), async (req, res) => {
+r.patch("/:orderAccessKey/cancel",
+	useUuidParam("orderAccessKey"),
+	useStringQueryParam({ name: "guestComment", maxLength: 200 }),
+
+	async (req, res) => {
 
 	const accessKey = req.orderAccessKey;
+	const guestComment = req.guestComment;
 	const foundOrder = await Order.findOne({ accessKey: accessKey })
 
 	if (!foundOrder) {
@@ -111,6 +117,7 @@ r.patch("/:orderAccessKey/cancel", useUuidParam("orderAccessKey"), async (req, r
 	}
 
 	foundOrder.status = OrderStatus.CANCELED;
+	foundOrder.guestComment = guestComment;
 	await foundOrder.save();
 	const result = OrderReturn.build(foundOrder).model;
 
@@ -206,6 +213,7 @@ r.patch("/update/status/by/filters", useAuth(), useModel(UpdateOrdersStatusByFil
 	} = req.model;
 
 	const newStatus = req.model.newStatus;
+	const newOwnerComment = req.model.ownerComment;
 
 	const foundMenu = await Menu.findOne({ code: menuId }).exec();
 	const { userId } = req.user;
@@ -236,7 +244,7 @@ r.patch("/update/status/by/filters", useAuth(), useModel(UpdateOrdersStatusByFil
 		if (finalAmountMax !== undefined) query.finalAmount.$lte = finalAmountMax;
 	}
 
-	const result = await Order.updateMany(query, { $set: { status: newStatus } });
+	const result = await Order.updateMany(query, { $set: { status: newStatus, ownerComment: newOwnerComment } });
 
 	return ok(res, { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
 })
@@ -248,9 +256,10 @@ r.patch("/update/status/by/ids", useAuth(), useModel(UpdateOrdersStatusById), as
 	const { userId } = req.user;
 	const ids = req.model.ids;
 	const newStatus = req.model.newStatus;
+	const newOwnerComment = req.model.ownerComment;
 
 	const query = { ownerId: userId, code: { $in: ids } }
-	const result = await Order.updateMany(query, { $set: { status: newStatus } });
+	const result = await Order.updateMany(query, { $set: { status: newStatus, ownerComment: newOwnerComment } });
 
 	return ok(res, { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
 })

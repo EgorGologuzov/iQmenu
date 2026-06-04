@@ -11,9 +11,9 @@ export const ORDER_SERVICE = {
     }
 	},
 
-	async cancel(orderAccessKey) {
+	async cancel(orderAccessKey, params) {
 		try {
-      const response = await ORDER_SERVICE.http.patch(`/order/${orderAccessKey}/cancel`);
+      const response = await ORDER_SERVICE.http.patch(`/order/${orderAccessKey}/cancel`, undefined, { params });
       return response.data;
     } catch (error) {
       throw handleHttpError(error);

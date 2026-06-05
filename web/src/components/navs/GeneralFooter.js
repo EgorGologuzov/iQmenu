@@ -21,11 +21,11 @@ function GeneralFooter() {
         >
 
           <Typography variant="body1" color="inherit" align="center">
-            <CLink to="/presentation">iQmenu</CLink> — цифровые меню для кафе и ресторанов
+            <CLink to="/presentation">Онлайн меню</CLink> — цифровые меню для кафе и ресторанов
           </Typography>
 
           <Typography variant="body1" color="inherit" align="center">
-            © {currentYear} iQmenu. Все права защищены.
+            © {currentYear} Онлайн меню. Все права защищены.
           </Typography>
 
         </Box>

@@ -24,8 +24,8 @@ function OwnerHeader() {
             </CLink>
 
             <CLink to="/o" noStyles>
-              <Typography variant="h6" component="div" sx={{ flexGrow: title ? "unset" : 1 }}>
-                Мой iQmenu
+              <Typography noWrap variant="h6" component="div" sx={{ flexGrow: title ? "unset" : 1 }}>
+                Мои онлайн меню
               </Typography>
             </CLink>
           </Stack>

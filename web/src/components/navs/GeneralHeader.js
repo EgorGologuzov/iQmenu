@@ -22,8 +22,8 @@ function GeneralHeader() {
             </CLink>
 
             <CLink to="/presentation" noStyles>
-              <Typography variant="h6" component="div" sx={{ flexGrow: title ? "unset" : 1 }}>
-                iQmenu
+              <Typography noWrap variant="h6" component="div" sx={{ flexGrow: title ? "unset" : 1 }}>
+                Онлайн меню
               </Typography>
             </CLink>
           </Stack>

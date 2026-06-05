@@ -47,7 +47,7 @@ function DownloadStatisticDialog({ menu, onClose, ...otherProps }) {
 
 	const saveAsJson = (listData) => {
 		const jsonString = JSON.stringify(listData, null, 2);
-		saveToFile(jsonString, 'iqmenu_stat.json', 'application/json;charset=utf-8');
+		saveToFile(jsonString, 'online_menu_stat.json', 'application/json;charset=utf-8');
 	};
 
 	const saveAsCsv = (listData) => {
@@ -67,7 +67,7 @@ function DownloadStatisticDialog({ menu, onClose, ...otherProps }) {
 		// Добавляем \uFEFF (BOM) для корректного отображения кириллицы в Excel
 		const finalContent = '\uFEFF' + csvContent.join('\n');
 
-		saveToFile(finalContent, 'iqmenu_stat.csv', 'text/csv;charset=utf-8');
+		saveToFile(finalContent, 'online_menu_stat.csv', 'text/csv;charset=utf-8');
 	};
 
 	const sendReportRequest = () => {

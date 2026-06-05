@@ -1,4 +1,4 @@
-export const DEFAULT_TAB_TITLE = "iQmenu";
+export const DEFAULT_TAB_TITLE = "Онлайн меню";
 export const DEFAULT_HEADER_TITLE = null;
 
 export const STATUS_TRANSLATION = Object.freeze({

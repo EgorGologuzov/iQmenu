@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useTitle from '../../hooks/useTitle';
-import { Alert, Box, Button, Stack, SvgIcon, Typography } from '@mui/material';
-import Logo from '../../components/icons/LogoCustomizable';
+import { Alert, Box, Button, Stack, Typography } from '@mui/material';
+import Logo from '../../components/icons/Logo';
 import withStackContainerShell from '../../hoc/withStackContainerShell';
 import { Link, useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
@@ -9,7 +9,6 @@ import { useSelector } from 'react-redux';
 import { ROLES } from '../../values/roles';
 
 const MotionBox = motion.create(Box);
-const MotionSvgIcon = motion.create(SvgIcon);
 const MotionTypography = motion.create(Typography);
 
 const textContainerVariants = {
@@ -69,7 +68,7 @@ function Presentation() {
     </Link>
   }
 
-  useTitle({ tabTitle: "iQmenu: QR-код меню для кафе и ресторанов", headerTitle: "Главная" }, []);
+  useTitle({ tabTitle: "Онлайн меню: QR-код меню для кафе и ресторанов", headerTitle: "Главная" }, []);
 
   useEffect(() => {
     if (document.readyState === 'complete') {
@@ -111,23 +110,17 @@ function Presentation() {
             justifyContent: "center",
           }}
         >
-          <MotionSvgIcon
-            inheritViewBox
+          <MotionBox
             initial={{ opacity: 0, scale: 0.8 }}
             animate={isReady ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
             sx={{
               width: { xs: 60, sm: 80, md: 100 },
               height: { xs: 60, sm: 80, md: 100 },
-              backgroundColor: "primary.main",
-              borderRadius: "50%",
-              borderWidth: "3px",
-              borderColor: "primary.main",
-              borderStyle: "solid",
             }}
           >
-            <Logo />
-          </MotionSvgIcon>
+            <Logo width="100%" height="100%" bg="circle" />
+          </MotionBox>
 
           <motion.div
             variants={textContainerVariants}
@@ -139,11 +132,11 @@ function Presentation() {
               variants={textItemVariants}
               variant='h2'
               sx={{
-                fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3.5rem' },
+                fontSize: { xs: '1.3rem', sm: '2.0rem', md: '3.0rem' },
                 lineHeight: 1.2
               }}
             >
-              <b>iQmenu</b>
+              <b>Онлайн меню</b>
             </MotionTypography>
 
             <MotionTypography
@@ -164,7 +157,7 @@ function Presentation() {
 
         <Typography variant="h6">Хотите создать меню для своего заведения?</Typography>
         {!isOwner && <NavigationButton to="/auth">Войдите в аккаунт</NavigationButton>}
-        {isOwner && <NavigationButton to="/o/menu">Перейдите в «Мой iQmenu»</NavigationButton>}
+        {isOwner && <NavigationButton to="/o/menu">Перейдите в «Мои онлайн меню»</NavigationButton>}
         
         <Typography variant="h6">Подробности и примеры</Typography>
         <Typography variant="body1">

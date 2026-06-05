@@ -117,6 +117,7 @@ function Presentation() {
             sx={{
               width: { xs: 60, sm: 80, md: 100 },
               height: { xs: 60, sm: 80, md: 100 },
+              mb: 1,
             }}
           >
             <Logo width="100%" height="100%" bg="circle" />
@@ -132,7 +133,7 @@ function Presentation() {
               variants={textItemVariants}
               variant='h2'
               sx={{
-                fontSize: { xs: '1.3rem', sm: '2.0rem', md: '3.0rem' },
+                fontSize: { xs: '1.3rem', sm: '2.0rem', md: '2.5rem' },
                 lineHeight: 1.2
               }}
             >
@@ -147,7 +148,7 @@ function Presentation() {
                 letterSpacing: { xs: '1px', sm: '2px' }
               }}
             >
-              ЭЛЕКТРОННЫЕ МЕНЮ
+              МЕНЮ ПО QR-КОДУ
             </MotionTypography>
           </motion.div>
         </Stack>
